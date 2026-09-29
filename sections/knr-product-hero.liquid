@@ -1,152 +1,187 @@
-{{ 'knr-product-page.css' | asset_url | stylesheet_tag }}
-<script src="{{ 'knr-animations.js' | asset_url }}" defer></script>
-
 {%- assign current_variant = product.selected_or_first_available_variant -%}
-{%- assign featured_image = current_variant.featured_image | default: product.featured_image -%}
+{%- assign featured_media = current_variant.featured_media | default: product.featured_media | default: product.featured_image -%}
 
-<section class="knr-product-detail-section" data-section-id="{{ section.id }}">
-  <div class="knr-product-detail__wrapper">
+<section class="knr-pdp-section" data-section-id="{{ section.id }}">
+  <div class="knr-pdp-wrapper">
 
-    {%- comment -%} ══════════════════════════════════════════════
-        LEFT COLUMN: FULL-WIDTH MEDIA GALLERY
-    ══════════════════════════════════════════════ {%- endcomment -%}
-    <div class="knr-product-detail__media-column">
+    {%- comment -%} ══════════════════════════════════════════════════
+        LEFT COLUMN: MEDIA GALLERY
+        - Top: Main featured product image (takes 100% of media width)
+        - Bottom: 2-Column lifestyle / secondary images with "+" hotspots
+    ══════════════════════════════════════════════════ {%- endcomment -%}
+    <div class="knr-pdp-media-column">
       
-      {%- comment -%} Main Featured Image (Takes full width of the media area) {%- endcomment -%}
-      <div class="knr-product-detail__main-image-wrap">
-        {%- if featured_image != blank -%}
-          {{ featured_image | image_url: width: 1400 | image_tag:
+      {%- comment -%} Main Product Image {%- endcomment -%}
+      <div class="knr-pdp-main-image-container">
+        {%- if section.settings.main_image != blank -%}
+          {{ section.settings.main_image | image_url: width: 1400 | image_tag:
             loading: 'eager',
             alt: product.title,
-            id: 'knr-pdp-main-image',
-            class: 'knr-product-detail__main-image'
+            class: 'knr-pdp-main-img'
+          }}
+        {%- elsif featured_media != blank -%}
+          {{ featured_media | image_url: width: 1400 | image_tag:
+            loading: 'eager',
+            alt: product.title,
+            class: 'knr-pdp-main-img'
           }}
         {%- else -%}
-          <div class="knr-product-detail__image-fallback">
-            {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
-          </div>
+          {{ 'product-1' | placeholder_svg_tag: 'knr-pdp-placeholder-svg' }}
         {%- endif -%}
       </div>
 
-      {%- comment -%} Secondary Images Grid (2 Columns below main image with hotspot icons) {%- endcomment -%}
-      <div class="knr-product-detail__secondary-grid">
-        {%- if product.images.size > 1 -%}
-          {%- for image in product.images offset: 1 limit: 2 -%}
-            <div class="knr-product-detail__grid-item">
-              {{ image | image_url: width: 800 | image_tag:
-                loading: 'lazy',
-                alt: product.title,
-                class: 'knr-product-detail__grid-image'
-              }}
-              <button type="button" class="knr-hotspot-btn" aria-label="Agrandir ou détails">+</button>
-            </div>
-          {%- endfor -%}
-        {%- else -%}
-          <div class="knr-product-detail__grid-item">
-            <div class="knr-product-detail__grid-placeholder">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" class="knr-placeholder-icon"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
-            </div>
-            <button type="button" class="knr-hotspot-btn" aria-label="Agrandir ou détails">+</button>
-          </div>
-          <div class="knr-product-detail__grid-item">
-            <div class="knr-product-detail__grid-placeholder">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" class="knr-placeholder-icon"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
-            </div>
-            <button type="button" class="knr-hotspot-btn" aria-label="Agrandir ou détails">+</button>
-          </div>
-        {%- endif -%}
-      </div>
+      {%- comment -%} Secondary Images (2-Column Grid) {%- endcomment -%}
+      {%- liquid
+        assign has_secondary_images = false
+        if section.settings.secondary_image_1 != blank or section.settings.secondary_image_2 != blank or product.media.size > 1
+          assign has_secondary_images = true
+        endif
+      -%}
 
-      {%- if product.images.size > 3 -%}
-        <div class="knr-product-detail__secondary-grid">
-          {%- for image in product.images offset: 3 limit: 2 -%}
-            <div class="knr-product-detail__grid-item">
-              {{ image | image_url: width: 800 | image_tag:
+      {%- if has_secondary_images -%}
+        <div class="knr-pdp-secondary-grid">
+          {%- comment -%} Image 1 (Left: lifestyle/model) {%- endcomment -%}
+          <div class="knr-pdp-grid-item">
+            {%- if section.settings.secondary_image_1 != blank -%}
+              {{ section.settings.secondary_image_1 | image_url: width: 800 | image_tag:
                 loading: 'lazy',
                 alt: product.title,
-                class: 'knr-product-detail__grid-image'
+                class: 'knr-pdp-grid-img'
               }}
-              <button type="button" class="knr-hotspot-btn" aria-label="Agrandir ou détails">+</button>
-            </div>
-          {%- endfor -%}
+            {%- elsif product.media[1] != blank -%}
+              {{ product.media[1] | image_url: width: 800 | image_tag:
+                loading: 'lazy',
+                alt: product.title,
+                class: 'knr-pdp-grid-img'
+              }}
+            {%- elsif product.images[1] != blank -%}
+              {{ product.images[1] | image_url: width: 800 | image_tag:
+                loading: 'lazy',
+                alt: product.title,
+                class: 'knr-pdp-grid-img'
+              }}
+            {%- else -%}
+              {{ 'collection-1' | placeholder_svg_tag: 'knr-pdp-placeholder-svg' }}
+            {%- endif -%}
+            <button type="button" class="knr-pdp-hotspot-btn" aria-label="Agrandir l'image">+</button>
+          </div>
+
+          {%- comment -%} Image 2 (Right: texture/roses) {%- endcomment -%}
+          <div class="knr-pdp-grid-item">
+            {%- if section.settings.secondary_image_2 != blank -%}
+              {{ section.settings.secondary_image_2 | image_url: width: 800 | image_tag:
+                loading: 'lazy',
+                alt: product.title,
+                class: 'knr-pdp-grid-img'
+              }}
+            {%- elsif product.media[2] != blank -%}
+              {{ product.media[2] | image_url: width: 800 | image_tag:
+                loading: 'lazy',
+                alt: product.title,
+                class: 'knr-pdp-grid-img'
+              }}
+            {%- elsif product.images[2] != blank -%}
+              {{ product.images[2] | image_url: width: 800 | image_tag:
+                loading: 'lazy',
+                alt: product.title,
+                class: 'knr-pdp-grid-img'
+              }}
+            {%- else -%}
+              {{ 'collection-2' | placeholder_svg_tag: 'knr-pdp-placeholder-svg' }}
+            {%- endif -%}
+            <button type="button" class="knr-pdp-hotspot-btn" aria-label="Agrandir l'image">+</button>
+          </div>
         </div>
+
+        {%- comment -%} Additional images if product has more than 3 photos {%- endcomment -%}
+        {%- if product.media.size > 3 -%}
+          <div class="knr-pdp-secondary-grid">
+            {%- for media in product.media offset: 3 -%}
+              <div class="knr-pdp-grid-item">
+                {{ media | image_url: width: 800 | image_tag:
+                  loading: 'lazy',
+                  alt: product.title,
+                  class: 'knr-pdp-grid-img'
+                }}
+                <button type="button" class="knr-pdp-hotspot-btn" aria-label="Agrandir l'image">+</button>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
       {%- endif -%}
+
     </div>
 
 
-    {%- comment -%} ══════════════════════════════════════════════
-        RIGHT COLUMN: STICKY PRODUCT DETAIL CARD WITH ALL BLOCKS
-    ══════════════════════════════════════════════ {%- endcomment -%}
-    <div class="knr-product-detail__info-column">
-      <div class="knr-product-detail__card">
+    {%- comment -%} ══════════════════════════════════════════════════
+        RIGHT COLUMN: STICKY FLOATING WHITE CARD WITH MODULAR BLOCKS
+    ══════════════════════════════════════════════════ {%- endcomment -%}
+    <div class="knr-pdp-sidebar-column">
+      <div class="knr-pdp-card">
 
         {%- for block in section.blocks -%}
           {%- case block.type -%}
 
-            {%- comment -%} 1. Breadcrumbs {%- endcomment -%}
+            {%- comment -%} 1. Breadcrumb {%- endcomment -%}
             {%- when 'breadcrumb' -%}
-              <nav class="knr-pdp__breadcrumbs" {{ block.shopify_attributes }}>
+              <nav class="knr-pdp-breadcrumb" {{ block.shopify_attributes }}>
                 <span>{{ block.settings.text | default: 'Soins anti-âge / Collection Cactus' }}</span>
               </nav>
 
-            {%- comment -%} 2. Badges (UNIFIE, PROTÈGE, etc.) {%- endcomment -%}
+            {%- comment -%} 2. Badges {%- endcomment -%}
             {%- when 'badges' -%}
-              <div class="knr-pdp__badges" {{ block.shopify_attributes }}>
+              <div class="knr-pdp-badges" {{ block.shopify_attributes }}>
                 {%- if block.settings.badge_1 != blank -%}
-                  <span class="knr-pdp__badge">{{ block.settings.badge_1 }}</span>
+                  <span class="knr-pdp-badge">{{ block.settings.badge_1 }}</span>
                 {%- endif -%}
                 {%- if block.settings.badge_2 != blank -%}
-                  <span class="knr-pdp__badge">{{ block.settings.badge_2 }}</span>
+                  <span class="knr-pdp-badge">{{ block.settings.badge_2 }}</span>
                 {%- endif -%}
                 {%- if block.settings.badge_3 != blank -%}
-                  <span class="knr-pdp__badge">{{ block.settings.badge_3 }}</span>
+                  <span class="knr-pdp-badge">{{ block.settings.badge_3 }}</span>
                 {%- endif -%}
               </div>
 
-            {%- comment -%} 3. Title with Rating {%- endcomment -%}
+            {%- comment -%} 3. Title & Rating {%- endcomment -%}
             {%- when 'title_and_rating' -%}
-              <div class="knr-pdp__title-row" {{ block.shopify_attributes }}>
-                <h1 class="knr-pdp__title">
-                  {{ product.title | default: block.settings.custom_title }}
+              <div class="knr-pdp-title-row" {{ block.shopify_attributes }}>
+                <h1 class="knr-pdp-title">
+                  {{ product.title | default: block.settings.custom_title | default: 'SÉRUM PRÉCIEUX RÉGÉNÉRANT' }}
                 </h1>
                 {%- if block.settings.show_rating -%}
-                  <div class="knr-pdp__rating-inline">
-                    <div class="knr-pdp__stars">★★★★★ <span class="knr-pdp__rating-score">{{ block.settings.rating_score | default: '4.7' }}</span></div>
-                    <span class="knr-pdp__review-count">{{ block.settings.review_count | default: '200 avis' }}</span>
+                  <div class="knr-pdp-rating">
+                    <div class="knr-pdp-stars">★★★★★ <span class="knr-pdp-rating-val">{{ block.settings.rating_score | default: '4.7' }}</span></div>
+                    <span class="knr-pdp-reviews-count">{{ block.settings.review_count | default: '200 avis' }}</span>
                   </div>
                 {%- endif -%}
               </div>
 
-            {%- comment -%} 4. Clean Beauty / Health Scores (Yuka, INCI Beauty) {%- endcomment -%}
+            {%- comment -%} 4. Clean Beauty Scores {%- endcomment -%}
             {%- when 'scores' -%}
-              <div class="knr-pdp__scores" {{ block.shopify_attributes }}>
-                <span class="knr-pdp__score-item">
-                  <strong>Yuka</strong> {{ block.settings.yuka_score | default: '100/100' }}
-                </span>
-                <span class="knr-pdp__score-sep">·</span>
-                <span class="knr-pdp__score-item">
-                  <strong>INCI Beauty</strong> {{ block.settings.inci_score | default: '20/20' }}
-                </span>
+              <div class="knr-pdp-scores" {{ block.shopify_attributes }}>
+                <span class="knr-pdp-score"><strong>Yuka</strong> {{ block.settings.yuka_score | default: '100/100' }}</span>
+                <span class="knr-pdp-score-sep">·</span>
+                <span class="knr-pdp-score"><strong>INCI Beauty</strong> {{ block.settings.inci_score | default: '20/20' }}</span>
               </div>
 
-            {%- comment -%} 5. Short Description / Excerpt {%- endcomment -%}
+            {%- comment -%} 5. Short Description {%- endcomment -%}
             {%- when 'short_description' -%}
-              <div class="knr-pdp__description-excerpt" {{ block.shopify_attributes }}>
+              <div class="knr-pdp-desc" {{ block.shopify_attributes }}>
                 {{ block.settings.text | default: 'Une huile anti-âge sèche ultra fine qui travaille en synergie avec la peau pour la maintenir ferme, pleine de vitalité tout en lissant les rides.' }}
               </div>
 
-            {%- comment -%} 6. Variant Picker (Taille / Size) {%- endcomment -%}
+            {%- comment -%} 6. Variant Picker {%- endcomment -%}
             {%- when 'variant_picker' -%}
-              <div class="knr-pdp__variants" {{ block.shopify_attributes }}>
+              <div class="knr-pdp-variants" {{ block.shopify_attributes }}>
                 {%- unless product.has_only_default_variant -%}
                   {%- for option in product.options_with_values -%}
-                    <div class="knr-pdp__option-group">
-                      <div class="knr-pdp__option-label">{{ option.name }}</div>
-                      <div class="knr-pdp__option-pills" role="radiogroup">
+                    <div class="knr-pdp-option-group">
+                      <div class="knr-pdp-option-label">{{ option.name }}</div>
+                      <div class="knr-pdp-option-pills" role="radiogroup">
                         {%- for value in option.values -%}
                           <button
                             type="button"
-                            class="knr-pdp__pill{% if option.selected_value == value %} active{% endif %}"
+                            class="knr-pdp-pill{% if option.selected_value == value %} active{% endif %}"
                             data-option-index="{{ option.position }}"
                             data-value="{{ value | escape }}"
                           >
@@ -157,12 +192,11 @@
                     </div>
                   {%- endfor -%}
                 {%- else -%}
-                  {%- comment -%} Fallback demo pills if product has only default variant {%- endcomment -%}
-                  <div class="knr-pdp__option-group">
-                    <div class="knr-pdp__option-label">{{ block.settings.fallback_label | default: 'Taille' }}</div>
-                    <div class="knr-pdp__option-pills">
-                      <button type="button" class="knr-pdp__pill active">{{ block.settings.fallback_val_1 | default: '15 mL' }}</button>
-                      <button type="button" class="knr-pdp__pill">{{ block.settings.fallback_val_2 | default: '150 mL' }}</button>
+                  <div class="knr-pdp-option-group">
+                    <div class="knr-pdp-option-label">{{ block.settings.fallback_label | default: 'Taille' }}</div>
+                    <div class="knr-pdp-option-pills">
+                      <button type="button" class="knr-pdp-pill active">{{ block.settings.fallback_val_1 | default: '15 mL' }}</button>
+                      <button type="button" class="knr-pdp-pill">{{ block.settings.fallback_val_2 | default: '150 mL' }}</button>
                     </div>
                   </div>
                 {%- endunless -%}
@@ -170,35 +204,35 @@
 
             {%- comment -%} 7. Price Block {%- endcomment -%}
             {%- when 'price' -%}
-              <div class="knr-pdp__price-block" {{ block.shopify_attributes }}>
-                <div class="knr-pdp__price-row">
-                  <span class="knr-pdp__price" id="knr-pdp-price">
+              <div class="knr-pdp-price-block" {{ block.shopify_attributes }}>
+                <div class="knr-pdp-price-row">
+                  <span class="knr-pdp-price">
                     {{ current_variant.price | default: 7500 | money }}
                   </span>
                   {%- assign compare_price = current_variant.compare_at_price | default: block.settings.demo_compare_price -%}
                   {%- if compare_price > current_variant.price or block.settings.demo_compare_price != blank -%}
-                    <span class="knr-pdp__price-compare" id="knr-pdp-compare-price">
-                      {{ compare_price | money }}
+                    <span class="knr-pdp-compare-price">
+                      {{ compare_price | default: 8500 | money }}
                     </span>
                   {%- endif -%}
                 </div>
                 {%- if block.settings.unit_price_text != blank -%}
-                  <p class="knr-pdp__unit-price">{{ block.settings.unit_price_text }}</p>
+                  <p class="knr-pdp-unit-price">{{ block.settings.unit_price_text }}</p>
                 {%- endif -%}
               </div>
 
-            {%- comment -%} 8. Buy Buttons / Add to Cart {%- endcomment -%}
+            {%- comment -%} 8. Buy Button {%- endcomment -%}
             {%- when 'buy_buttons' -%}
-              <div class="knr-pdp__actions" {{ block.shopify_attributes }}>
-                <product-form class="knr-pdp__form">
-                  {%- form 'product', product, id: 'knr-pdp-product-form', novalidate: 'novalidate' -%}
-                    <input type="hidden" name="id" value="{{ current_variant.id }}" id="knr-pdp-variant-id">
+              <div class="knr-pdp-actions" {{ block.shopify_attributes }}>
+                <product-form class="knr-pdp-form">
+                  {%- form 'product', product, id: 'knr-hero-details-form', novalidate: 'novalidate' -%}
+                    <input type="hidden" name="id" value="{{ current_variant.id }}">
                     <input type="hidden" name="quantity" value="1">
 
                     <button
                       type="submit"
                       name="add"
-                      class="knr-pdp__add-btn"
+                      class="knr-pdp-add-btn"
                       {% unless current_variant.available %}disabled{% endunless %}
                     >
                       {%- if current_variant.available -%}
@@ -211,32 +245,32 @@
                 </product-form>
               </div>
 
-            {%- comment -%} 9. Shipping / Stock Notice {%- endcomment -%}
+            {%- comment -%} 9. Shipping & Stock Notice {%- endcomment -%}
             {%- when 'shipping_notice' -%}
-              <div class="knr-pdp__shipping-notice" {{ block.shopify_attributes }}>
+              <div class="knr-pdp-shipping" {{ block.shopify_attributes }}>
                 <p>{{ block.settings.text | default: 'En stock, livraison estimée Mercredi 25 février.' }}</p>
               </div>
 
-            {%- comment -%} 10. Slider Indicator Dots / Dashes {%- endcomment -%}
+            {%- comment -%} 10. Slider Indicator Dashes {%- endcomment -%}
             {%- when 'slider_indicators' -%}
-              <div class="knr-pdp__indicators" {{ block.shopify_attributes }}>
-                <span class="knr-pdp__indicator-bar active"></span>
-                <span class="knr-pdp__indicator-bar"></span>
-                <span class="knr-pdp__indicator-bar"></span>
+              <div class="knr-pdp-dashes" {{ block.shopify_attributes }}>
+                <span class="knr-pdp-dash active"></span>
+                <span class="knr-pdp-dash"></span>
+                <span class="knr-pdp-dash"></span>
               </div>
 
-            {%- comment -%} 11. Collapsible Accordion Tab {%- endcomment -%}
+            {%- comment -%} 11. Collapsible Accordion Tabs {%- endcomment -%}
             {%- when 'collapsible_tab' -%}
-              <details class="knr-pdp__accordion" {% if block.settings.open_by_default %}open{% endif %} {{ block.shopify_attributes }}>
-                <summary class="knr-pdp__accordion-summary">
-                  <span class="knr-pdp__accordion-title">{{ block.settings.heading }}</span>
-                  <span class="knr-pdp__accordion-icon" aria-hidden="true">
-                    <svg viewBox="0 0 14 14" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4">
-                      <path class="chevron-path" d="M3 5l4 4 4-4"/>
+              <details class="knr-pdp-accordion" {% if block.settings.open_by_default %}open{% endif %} {{ block.shopify_attributes }}>
+                <summary class="knr-pdp-accordion-summary">
+                  <span class="knr-pdp-accordion-title">{{ block.settings.heading }}</span>
+                  <span class="knr-pdp-accordion-icon" aria-hidden="true">
+                    <svg viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path d="M3 5l4 4 4-4"/>
                     </svg>
                   </span>
                 </summary>
-                <div class="knr-pdp__accordion-content">
+                <div class="knr-pdp-accordion-content">
                   {%- if block.settings.content != blank -%}
                     {{ block.settings.content }}
                   {%- elsif block.settings.use_product_description -%}
@@ -245,71 +279,65 @@
                 </div>
               </details>
 
-            {%- comment -%} 12. Complementary Products / "Complétez votre rituel" {%- endcomment -%}
+            {%- comment -%} 12. Complementary Products ("Complétez votre rituel") {%- endcomment -%}
             {%- when 'complementary_products' -%}
-              <div class="knr-pdp__cross-sell" {{ block.shopify_attributes }}>
-                <div class="knr-pdp__cross-sell-header">
-                  <span class="knr-pdp__cross-sell-title">{{ block.settings.heading | default: 'COMPLÉTEZ VOTRE RITUEL' }}</span>
-                  <a href="{{ block.settings.link | default: routes.all_products_collection_url }}" class="knr-pdp__cross-sell-arrow" aria-label="Voir la collection">
-                    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4">
+              <div class="knr-pdp-cross-sell" {{ block.shopify_attributes }}>
+                <div class="knr-pdp-cross-header">
+                  <span class="knr-pdp-cross-title">{{ block.settings.heading | default: 'COMPLÉTEZ VOTRE RITUEL' }}</span>
+                  <a href="{{ block.settings.link | default: routes.all_products_collection_url }}" class="knr-pdp-cross-arrow" aria-label="Voir la collection">
+                    <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6">
                       <path d="M6 12l4-4-4-4"/>
                     </svg>
                   </a>
                 </div>
 
-                <div class="knr-pdp__cross-sell-slider">
-                  {%- comment -%} Product Card 1 {%- endcomment -%}
-                  <div class="knr-pdp__cross-card">
-                    <div class="knr-pdp__cross-media">
+                <div class="knr-pdp-cross-grid">
+                  {%- comment -%} Product 1 {%- endcomment -%}
+                  <div class="knr-pdp-cross-card">
+                    <div class="knr-pdp-cross-img-wrap">
                       {%- if block.settings.product_1 != blank and block.settings.product_1.featured_image != blank -%}
                         {{ block.settings.product_1.featured_image | image_url: width: 300 | image_tag: loading: 'lazy' }}
+                      {%- elsif product.images.size > 1 -%}
+                        {{ product.images[1] | image_url: width: 300 | image_tag: loading: 'lazy' }}
                       {%- else -%}
-                        <div class="knr-pdp__cross-img-fallback">
-                          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" fill="none" stroke-width="1"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 3v2h6V3"/></svg>
-                        </div>
+                        {{ 'product-2' | placeholder_svg_tag: 'knr-pdp-placeholder-svg' }}
                       {%- endif -%}
-                      <button type="button" class="knr-pdp__cross-add-btn" aria-label="Ajouter au panier">+</button>
+                      <button type="button" class="knr-pdp-cross-plus-btn" aria-label="Ajouter au panier">+</button>
                     </div>
-                    <div class="knr-pdp__cross-info">
-                      <p class="knr-pdp__cross-name">{{ block.settings.product_1.title | default: block.settings.product_1_title | default: 'Huile Précieuse' }}</p>
-                      <p class="knr-pdp__cross-price">{{ block.settings.product_1.price | default: 6500 | money }}</p>
-                    </div>
+                    <p class="knr-pdp-cross-name">{{ block.settings.product_1.title | default: block.settings.product_1_title | default: 'Huile Précieuse' }}</p>
+                    <p class="knr-pdp-cross-price">{{ block.settings.product_1.price | default: 0 | money }}</p>
                   </div>
 
-                  {%- comment -%} Product Card 2 {%- endcomment -%}
-                  <div class="knr-pdp__cross-card">
-                    <div class="knr-pdp__cross-media">
+                  {%- comment -%} Product 2 {%- endcomment -%}
+                  <div class="knr-pdp-cross-card">
+                    <div class="knr-pdp-cross-img-wrap">
                       {%- if block.settings.product_2 != blank and block.settings.product_2.featured_image != blank -%}
                         {{ block.settings.product_2.featured_image | image_url: width: 300 | image_tag: loading: 'lazy' }}
+                      {%- elsif product.images.size > 2 -%}
+                        {{ product.images[2] | image_url: width: 300 | image_tag: loading: 'lazy' }}
                       {%- else -%}
-                        <div class="knr-pdp__cross-img-fallback">
-                          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" fill="none" stroke-width="1"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 3v2h6V3"/></svg>
-                        </div>
+                        {{ 'product-3' | placeholder_svg_tag: 'knr-pdp-placeholder-svg' }}
                       {%- endif -%}
-                      <button type="button" class="knr-pdp__cross-add-btn" aria-label="Ajouter au panier">+</button>
+                      <button type="button" class="knr-pdp-cross-plus-btn" aria-label="Ajouter au panier">+</button>
                     </div>
-                    <div class="knr-pdp__cross-info">
-                      <p class="knr-pdp__cross-name">{{ block.settings.product_2.title | default: block.settings.product_2_title | default: 'Sérum Éclat' }}</p>
-                      <p class="knr-pdp__cross-price">{{ block.settings.product_2.price | default: 7000 | money }}</p>
-                    </div>
+                    <p class="knr-pdp-cross-name">{{ block.settings.product_2.title | default: block.settings.product_2_title | default: 'Sérum Éclat' }}</p>
+                    <p class="knr-pdp-cross-price">{{ block.settings.product_2.price | default: 0 | money }}</p>
                   </div>
 
-                  {%- comment -%} Product Card 3 {%- endcomment -%}
-                  <div class="knr-pdp__cross-card">
-                    <div class="knr-pdp__cross-media">
+                  {%- comment -%} Product 3 {%- endcomment -%}
+                  <div class="knr-pdp-cross-card">
+                    <div class="knr-pdp-cross-img-wrap">
                       {%- if block.settings.product_3 != blank and block.settings.product_3.featured_image != blank -%}
                         {{ block.settings.product_3.featured_image | image_url: width: 300 | image_tag: loading: 'lazy' }}
+                      {%- elsif product.images.size > 0 -%}
+                        {{ product.images[0] | image_url: width: 300 | image_tag: loading: 'lazy' }}
                       {%- else -%}
-                        <div class="knr-pdp__cross-img-fallback">
-                          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" fill="none" stroke-width="1"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 3v2h6V3"/></svg>
-                        </div>
+                        {{ 'product-4' | placeholder_svg_tag: 'knr-pdp-placeholder-svg' }}
                       {%- endif -%}
-                      <button type="button" class="knr-pdp__cross-add-btn" aria-label="Ajouter au panier">+</button>
+                      <button type="button" class="knr-pdp-cross-plus-btn" aria-label="Ajouter au panier">+</button>
                     </div>
-                    <div class="knr-pdp__cross-info">
-                      <p class="knr-pdp__cross-name">{{ block.settings.product_3.title | default: block.settings.product_3_title | default: 'Crème Fondante' }}</p>
-                      <p class="knr-pdp__cross-price">{{ block.settings.product_3.price | default: 5800 | money }}</p>
-                    </div>
+                    <p class="knr-pdp-cross-name">{{ block.settings.product_3.title | default: block.settings.product_3_title | default: 'Crème Fondante' }}</p>
+                    <p class="knr-pdp-cross-price">{{ block.settings.product_3.price | default: 0 | money }}</p>
                   </div>
                 </div>
               </div>
@@ -323,25 +351,539 @@
   </div>
 </section>
 
+<style>
+.knr-pdp-section {
+  width: 100%;
+  background-color: #ECE7DF;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-body--family, 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  color: #1A1A1A;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+.knr-pdp-section *,
+.knr-pdp-section *::before,
+.knr-pdp-section *::after {
+  box-sizing: border-box;
+}
+
+.knr-pdp-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+}
+
+@media (min-width: 990px) {
+  .knr-pdp-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 490px;
+    align-items: start;
+    gap: 0;
+  }
+}
+
+@media (min-width: 1320px) {
+  .knr-pdp-wrapper {
+    grid-template-columns: 1fr 520px;
+  }
+}
+
+.knr-pdp-media-column {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background-color: #ECE7DF;
+}
+
+.knr-pdp-main-image-container {
+  width: 100%;
+  background-color: #ECE7DF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.knr-pdp-main-img {
+  width: 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: cover;
+  display: block;
+}
+
+.knr-pdp-placeholder-svg {
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+  max-height: 70vh;
+  display: block;
+  background-color: #ECE7DF;
+  fill: #8C847A;
+}
+
+.knr-pdp-secondary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  width: 100%;
+}
+
+.knr-pdp-grid-item {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background-color: #E5DFC8;
+  overflow: hidden;
+}
+
+.knr-pdp-grid-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.knr-pdp-hotspot-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #FFFFFF;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.45));
+  transition: transform 0.2s ease;
+  z-index: 2;
+}
+
+.knr-pdp-hotspot-btn:hover {
+  transform: scale(1.2);
+}
+
+.knr-pdp-sidebar-column {
+  padding: 16px;
+  background-color: #ECE7DF;
+}
+
+@media (min-width: 990px) {
+  .knr-pdp-sidebar-column {
+    position: sticky;
+    top: 0;
+    padding: 24px 28px 24px 16px;
+    height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+
+.knr-pdp-card {
+  background: #FFFFFF;
+  padding: 34px 38px 40px;
+  color: #1A1A1A;
+}
+
+@media (max-width: 749px) {
+  .knr-pdp-card {
+    padding: 24px 18px;
+  }
+}
+
+.knr-pdp-breadcrumb {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: #8C847B;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.knr-pdp-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.knr-pdp-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border: 1px solid #1A1A1A;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1A1A1A;
+  border-radius: 2px;
+}
+
+.knr-pdp-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.knr-pdp-title {
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.25;
+  color: #111111;
+  margin: 0;
+  font-family: inherit;
+}
+
+.knr-pdp-rating {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.knr-pdp-stars {
+  font-size: 11px;
+  color: #55504A;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  letter-spacing: 0.08em;
+}
+
+.knr-pdp-rating-val {
+  font-weight: 600;
+  color: #222222;
+}
+
+.knr-pdp-reviews-count {
+  display: block;
+  font-size: 10px;
+  color: #8C847A;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  margin-top: 2px;
+}
+
+.knr-pdp-scores {
+  font-size: 11px;
+  color: #2B2824;
+  margin-bottom: 16px;
+}
+
+.knr-pdp-score strong {
+  font-weight: 700;
+  color: #000000;
+}
+
+.knr-pdp-score-sep {
+  margin: 0 6px;
+  color: #B5AEA4;
+}
+
+.knr-pdp-desc {
+  font-size: 12px;
+  line-height: 1.65;
+  color: #4A4641;
+  margin-bottom: 22px;
+}
+
+.knr-pdp-variants {
+  margin-bottom: 20px;
+}
+
+.knr-pdp-option-group {
+  margin-bottom: 12px;
+}
+
+.knr-pdp-option-label {
+  font-size: 11px;
+  color: #222222;
+  margin-bottom: 8px;
+}
+
+.knr-pdp-option-pills {
+  display: flex;
+  gap: 12px;
+}
+
+.knr-pdp-pill {
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid transparent;
+  padding: 4px 6px;
+  font-size: 12px;
+  color: #666666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.knr-pdp-pill.active,
+.knr-pdp-pill:hover {
+  color: #000000;
+  font-weight: 600;
+  border-bottom-color: #000000;
+}
+
+.knr-pdp-price-block {
+  margin-bottom: 20px;
+}
+
+.knr-pdp-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.knr-pdp-price {
+  font-size: 22px;
+  font-weight: 500;
+  color: #111111;
+  letter-spacing: -0.01em;
+}
+
+.knr-pdp-compare-price {
+  font-size: 13px;
+  color: #A09A92;
+  text-decoration: line-through;
+}
+
+.knr-pdp-unit-price {
+  font-size: 11px;
+  color: #8C847A;
+  margin: 0;
+}
+
+.knr-pdp-actions {
+  margin-bottom: 12px;
+}
+
+.knr-pdp-add-btn {
+  width: 100%;
+  background: #000000;
+  color: #FFFFFF;
+  padding: 15px 20px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  font-family: inherit;
+}
+
+.knr-pdp-add-btn:hover {
+  opacity: 0.88;
+}
+
+.knr-pdp-add-btn:disabled {
+  background: #C4BFB8;
+  cursor: not-allowed;
+}
+
+.knr-pdp-shipping {
+  text-align: center;
+  font-size: 11px;
+  color: #55504A;
+  margin-bottom: 16px;
+}
+
+.knr-pdp-shipping p {
+  margin: 0;
+}
+
+.knr-pdp-dashes {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+.knr-pdp-dash {
+  width: 22px;
+  height: 1.5px;
+  background-color: #E2DDD5;
+  border-radius: 1px;
+}
+
+.knr-pdp-dash.active {
+  background-color: #55504A;
+}
+
+.knr-pdp-accordion {
+  border-top: 1px solid #ECE7E0;
+}
+
+.knr-pdp-accordion-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  cursor: pointer;
+  list-style: none;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1A1A1A;
+}
+
+.knr-pdp-accordion-summary::-webkit-details-marker {
+  display: none;
+}
+
+.knr-pdp-accordion-icon svg {
+  transition: transform 0.25s ease;
+  display: block;
+}
+
+.knr-pdp-accordion[open] .knr-pdp-accordion-icon svg {
+  transform: rotate(180deg);
+}
+
+.knr-pdp-accordion-content {
+  padding-bottom: 16px;
+  font-size: 12px;
+  line-height: 1.65;
+  color: #4A4641;
+}
+
+.knr-pdp-accordion-content p {
+  margin: 0;
+}
+
+.knr-pdp-cross-sell {
+  border-top: 1px solid #ECE7E0;
+  padding-top: 20px;
+  margin-top: 8px;
+}
+
+.knr-pdp-cross-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.knr-pdp-cross-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1A1A1A;
+}
+
+.knr-pdp-cross-arrow {
+  color: #1A1A1A;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.knr-pdp-cross-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.knr-pdp-cross-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.knr-pdp-cross-img-wrap {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background-color: #ECE7DF;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.knr-pdp-cross-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.knr-pdp-cross-img-wrap svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  fill: #8C847A;
+}
+
+.knr-pdp-cross-plus-btn {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  width: 20px;
+  height: 20px;
+  background: #FFFFFF;
+  border-radius: 50%;
+  border: none;
+  font-size: 13px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #111111;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s ease;
+}
+
+.knr-pdp-cross-plus-btn:hover {
+  transform: scale(1.15);
+}
+
+.knr-pdp-cross-name {
+  font-size: 10px;
+  font-weight: 500;
+  color: #222222;
+  margin: 6px 0 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.knr-pdp-cross-price {
+  font-size: 10px;
+  color: #555555;
+  margin: 0;
+}
+</style>
+
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     /* Interactive Variant Pills */
-    const pills = document.querySelectorAll('.knr-pdp__pill');
+    const pills = document.querySelectorAll('.knr-pdp-pill');
     pills.forEach(pill => {
       pill.addEventListener('click', function () {
-        const parent = pill.closest('.knr-pdp__option-pills');
+        const parent = pill.closest('.knr-pdp-option-pills');
         if (parent) {
-          parent.querySelectorAll('.knr-pdp__pill').forEach(p => p.classList.remove('active'));
+          parent.querySelectorAll('.knr-pdp-pill').forEach(p => p.classList.remove('active'));
           pill.classList.add('active');
         }
       });
     });
 
-    /* Accordion toggle */
-    const accordions = document.querySelectorAll('.knr-pdp__accordion');
+    /* Accordion chevron animation */
+    const accordions = document.querySelectorAll('.knr-pdp-accordion');
     accordions.forEach(acc => {
       acc.addEventListener('toggle', function () {
-        const icon = acc.querySelector('.knr-pdp__accordion-icon svg');
+        const icon = acc.querySelector('.knr-pdp-accordion-icon svg');
         if (icon) {
           icon.style.transform = acc.open ? 'rotate(180deg)' : 'rotate(0deg)';
         }
@@ -354,8 +896,24 @@
 {
   "name": "KNR Product Details",
   "tag": "section",
-  "class": "knr-product-details-section",
-  "settings": [],
+  "class": "knr-pdp-section-wrapper",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "main_image",
+      "label": "Image produit principale (remplacement optionnel)"
+    },
+    {
+      "type": "image_picker",
+      "id": "secondary_image_1",
+      "label": "Photo éditoriale 1 (gauche, optionnel)"
+    },
+    {
+      "type": "image_picker",
+      "id": "secondary_image_2",
+      "label": "Photo éditoriale 2 (droite, optionnel)"
+    }
+  ],
   "blocks": [
     {
       "type": "breadcrumb",
@@ -617,7 +1175,7 @@
   ],
   "presets": [
     {
-      "name": "KNR Product Details",
+      "name": "KNR Product Hero / Details",
       "category": "Product",
       "blocks": [
         { "type": "breadcrumb" },
