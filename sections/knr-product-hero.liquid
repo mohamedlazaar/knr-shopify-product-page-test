@@ -131,8 +131,94 @@
 </script>
 
 {% schema %}
+
 {
   "name": "Product details",
-  "...": "..."
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted color",
+      "default": "#777777"
+    },
+    {
+      "type": "color",
+      "id": "line_color",
+      "label": "Line color",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "color",
+      "id": "card_color",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "page_color",
+      "label": "Page background",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "font_picker",
+      "id": "font",
+      "label": "Font",
+      "default": "Helvetica"
+    },
+    {
+      "type": "range",
+      "id": "delivery_days",
+      "label": "Delivery days offset",
+      "min": 0,
+      "max": 30,
+      "default": 2
+    },
+    {
+      "type": "text",
+      "id": "after_add",
+      "label": "After add label",
+      "default": "Added to cart"
+    },
+    {
+      "type": "text",
+      "id": "added_label",
+      "label": "Added label",
+      "default": "Added"
+    },
+    {
+      "type": "text",
+      "id": "sold_out_label",
+      "label": "Sold out label",
+      "default": "Sold out"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product details"
+    }
+  ]
 }
+{% endschema %}
 {% endschema %}
