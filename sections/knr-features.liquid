@@ -1,65 +1,70 @@
 {% comment %}
-  Section 2: Product Features
-  Two-column image + text. Supports reversed layout.
-  Desktop: side by side. Mobile: stacked.
+  Section 2/3: Product Features
+  Full-bleed two-column image + text. Supports reversed + dark variant.
+  Desktop: edge-to-edge side by side. Mobile: stacked.
 {% endcomment %}
 
-<section class="knr-section knr-features" data-section-id="{{ section.id }}">
-  <div class="knr-container">
-    <div class="knr-features__grid{% if section.settings.image_position == 'right' %} knr-features__grid--reverse{% endif %}">
+{%- assign is_reversed = false -%}
+{%- if section.settings.image_position == 'right' -%}
+  {%- assign is_reversed = true -%}
+{%- endif -%}
 
-      {%- comment -%} ── Image ── {%- endcomment -%}
-      <div class="knr-features__image knr-animate">
-        {%- if section.settings.image != blank -%}
-          {{ section.settings.image | image_url: width: 900 | image_tag:
-            loading: 'lazy',
-            alt: section.settings.heading,
-            sizes: '(min-width: 750px) 50vw, 100vw'
-          }}
-        {%- else -%}
-          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+<section class="knr-section knr-features{% if section.settings.dark_content %} knr-features--dark{% endif %}" data-section-id="{{ section.id }}">
+  <div class="knr-features__grid{% if is_reversed %} knr-features__grid--reverse{% endif %}">
+
+    {%- comment -%} ── Image ── {%- endcomment -%}
+    <div class="knr-features__image">
+      {%- if section.settings.image != blank -%}
+        {{ section.settings.image | image_url: width: 1200 | image_tag:
+          loading: 'lazy',
+          alt: section.settings.heading,
+          sizes: '(min-width: 750px) 50vw, 100vw'
+        }}
+      {%- else -%}
+        <div style="width:100%;height:100%;background:var(--knr-warm);display:flex;align-items:center;justify-content:center;color:var(--knr-muted);font-size:0.875rem;">
+          Image placeholder
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ── Content ── {%- endcomment -%}
+    <div class="knr-features__content">
+
+      {%- if section.settings.tag != blank -%}
+        <span class="knr-features__tag">{{ section.settings.tag }}</span>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <h2 class="knr-features__title">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <div class="knr-features__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- assign has_list_items = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'feature_item' -%}
+          {%- assign has_list_items = true -%}
+          {%- break -%}
         {%- endif -%}
-      </div>
+      {%- endfor -%}
 
-      {%- comment -%} ── Content ── {%- endcomment -%}
-      <div class="knr-features__content knr-animate knr-animate-delay-2">
+      {%- if has_list_items -%}
+        <ul class="knr-features__list">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'feature_item' -%}
+              <li {{ block.shopify_attributes }}>{{ block.settings.text }}</li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
 
-        {%- if section.settings.tag != blank -%}
-          <span class="knr-features__tag">{{ section.settings.tag }}</span>
-        {%- endif -%}
-
-        {%- if section.settings.heading != blank -%}
-          <h2 class="knr-features__title">{{ section.settings.heading }}</h2>
-        {%- endif -%}
-
-        {%- if section.settings.text != blank -%}
-          <div class="knr-features__text">{{ section.settings.text }}</div>
-        {%- endif -%}
-
-        {%- assign has_list_items = false -%}
-        {%- for block in section.blocks -%}
-          {%- if block.type == 'feature_item' -%}
-            {%- assign has_list_items = true -%}
-            {%- break -%}
-          {%- endif -%}
-        {%- endfor -%}
-
-        {%- if has_list_items -%}
-          <ul class="knr-features__list">
-            {%- for block in section.blocks -%}
-              {%- if block.type == 'feature_item' -%}
-                <li {{ block.shopify_attributes }}>{{ block.settings.text }}</li>
-              {%- endif -%}
-            {%- endfor -%}
-          </ul>
-        {%- endif -%}
-
-        {%- if section.settings.button_text != blank -%}
-          <a href="{{ section.settings.button_link }}" class="knr-btn knr-btn--outline" style="width:fit-content;">
-            {{ section.settings.button_text }}
-          </a>
-        {%- endif -%}
-      </div>
+      {%- if section.settings.button_text != blank -%}
+        <a href="{{ section.settings.button_link }}" class="knr-btn {% if section.settings.dark_content %}knr-btn--outline{% else %}knr-btn--outline{% endif %}" style="width:fit-content;{% if section.settings.dark_content %}color:#fff;border-color:rgba(255,255,255,0.3);{% endif %}">
+          {{ section.settings.button_text }}
+        </a>
+      {%- endif -%}
     </div>
   </div>
 </section>
@@ -83,6 +88,13 @@
         { "value": "right", "label": "Right" }
       ],
       "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "dark_content",
+      "label": "Dark content background",
+      "default": false,
+      "info": "Use a dark olive/brown background for the text column"
     },
     {
       "type": "text",
@@ -134,27 +146,19 @@
       "blocks": [
         {
           "type": "feature_item",
-          "settings": {
-            "text": "100% natural & organic ingredients"
-          }
+          "settings": { "text": "100% natural & organic ingredients" }
         },
         {
           "type": "feature_item",
-          "settings": {
-            "text": "Dermatologically tested & approved"
-          }
+          "settings": { "text": "Dermatologically tested & approved" }
         },
         {
           "type": "feature_item",
-          "settings": {
-            "text": "Cruelty-free & sustainably sourced"
-          }
+          "settings": { "text": "Cruelty-free & sustainably sourced" }
         },
         {
           "type": "feature_item",
-          "settings": {
-            "text": "Visible results in 4 weeks"
-          }
+          "settings": { "text": "Visible results in 4 weeks" }
         }
       ]
     }

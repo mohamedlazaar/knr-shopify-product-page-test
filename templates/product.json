@@ -11,6 +11,17 @@
   "sections": {
     "knr_hero": {
       "type": "knr-product-hero",
+      "settings": {
+        "subtitle": "Hydrating face serum with hyaluronic acid & botanical extracts",
+        "show_brand": true,
+        "show_rating": true,
+        "review_count": "(128 reviews)",
+        "show_buy_now": true,
+        "buy_now_text": "Buy Now",
+        "show_payment_icons": true,
+        "show_meta": true,
+        "show_description": true
+      },
       "blocks": {
         "meta_1": {
           "type": "meta_item",
@@ -38,17 +49,7 @@
         "meta_1",
         "meta_2",
         "meta_3"
-      ],
-      "settings": {
-        "subtitle": "Hydrating face serum with hyaluronic acid & botanical extracts",
-        "show_brand": true,
-        "show_rating": true,
-        "review_count": "(128 reviews)",
-        "show_buy_now": true,
-        "buy_now_text": "Buy Now",
-        "show_meta": true,
-        "show_description": true
-      }
+      ]
     },
     "knr_features_1": {
       "type": "knr-features",
@@ -86,6 +87,7 @@
       ],
       "settings": {
         "image_position": "left",
+        "dark_content": false,
         "tag": "Why Choose Us",
         "heading": "Crafted with the finest natural ingredients",
         "text": "<p>Our products are carefully formulated with premium botanical extracts and cutting-edge science to deliver visible results for every skin type.</p>",
@@ -129,6 +131,7 @@
       ],
       "settings": {
         "image_position": "right",
+        "dark_content": true,
         "tag": "Ingredients",
         "heading": "Pure botanicals meet advanced science",
         "text": "<p>Each ingredient is carefully selected for its proven efficacy. From hyaluronic acid for deep hydration to vitamin C for radiance — every drop works in harmony with your skin's natural renewal process.</p>",
@@ -189,6 +192,13 @@
     },
     "knr_faq": {
       "type": "knr-faq",
+<<<<<<< HEAD
+=======
+      "settings": {
+        "heading": "Questions & answers",
+        "view_all_text": "View all"
+      },
+>>>>>>> 41dc314 (...)
       "blocks": {
         "faq_1": {
           "type": "faq_item",
@@ -293,26 +303,47 @@
       "type": "knr-testimonial",
       "settings": {
         "quote": "This serum has completely transformed my skincare routine. My skin feels hydrated, luminous, and healthier than ever before.",
+<<<<<<< HEAD
         "author": "Sophie Laurent, Beauty Editor",
         "background_color": ""
       }
+=======
+        "author": "Sophie Laurent, Beauty Editor"
     },
-    "knr_brand_footer": {
-      "type": "knr-brand-footer",
-      "settings": {
-        "brand_name": "maison célestine"
+    "blocks": {
+      "bg_1": {
+        "type": "bg_image"
+      },
+      "bg_2": {
+        "type": "bg_image"
+      },
+      "bg_3": {
+        "type": "bg_image"
       }
-    }
+    },
+    "block_order": [
+      "bg_1",
+      "bg_2",
+      "bg_3"
+    ]
+>>>>>>> 41dc314 (...)
   },
-  "order": [
-    "knr_hero",
-    "knr_features_1",
-    "knr_features_2",
-    "knr_howto",
-    "knr_ritual",
-    "knr_faq",
-    "knr_gallery",
-    "knr_testimonial",
-    "knr_brand_footer"
-  ]
+  "knr_brand_footer": {
+    "type": "knr-brand-footer",
+    "settings": {
+      "brand_name": "maison célestine"
+    }
+  }
+},
+"order": [
+  "knr_hero",
+  "knr_features_1",
+  "knr_features_2",
+  "knr_howto",
+  "knr_ritual",
+  "knr_faq",
+  "knr_gallery",
+  "knr_testimonial",
+  "knr_brand_footer"
+]
 }

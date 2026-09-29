@@ -1,41 +1,40 @@
 {% comment %}
   Section 6: Product Gallery Grid
-  Grid of lifestyle / product images.
-  Desktop: 4 cols. Mobile: 2 cols.
-  Supports wide-spanning items.
+  Full-bleed grid of lifestyle/product images.
+  Desktop: 4 cols, rows of square + wide images. Mobile: 2 cols.
 {% endcomment %}
 
 <section class="knr-section knr-gallery" data-section-id="{{ section.id }}">
-  <div class="knr-container">
 
-    {%- if section.settings.heading != blank -%}
-      <div class="knr-gallery__header knr-animate">
-        {%- if section.settings.tag != blank -%}
-          <p class="knr-label" style="margin-bottom: 8px;">{{ section.settings.tag }}</p>
-        {%- endif -%}
-        <h2 class="knr-heading-lg">{{ section.settings.heading }}</h2>
-      </div>
-    {%- endif -%}
-
-    <div class="knr-gallery__grid">
-      {%- for block in section.blocks -%}
-        {%- if block.type == 'gallery_image' -%}
-          <div class="knr-gallery__item{% if block.settings.wide %} knr-gallery__item--wide{% endif %} knr-animate knr-animate-delay-{{ forloop.index }}" {{ block.shopify_attributes }}>
-            {%- if block.settings.image != blank -%}
-              {{ block.settings.image | image_url: width: 900 | image_tag:
-                loading: 'lazy',
-                alt: block.settings.alt_text | default: section.settings.heading,
-                sizes: '(min-width: 750px) 25vw, 50vw'
-              }}
-            {%- else -%}
-              {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
-            {%- endif -%}
-          </div>
-        {%- endif -%}
-      {%- endfor -%}
+  {%- if section.settings.heading != blank -%}
+    <div class="knr-gallery__header knr-animate">
+      {%- if section.settings.tag != blank -%}
+        <p class="knr-label" style="margin-bottom: 8px;">{{ section.settings.tag }}</p>
+      {%- endif -%}
+      <h2 class="knr-heading-lg">{{ section.settings.heading }}</h2>
     </div>
+  {%- endif -%}
 
+  <div class="knr-gallery__grid">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'gallery_image' -%}
+        <div class="knr-gallery__item{% if block.settings.wide %} knr-gallery__item--wide{% endif %}" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            {{ block.settings.image | image_url: width: 900 | image_tag:
+              loading: 'lazy',
+              alt: block.settings.alt_text | default: 'Gallery image',
+              sizes: '(min-width: 750px) 25vw, 50vw'
+            }}
+          {%- else -%}
+            <div style="width:100%;height:100%;background:var(--knr-warm);display:flex;align-items:center;justify-content:center;color:var(--knr-muted);font-size:0.75rem;">
+              {{ forloop.index }}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
   </div>
+
 </section>
 
 {% schema %}
@@ -87,8 +86,8 @@
         { "type": "gallery_image" },
         { "type": "gallery_image" },
         { "type": "gallery_image" },
-        { "type": "gallery_image" },
-        { "type": "gallery_image" }
+        { "type": "gallery_image", "settings": { "wide": true } },
+        { "type": "gallery_image", "settings": { "wide": true } }
       ]
     }
   ]

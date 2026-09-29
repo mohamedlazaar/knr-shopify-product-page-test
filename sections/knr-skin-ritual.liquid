@@ -1,6 +1,7 @@
 {% comment %}
   Section 4: Skin Ritual
   Full-width centered layout with circular image and descriptive text.
+  Uses serif font for the heading to match design reference.
 {% endcomment %}
 
 <section class="knr-section knr-ritual" data-section-id="{{ section.id }}">
@@ -18,13 +19,15 @@
     <div class="knr-ritual__image-wrapper knr-animate knr-animate-delay-1">
       <div class="knr-ritual__image">
         {%- if section.settings.image != blank -%}
-          {{ section.settings.image | image_url: width: 960 | image_tag:
+          {{ section.settings.image | image_url: width: 1040 | image_tag:
             loading: 'lazy',
             alt: section.settings.heading,
-            sizes: '(min-width: 750px) 480px, 80vw'
+            sizes: '(min-width: 750px) 520px, 80vw'
           }}
         {%- else -%}
-          {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+          <div style="width:100%;height:100%;background:var(--knr-warm);display:flex;align-items:center;justify-content:center;color:var(--knr-muted);font-size:0.875rem;">
+            Image placeholder
+          </div>
         {%- endif -%}
       </div>
     </div>

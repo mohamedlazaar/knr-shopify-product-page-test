@@ -4,7 +4,7 @@
 {% comment %}
   Section 1: Product Hero
   Two-column layout – gallery left, product info right
-  Mobile: single column, full-width buttons
+  Desktop: ~55/45 split. Mobile: single column, full-width buttons
 {% endcomment %}
 
 {%- assign current_variant = product.selected_or_first_available_variant -%}
@@ -22,7 +22,7 @@
               loading: 'eager',
               alt: product.title,
               id: 'knr-main-image',
-              sizes: '(min-width: 750px) 50vw, 100vw'
+              sizes: '(min-width: 750px) 55vw, 100vw'
             }}
           {%- else -%}
             {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
@@ -56,19 +56,19 @@
           <p class="knr-product-hero__subtitle">{{ section.settings.subtitle }}</p>
         {%- endif -%}
 
-        <div class="knr-product-hero__price-row">
-          <span class="knr-product-hero__price">{{ current_variant.price | money }}</span>
-          {%- if current_variant.compare_at_price > current_variant.price -%}
-            <span class="knr-product-hero__price-compare">{{ current_variant.compare_at_price | money }}</span>
-          {%- endif -%}
-        </div>
-
         {%- if section.settings.show_rating -%}
           <div class="knr-product-hero__rating">
             <span class="knr-product-hero__stars">★★★★★</span>
             <span class="knr-product-hero__review-count">{{ section.settings.review_count }}</span>
           </div>
         {%- endif -%}
+
+        <div class="knr-product-hero__price-row">
+          <span class="knr-product-hero__price">{{ current_variant.price | money }}</span>
+          {%- if current_variant.compare_at_price > current_variant.price -%}
+            <span class="knr-product-hero__price-compare">{{ current_variant.compare_at_price | money }}</span>
+          {%- endif -%}
+        </div>
 
         <div class="knr-product-hero__divider"></div>
 
@@ -98,7 +98,7 @@
           </div>
         </div>
 
-        {%- comment -%} Add to Cart {%- endcomment -%}
+        {%- comment -%} Add to Cart / Buy Now {%- endcomment -%}
         <product-form class="knr-product-hero__form">
           {%- form 'product', product, id: 'knr-product-form', novalidate: 'novalidate' -%}
             <input type="hidden" name="id" value="{{ current_variant.id }}">
@@ -127,8 +127,19 @@
           {%- endform -%}
         </product-form>
 
+        {%- comment -%} Payment icons {%- endcomment -%}
+        {%- if section.settings.show_payment_icons -%}
+          <div class="knr-product-hero__payment-icons">
+            <span class="knr-product-hero__payment-icon"></span>
+            <span class="knr-product-hero__payment-icon"></span>
+            <span class="knr-product-hero__payment-icon"></span>
+            <span class="knr-product-hero__payment-icon"></span>
+          </div>
+        {%- endif -%}
+
         {%- comment -%} Meta info (shipping, returns) {%- endcomment -%}
         {%- if section.settings.show_meta -%}
+          <div class="knr-product-hero__divider"></div>
           <div class="knr-product-hero__meta">
             {%- for block in section.blocks -%}
               {%- if block.type == 'meta_item' -%}
@@ -154,7 +165,7 @@
         {%- comment -%} Description {%- endcomment -%}
         {%- if product.description != blank and section.settings.show_description -%}
           <div class="knr-product-hero__divider"></div>
-          <div class="knr-body">
+          <div class="knr-product-hero__description">
             {{ product.description }}
           </div>
         {%- endif -%}
@@ -166,8 +177,8 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     /* Thumbnail gallery */
-    const thumbs = document.querySelectorAll('.knr-product-hero__thumb');
-    const mainImg = document.getElementById('knr-main-image');
+    var thumbs = document.querySelectorAll('.knr-product-hero__thumb');
+    var mainImg = document.getElementById('knr-main-image');
     thumbs.forEach(function (thumb) {
       thumb.addEventListener('click', function () {
         thumbs.forEach(function (t) { t.classList.remove('active'); });
@@ -180,11 +191,11 @@
     });
 
     /* Quantity stepper */
-    const qtyVal = document.getElementById('knr-qty-value');
-    const qtyInput = document.getElementById('knr-qty-input');
+    var qtyVal = document.getElementById('knr-qty-value');
+    var qtyInput = document.getElementById('knr-qty-input');
     document.querySelectorAll('.knr-product-hero__qty-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        let val = parseInt(qtyVal.textContent) || 1;
+        var val = parseInt(qtyVal.textContent) || 1;
         if (btn.dataset.action === 'increase') val++;
         if (btn.dataset.action === 'decrease' && val > 1) val--;
         qtyVal.textContent = val;
@@ -234,6 +245,12 @@
       "id": "buy_now_text",
       "label": "Buy Now button text",
       "default": "Buy Now"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show payment icons",
+      "default": true
     },
     {
       "type": "checkbox",

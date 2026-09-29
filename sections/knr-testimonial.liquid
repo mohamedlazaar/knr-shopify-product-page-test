@@ -1,15 +1,38 @@
 {% comment %}
   Section 7: Testimonial Banner
-  Dark full-width banner with centered quote and author attribution.
+  Dark full-width banner with background images and centered quote.
+  Uses serif font for the quote text.
 {% endcomment %}
 
-<section class="knr-section knr-testimonial" data-section-id="{{ section.id }}"
-  {%- if section.settings.background_color != blank %}
-    style="background: {{ section.settings.background_color }};"
+<section class="knr-section knr-testimonial" data-section-id="{{ section.id }}">
+
+  {%- comment -%} Background images layer {%- endcomment -%}
+  {%- assign has_bg_images = false -%}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'bg_image' and block.settings.image != blank -%}
+      {%- assign has_bg_images = true -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if has_bg_images -%}
+    <div class="knr-testimonial__bg">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'bg_image' -%}
+          {%- if block.settings.image != blank -%}
+            {{ block.settings.image | image_url: width: 600 | image_tag:
+              loading: 'lazy',
+              alt: '',
+              class: 'knr-testimonial__bg-img'
+            }}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
   {%- endif -%}
->
+
   <div class="knr-container">
-    <div class="knr-animate">
+    <div class="knr-testimonial__inner knr-animate">
       {%- if section.settings.quote != blank -%}
         <blockquote class="knr-testimonial__quote">
           {{ section.settings.quote }}
@@ -39,17 +62,30 @@
       "id": "author",
       "label": "Author name",
       "default": "Sophie Laurent, Beauty Editor"
-    },
+    }
+  ],
+  "blocks": [
     {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background color"
+      "type": "bg_image",
+      "name": "Background image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Background image"
+        }
+      ]
     }
   ],
   "presets": [
     {
       "name": "KNR Testimonial",
-      "category": "Product"
+      "category": "Product",
+      "blocks": [
+        { "type": "bg_image" },
+        { "type": "bg_image" },
+        { "type": "bg_image" }
+      ]
     }
   ]
 }
