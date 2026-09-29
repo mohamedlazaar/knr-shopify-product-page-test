@@ -1,951 +1,470 @@
-{%- assign current_variant = product.selected_or_first_available_variant -%}
-{%- assign featured_media = current_variant.featured_media | default: product.featured_media | default: product.featured_image -%}
+{%- comment -%}
+  sections/product-details.liquid
+  Product details section — big hero + 2-col gallery on the left, sticky white info card on the right.
+  Use it in templates/product.json (or product.liquid).
+{%- endcomment -%}
 
-<section class="knr-pdp-section" data-section-id="{{ section.id }}">
-  <div class="knr-pdp-wrapper">
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign form_id = 'pd-form-' | append: section.id
+  assign delivery_days = section.settings.delivery_days
+  assign now_ts = 'now' | date: '%s' | plus: 0
+  assign delivery_ts = delivery_days | times: 86400 | plus: now_ts
+  assign fr_days = 'Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi' | split: ','
+  assign fr_months = 'janvier,février,mars,avril,mai,juin,juillet,août,septembre,octobre,novembre,décembre' | split: ','
+  assign d_idx = delivery_ts | date: '%w' | plus: 0
+  assign m_idx = delivery_ts | date: '%-m' | plus: 0 | minus: 1
+  assign d_num = delivery_ts | date: '%-d'
+  assign delivery_date = fr_days[d_idx] | append: ' ' | append: d_num | append: ' ' | append: fr_months[m_idx]
+-%}
 
-    {%- comment -%} ══════════════════════════════════════════════════
-        LEFT COLUMN: MEDIA GALLERY
-        - Top: Main featured product image (takes 100% of media width)
-        - Bottom: 2-Column lifestyle / secondary images with "+" hotspots
-    ══════════════════════════════════════════════════ {%- endcomment -%}
-    <div class="knr-pdp-media-column">
-      
-      {%- comment -%} Main Product Image {%- endcomment -%}
-      <div class="knr-pdp-main-image-container">
-        {%- if section.settings.main_image != blank -%}
-          {{ section.settings.main_image | image_url: width: 1400 | image_tag:
-            loading: 'eager',
-            alt: product.title,
-            class: 'knr-pdp-main-img'
-          }}
-        {%- elsif featured_media != blank -%}
-          {{ featured_media | image_url: width: 1400 | image_tag:
-            loading: 'eager',
-            alt: product.title,
-            class: 'knr-pdp-main-img'
-          }}
-        {%- else -%}
-          {{ 'product-1' | placeholder_svg_tag: 'knr-pdp-placeholder-svg' }}
+{{ section.settings.font | font_face: font_display: 'swap' }}
+
+{% style %}
+  #pd-{{ section.id }} {
+    --pd-text: {{ section.settings.text_color }};
+    --pd-muted: {{ section.settings.muted_color }};
+    --pd-line: {{ section.settings.line_color }};
+    --pd-card: {{ section.settings.card_color }};
+    --pd-btn-bg: {{ section.settings.button_bg }};
+    --pd-btn-text: {{ section.settings.button_text }};
+    --pd-page: {{ section.settings.page_color }};
+    --pd-font: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
+    --pd-gap: 9px;
+  }
+  #pd-{{ section.id }} { background: var(--pd-page); color: var(--pd-text); font-family: var(--pd-font); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  #pd-{{ section.id }} *, #pd-{{ section.id }} *::before, #pd-{{ section.id }} *::after { box-sizing: border-box; }
+  #pd-{{ section.id }} img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  #pd-{{ section.id }} button { font: inherit; color: inherit; cursor: pointer; }
+  #pd-{{ section.id }} a { color: inherit; text-decoration: none; }
+  #pd-{{ section.id }} :focus-visible { outline: 2px solid var(--pd-text); outline-offset: 3px; }
+
+  /* ---------- Layout ---------- */
+  #pd-{{ section.id }} .pd { display: grid; grid-template-columns: minmax(0, 65.6%) minmax(0, 1fr); background: var(--pd-card); }
+  #pd-{{ section.id }} .pd__media { display: contents; }
+  #pd-{{ section.id }} .pd__hero { grid-column: 1 / -1; grid-row: 1; aspect-ratio: 1526 / 730; position: relative; background: var(--pd-page); overflow: hidden; }
+  #pd-{{ section.id }} .pd__grid { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; gap: var(--pd-gap); margin-top: var(--pd-gap); align-content: start; }
+  #pd-{{ section.id }} .pd__tile { position: relative; aspect-ratio: 495 / 647; overflow: hidden; background: var(--pd-page); }
+  #pd-{{ section.id }} .pd__zoom { position: absolute; right: 16px; bottom: 16px; width: 28px; height: 28px; display: grid; place-items: center; background: none; border: 0; padding: 0; color: #fff; }
+  #pd-{{ section.id }} .pd__zoom svg { width: 20px; height: 20px; }
+  #pd-{{ section.id }} .pd__dots { display: none; }
+
+  #pd-{{ section.id }} .pd__info { grid-column: 2; grid-row: 1 / span 2; padding: 59px 41px 0 0; position: relative; z-index: 2; pointer-events: none; }
+  #pd-{{ section.id }} .pd__card { pointer-events: auto; position: sticky; top: 20px; background: var(--pd-card); padding: 42px 42px 48px; }
+
+  /* ---------- Blocks ---------- */
+  #pd-{{ section.id }} .pd-breadcrumb { font-size: 11px; color: var(--pd-muted); margin: 0 0 40px; }
+  #pd-{{ section.id }} .pd-breadcrumb a:hover { text-decoration: underline; }
+  #pd-{{ section.id }} .pd-badges { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 32px; padding: 0; list-style: none; }
+  #pd-{{ section.id }} .pd-badges li { border: 1px solid var(--pd-text); border-radius: 2px; padding: 2px 4px; font-size: 13px; line-height: 1.4; text-transform: uppercase; }
+  #pd-{{ section.id }} .pd-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin: 0 0 30px; }
+  #pd-{{ section.id }} .pd-title { margin: 0; font-size: 26px; line-height: 1.3; font-weight: 400; text-transform: uppercase; }
+  #pd-{{ section.id }} .pd-rating { flex: none; text-align: right; font-size: 11px; color: var(--pd-muted); padding-top: 2px; line-height: 1.6; }
+  #pd-{{ section.id }} .pd-stars { position: relative; display: inline-block; font-size: 10px; letter-spacing: 2px; line-height: 1; }
+  #pd-{{ section.id }} .pd-stars__bg { opacity: .35; }
+  #pd-{{ section.id }} .pd-stars__fg { position: absolute; inset: 0 auto 0 0; overflow: hidden; white-space: nowrap; }
+  #pd-{{ section.id }} .pd-rating__count { display: block; opacity: .8; margin-top: 4px; }
+  #pd-{{ section.id }} .pd-scores { margin: 0 0 22px; }
+  #pd-{{ section.id }} .pd-scores strong { font-weight: 600; }
+  #pd-{{ section.id }} .pd-scores span { margin: 0 4px; }
+  #pd-{{ section.id }} .pd-intro { margin: 0 0 46px; line-height: 1.75; }
+  #pd-{{ section.id }} .pd-intro p { margin: 0; }
+
+  #pd-{{ section.id }} .pd-option { border: 0; margin: 0 0 40px; padding: 0; min-width: 0; }
+  #pd-{{ section.id }} .pd-option legend { padding: 0; margin: 0 0 24px; }
+  #pd-{{ section.id }} .pd-option__values { display: flex; flex-wrap: wrap; gap: 6px 10px; }
+  #pd-{{ section.id }} .pd-option input { position: absolute; opacity: 0; pointer-events: none; }
+  #pd-{{ section.id }} .pd-option label { cursor: pointer; padding-bottom: 2px; border-bottom: 1px solid transparent; }
+  #pd-{{ section.id }} .pd-option input:checked + label { border-bottom-color: var(--pd-text); }
+  #pd-{{ section.id }} .pd-option input:focus-visible + label { outline: 2px solid var(--pd-text); outline-offset: 3px; }
+  #pd-{{ section.id }} .pd-option input:disabled + label { opacity: .4; text-decoration: line-through; }
+
+  #pd-{{ section.id }} .pd-price { margin: 0 0 34px; }
+  #pd-{{ section.id }} .pd-price__row { display: flex; align-items: baseline; gap: 6px; }
+  #pd-{{ section.id }} .pd-price__now { font-size: 26px; line-height: 1.2; }
+  #pd-{{ section.id }} .pd-price__was { font-size: 11px; color: var(--pd-muted); text-decoration: line-through; }
+  #pd-{{ section.id }} .pd-price__unit { margin: 8px 0 0; font-size: 12px; color: var(--pd-muted); }
+
+  #pd-{{ section.id }} .pd-buy { margin: 0 0 26px; }
+  #pd-{{ section.id }} .pd-atc { width: 100%; height: 51px; background: var(--pd-btn-bg); color: var(--pd-btn-text) !important; border: 1px solid var(--pd-btn-bg); border-radius: 0; font-size: 14px; transition: opacity .2s; }
+  #pd-{{ section.id }} .pd-atc:hover { opacity: .85; }
+  #pd-{{ section.id }} .pd-atc:disabled { opacity: .45; cursor: not-allowed; }
+  #pd-{{ section.id }} .pd-delivery { margin: 16px 0 0; text-align: center; font-size: 12px; }
+
+  #pd-{{ section.id }} .pd-acc { border-top: 1px solid var(--pd-line); }
+  #pd-{{ section.id }} .pd-acc summary { list-style: none; display: flex; justify-content: space-between; align-items: center; padding: 24px 0; cursor: pointer; }
+  #pd-{{ section.id }} .pd-acc summary::-webkit-details-marker { display: none; }
+  #pd-{{ section.id }} .pd-acc svg { width: 12px; height: 12px; transition: transform .25s; flex: none; }
+  #pd-{{ section.id }} .pd-acc[open] svg { transform: rotate(180deg); }
+  #pd-{{ section.id }} .pd-acc__body { padding: 0 0 24px; line-height: 1.75; }
+  #pd-{{ section.id }} .pd-acc__body > :first-child { margin-top: 0; }
+  #pd-{{ section.id }} .pd-acc__body > :last-child { margin-bottom: 0; }
+  #pd-{{ section.id }} .pd-acc[open] summary { padding-bottom: 18px; }
+
+  #pd-{{ section.id }} .pd-ritual { margin-top: 44px; }
+  #pd-{{ section.id }} .pd-ritual__head { display: flex; justify-content: space-between; align-items: center; margin: 0 0 20px; text-transform: uppercase; }
+  #pd-{{ section.id }} .pd-ritual__next { background: none; border: 0; padding: 0; width: 20px; height: 20px; display: grid; place-items: center; }
+  #pd-{{ section.id }} .pd-ritual__next svg { width: 12px; height: 12px; }
+  #pd-{{ section.id }} .pd-ritual__track { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-right: -42px; padding-right: 42px; }
+  #pd-{{ section.id }} .pd-ritual__track::-webkit-scrollbar { display: none; }
+  #pd-{{ section.id }} .pd-ritual__item { flex: 0 0 42.4%; scroll-snap-align: start; min-width: 0; }
+  #pd-{{ section.id }} .pd-ritual__img { position: relative; aspect-ratio: 169 / 221; background: var(--pd-page); overflow: hidden; }
+  #pd-{{ section.id }} .pd-ritual__add { position: absolute; left: 10px; bottom: 10px; width: 16px; height: 16px; display: grid; place-items: center; background: #fff; border: 0; padding: 0; }
+  #pd-{{ section.id }} .pd-ritual__add svg { width: 8px; height: 8px; }
+  #pd-{{ section.id }} .pd-ritual__meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; font-size: 12px; }
+  #pd-{{ section.id }} .pd-ritual__meta span:last-child { white-space: nowrap; }
+
+  #pd-{{ section.id }} .pd-lightbox { border: 0; padding: 0; background: transparent; max-width: 92vw; max-height: 92vh; }
+  #pd-{{ section.id }} .pd-lightbox::backdrop { background: rgba(0,0,0,.75); }
+  #pd-{{ section.id }} .pd-lightbox img { width: auto; height: auto; max-width: 92vw; max-height: 92vh; object-fit: contain; }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width: 989px) {
+    #pd-{{ section.id }} .pd { display: block; }
+    #pd-{{ section.id }} .pd__media { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; position: relative; }
+    #pd-{{ section.id }} .pd__media::-webkit-scrollbar { display: none; }
+    #pd-{{ section.id }} .pd__grid { display: contents; }
+    #pd-{{ section.id }} .pd__hero, #pd-{{ section.id }} .pd__tile { flex: 0 0 100%; aspect-ratio: 4 / 5; scroll-snap-align: start; margin: 0; }
+    #pd-{{ section.id }} .pd__dots { display: flex; justify-content: center; gap: 6px; padding: 14px 0 0; background: var(--pd-card); }
+    #pd-{{ section.id }} .pd__dots i { width: 20px; height: 2px; background: var(--pd-line); }
+    #pd-{{ section.id }} .pd__dots i.is-active { background: var(--pd-text); }
+    #pd-{{ section.id }} .pd__info { padding: 0; pointer-events: auto; }
+    #pd-{{ section.id }} .pd__card { position: static; padding: 28px 20px 40px; }
+    #pd-{{ section.id }} .pd-ritual__track { margin-right: -20px; padding-right: 20px; }
+    #pd-{{ section.id }} .pd-title { font-size: 22px; }
+  }
+{% endstyle %}
+
+<section id="pd-{{ section.id }}" data-section-id="{{ section.id }}" data-after-add="{{ section.settings.after_add }}" data-unavailable="{{ section.settings.sold_out_label | escape }}" data-added="{{ section.settings.added_label | escape }}">
+  <div class="pd">
+
+    {%- comment -%} ---------- Gallery ---------- {%- endcomment -%}
+    <div class="pd__media" data-pd-media>
+      {%- for media in product.media -%}
+        {%- if forloop.first -%}
+          <div class="pd__hero">
+            {{ media.preview_image | image_url: width: 2000 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '750, 1100, 1500, 2000', sizes: '100vw', alt: media.alt | default: product.title }}
+          </div>
         {%- endif -%}
+      {%- endfor -%}
+
+      <div class="pd__grid">
+        {%- for media in product.media offset: 1 -%}
+          <div class="pd__tile">
+            {{ media.preview_image | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '400, 600, 800, 1200', sizes: '(min-width: 990px) 33vw, 100vw', alt: media.alt | default: product.title }}
+            <button type="button" class="pd__zoom" data-pd-zoom="{{ media.preview_image | image_url: width: 2000 }}" aria-label="{{ section.settings.zoom_label | escape }}">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3v14M3 10h14"/></svg>
+            </button>
+          </div>
+        {%- endfor -%}
       </div>
-
-      {%- comment -%} Secondary Images (2-Column Grid) {%- endcomment -%}
-      {%- liquid
-        assign has_secondary_images = false
-        if section.settings.secondary_image_1 != blank or section.settings.secondary_image_2 != blank or product.media.size > 1
-          assign has_secondary_images = true
-        endif
-      -%}
-
-      {%- if has_secondary_images -%}
-        <div class="knr-pdp-secondary-grid">
-          {%- comment -%} Image 1 (Left: lifestyle/model) {%- endcomment -%}
-          <div class="knr-pdp-grid-item">
-            {%- if section.settings.secondary_image_1 != blank -%}
-              {{ section.settings.secondary_image_1 | image_url: width: 800 | image_tag:
-                loading: 'lazy',
-                alt: product.title,
-                class: 'knr-pdp-grid-img'
-              }}
-            {%- elsif product.media[1] != blank -%}
-              {{ product.media[1] | image_url: width: 800 | image_tag:
-                loading: 'lazy',
-                alt: product.title,
-                class: 'knr-pdp-grid-img'
-              }}
-            {%- elsif product.images[1] != blank -%}
-              {{ product.images[1] | image_url: width: 800 | image_tag:
-                loading: 'lazy',
-                alt: product.title,
-                class: 'knr-pdp-grid-img'
-              }}
-            {%- else -%}
-              {{ 'collection-1' | placeholder_svg_tag: 'knr-pdp-placeholder-svg' }}
-            {%- endif -%}
-            <button type="button" class="knr-pdp-hotspot-btn" aria-label="Agrandir l'image">+</button>
-          </div>
-
-          {%- comment -%} Image 2 (Right: texture/roses) {%- endcomment -%}
-          <div class="knr-pdp-grid-item">
-            {%- if section.settings.secondary_image_2 != blank -%}
-              {{ section.settings.secondary_image_2 | image_url: width: 800 | image_tag:
-                loading: 'lazy',
-                alt: product.title,
-                class: 'knr-pdp-grid-img'
-              }}
-            {%- elsif product.media[2] != blank -%}
-              {{ product.media[2] | image_url: width: 800 | image_tag:
-                loading: 'lazy',
-                alt: product.title,
-                class: 'knr-pdp-grid-img'
-              }}
-            {%- elsif product.images[2] != blank -%}
-              {{ product.images[2] | image_url: width: 800 | image_tag:
-                loading: 'lazy',
-                alt: product.title,
-                class: 'knr-pdp-grid-img'
-              }}
-            {%- else -%}
-              {{ 'collection-2' | placeholder_svg_tag: 'knr-pdp-placeholder-svg' }}
-            {%- endif -%}
-            <button type="button" class="knr-pdp-hotspot-btn" aria-label="Agrandir l'image">+</button>
-          </div>
-        </div>
-
-        {%- comment -%} Additional images if product has more than 3 photos {%- endcomment -%}
-        {%- if product.media.size > 3 -%}
-          <div class="knr-pdp-secondary-grid">
-            {%- for media in product.media offset: 3 -%}
-              <div class="knr-pdp-grid-item">
-                {{ media | image_url: width: 800 | image_tag:
-                  loading: 'lazy',
-                  alt: product.title,
-                  class: 'knr-pdp-grid-img'
-                }}
-                <button type="button" class="knr-pdp-hotspot-btn" aria-label="Agrandir l'image">+</button>
-              </div>
-            {%- endfor -%}
-          </div>
-        {%- endif -%}
-      {%- endif -%}
-
+    </div>
+    <div class="pd__dots" data-pd-dots aria-hidden="true">
+      {%- for media in product.media -%}<i{% if forloop.first %} class="is-active"{% endif %}></i>{%- endfor -%}
     </div>
 
-
-    {%- comment -%} ══════════════════════════════════════════════════
-        RIGHT COLUMN: STICKY FLOATING WHITE CARD WITH MODULAR BLOCKS
-    ══════════════════════════════════════════════════ {%- endcomment -%}
-    <div class="knr-pdp-sidebar-column">
-      <div class="knr-pdp-card">
-
+    {%- comment -%} ---------- Info card ---------- {%- endcomment -%}
+    <div class="pd__info">
+      <div class="pd__card">
         {%- for block in section.blocks -%}
+          <div {{ block.shopify_attributes }}>
           {%- case block.type -%}
 
-            {%- comment -%} 1. Breadcrumb {%- endcomment -%}
             {%- when 'breadcrumb' -%}
-              <nav class="knr-pdp-breadcrumb" {{ block.shopify_attributes }}>
-                <span>{{ block.settings.text | default: 'Soins anti-âge / Collection Cactus' }}</span>
+              {%- liquid
+                assign c1_label = block.settings.label_1
+                assign c1_url = block.settings.url_1
+                assign c2_label = block.settings.label_2
+                assign c2_url = block.settings.url_2
+                if c1_label == blank
+                  assign c1_label = product.type
+                endif
+                if c2_label == blank and product.collections.size > 0
+                  assign c2_label = product.collections.first.title
+                  assign c2_url = product.collections.first.url
+                endif
+              -%}
+              <nav class="pd-breadcrumb" aria-label="Breadcrumb">
+                {%- if c1_label != blank -%}{% if c1_url != blank %}<a href="{{ c1_url }}">{{ c1_label }}</a>{% else %}{{ c1_label }}{% endif %}{%- endif -%}
+                {%- if c1_label != blank and c2_label != blank %} / {% endif -%}
+                {%- if c2_label != blank -%}{% if c2_url != blank %}<a href="{{ c2_url }}">{{ c2_label }}</a>{% else %}{{ c2_label }}{% endif %}{%- endif -%}
               </nav>
 
-            {%- comment -%} 2. Badges {%- endcomment -%}
             {%- when 'badges' -%}
-              <div class="knr-pdp-badges" {{ block.shopify_attributes }}>
-                {%- if block.settings.badge_1 != blank -%}
-                  <span class="knr-pdp-badge">{{ block.settings.badge_1 }}</span>
-                {%- endif -%}
-                {%- if block.settings.badge_2 != blank -%}
-                  <span class="knr-pdp-badge">{{ block.settings.badge_2 }}</span>
-                {%- endif -%}
-                {%- if block.settings.badge_3 != blank -%}
-                  <span class="knr-pdp-badge">{{ block.settings.badge_3 }}</span>
-                {%- endif -%}
-              </div>
+              {%- assign badge_list = block.settings.badges | split: ',' -%}
+              {%- if badge_list.size > 0 -%}
+                <ul class="pd-badges">
+                  {%- for b in badge_list -%}{%- assign bt = b | strip -%}{%- if bt != blank -%}<li>{{ bt }}</li>{%- endif -%}{%- endfor -%}
+                </ul>
+              {%- endif -%}
 
-            {%- comment -%} 3. Title & Rating {%- endcomment -%}
-            {%- when 'title_and_rating' -%}
-              <div class="knr-pdp-title-row" {{ block.shopify_attributes }}>
-                <h1 class="knr-pdp-title">
-                  {{ product.title | default: block.settings.custom_title | default: 'SÉRUM PRÉCIEUX RÉGÉNÉRANT' }}
-                </h1>
-                {%- if block.settings.show_rating -%}
-                  <div class="knr-pdp-rating">
-                    <div class="knr-pdp-stars">★★★★★ <span class="knr-pdp-rating-val">{{ block.settings.rating_score | default: '4.7' }}</span></div>
-                    <span class="knr-pdp-reviews-count">{{ block.settings.review_count | default: '200 avis' }}</span>
-                  </div>
-                {%- endif -%}
-              </div>
-
-            {%- comment -%} 4. Clean Beauty Scores {%- endcomment -%}
-            {%- when 'scores' -%}
-              <div class="knr-pdp-scores" {{ block.shopify_attributes }}>
-                <span class="knr-pdp-score"><strong>Yuka</strong> {{ block.settings.yuka_score | default: '100/100' }}</span>
-                <span class="knr-pdp-score-sep">·</span>
-                <span class="knr-pdp-score"><strong>INCI Beauty</strong> {{ block.settings.inci_score | default: '20/20' }}</span>
-              </div>
-
-            {%- comment -%} 5. Short Description {%- endcomment -%}
-            {%- when 'short_description' -%}
-              <div class="knr-pdp-desc" {{ block.shopify_attributes }}>
-                {{ block.settings.text | default: 'Une huile anti-âge sèche ultra fine qui travaille en synergie avec la peau pour la maintenir ferme, pleine de vitalité tout en lissant les rides.' }}
-              </div>
-
-            {%- comment -%} 6. Variant Picker {%- endcomment -%}
-            {%- when 'variant_picker' -%}
-              <div class="knr-pdp-variants" {{ block.shopify_attributes }}>
-                {%- unless product.has_only_default_variant -%}
-                  {%- for option in product.options_with_values -%}
-                    <div class="knr-pdp-option-group">
-                      <div class="knr-pdp-option-label">{{ option.name }}</div>
-                      <div class="knr-pdp-option-pills" role="radiogroup">
-                        {%- for value in option.values -%}
-                          <button
-                            type="button"
-                            class="knr-pdp-pill{% if option.selected_value == value %} active{% endif %}"
-                            data-option-index="{{ option.position }}"
-                            data-value="{{ value | escape }}"
-                          >
-                            {{ value }}
-                          </button>
-                        {%- endfor -%}
-                      </div>
-                    </div>
-                  {%- endfor -%}
-                {%- else -%}
-                  <div class="knr-pdp-option-group">
-                    <div class="knr-pdp-option-label">{{ block.settings.fallback_label | default: 'Taille' }}</div>
-                    <div class="knr-pdp-option-pills">
-                      <button type="button" class="knr-pdp-pill active">{{ block.settings.fallback_val_1 | default: '15 mL' }}</button>
-                      <button type="button" class="knr-pdp-pill">{{ block.settings.fallback_val_2 | default: '150 mL' }}</button>
-                    </div>
-                  </div>
-                {%- endunless -%}
-              </div>
-
-            {%- comment -%} 7. Price Block {%- endcomment -%}
-            {%- when 'price' -%}
-              <div class="knr-pdp-price-block" {{ block.shopify_attributes }}>
-                <div class="knr-pdp-price-row">
-                  <span class="knr-pdp-price">
-                    {{ current_variant.price | default: 7500 | money }}
-                  </span>
-                  {%- assign compare_price = current_variant.compare_at_price | default: block.settings.demo_compare_price -%}
-                  {%- if compare_price > current_variant.price or block.settings.demo_compare_price != blank -%}
-                    <span class="knr-pdp-compare-price">
-                      {{ compare_price | default: 8500 | money }}
+            {%- when 'title' -%}
+              {%- liquid
+                assign rating = product.metafields.reviews.rating.value.rating
+                assign rating_count = product.metafields.reviews.rating_count
+                if rating == blank
+                  assign rating = block.settings.fallback_rating
+                endif
+                if rating_count == blank
+                  assign rating_count = block.settings.fallback_count
+                endif
+                assign rating_pct = rating | times: 20.0
+              -%}
+              <div class="pd-title-row">
+                <h1 class="pd-title">{{ product.title }}</h1>
+                {%- if block.settings.show_rating and rating != blank and rating != 0 -%}
+                  <div class="pd-rating">
+                    <span class="pd-stars" role="img" aria-label="{{ rating }} / 5">
+                      <span class="pd-stars__bg">★★★★★</span>
+                      <span class="pd-stars__fg" style="width: {{ rating_pct }}%">★★★★★</span>
                     </span>
+                    <span>{{ rating }}</span>
+                    <span class="pd-rating__count">{{ rating_count }} {{ block.settings.reviews_label }}</span>
+                  </div>
+                {%- endif -%}
+              </div>
+
+            {%- when 'scores' -%}
+              <p class="pd-scores">
+                {%- if block.settings.label_1 != blank -%}<strong>{{ block.settings.label_1 }}</strong> {{ block.settings.score_1 }}{%- endif -%}
+                {%- if block.settings.label_2 != blank -%}<span>·</span><strong>{{ block.settings.label_2 }}</strong> {{ block.settings.score_2 }}{%- endif -%}
+              </p>
+
+            {%- when 'intro' -%}
+              <div class="pd-intro">
+                {%- if block.settings.text != blank -%}{{ block.settings.text }}{%- else -%}<p>{{ product.description | strip_html | truncatewords: 40 }}</p>{%- endif -%}
+              </div>
+
+            {%- when 'variant_picker' -%}
+              {%- unless product.has_only_default_variant -%}
+                {%- for option in product.options_with_values -%}
+                  <fieldset class="pd-option" data-pd-option>
+                    <legend>{{ option.name }}</legend>
+                    <div class="pd-option__values">
+                      {%- for value in option.values -%}
+                        {%- assign oid = 'pd-' | append: section.id | append: '-' | append: option.position | append: '-' | append: forloop.index -%}
+                        <input type="radio" id="{{ oid }}" name="pd-option-{{ option.position }}" value="{{ value | escape }}" {% if option.selected_value == value %}checked{% endif %}>
+                        <label for="{{ oid }}">{{ value }}</label>
+                      {%- endfor -%}
+                    </div>
+                  </fieldset>
+                {%- endfor -%}
+              {%- endunless -%}
+
+            {%- when 'price' -%}
+              <div class="pd-price" data-pd-dynamic="{{ block.id }}">
+                <div class="pd-price__row">
+                  <span class="pd-price__now">{{ variant.price | money }}</span>
+                  {%- if variant.compare_at_price > variant.price -%}
+                    <s class="pd-price__was">{{ variant.compare_at_price | money }}</s>
                   {%- endif -%}
                 </div>
-                {%- if block.settings.unit_price_text != blank -%}
-                  <p class="knr-pdp-unit-price">{{ block.settings.unit_price_text }}</p>
+                {%- if variant.unit_price_measurement -%}
+                  <p class="pd-price__unit">
+                    {{ variant.unit_price | money }} {{ block.settings.per_label }}
+                    {% if variant.unit_price_measurement.reference_value != 1 %}{{ variant.unit_price_measurement.reference_value }}{% endif %}
+                    {{ variant.unit_price_measurement.reference_unit }}
+                  </p>
                 {%- endif -%}
               </div>
 
-            {%- comment -%} 8. Buy Button {%- endcomment -%}
             {%- when 'buy_buttons' -%}
-              <div class="knr-pdp-actions" {{ block.shopify_attributes }}>
-                <product-form class="knr-pdp-form">
-                  {%- form 'product', product, id: 'knr-product-details-form', novalidate: 'novalidate' -%}
-                    <input type="hidden" name="id" value="{{ current_variant.id }}" id="knr-pdp-variant-id">
-                    <input type="hidden" name="quantity" value="1">
-
-                    <button
-                      type="submit"
-                      name="add"
-                      class="knr-pdp-add-btn"
-                      {% unless current_variant.available %}disabled{% endunless %}
-                    >
-                      {%- if current_variant.available -%}
-                        {{ block.settings.button_text | default: 'Ajouter au panier' }}
-                      {%- else -%}
-                        {{ 'products.product.sold_out' | t | default: 'Épuisé' }}
-                      {%- endif -%}
-                    </button>
-                  {%- endform -%}
-                </product-form>
+              <div class="pd-buy" data-pd-dynamic="{{ block.id }}">
+                {%- form 'product', product, id: form_id, data-pd-ajax: '' -%}
+                  <input type="hidden" name="id" value="{{ variant.id }}">
+                  <button type="submit" class="pd-atc" {% unless variant.available %}disabled{% endunless %}>
+                    {%- if variant.available -%}{{ block.settings.button_label }}{%- else -%}{{ section.settings.sold_out_label }}{%- endif -%}
+                  </button>
+                {%- endform -%}
+                {%- if block.settings.show_delivery -%}
+                  <p class="pd-delivery">
+                    {%- if variant.available -%}
+                      {{ block.settings.in_stock_label }}, {{ block.settings.delivery_label }} {{ delivery_date }}.
+                    {%- else -%}
+                      {{ section.settings.sold_out_label }}
+                    {%- endif -%}
+                  </p>
+                {%- endif -%}
               </div>
 
-            {%- comment -%} 9. Shipping & Stock Notice {%- endcomment -%}
-            {%- when 'shipping_notice' -%}
-              <div class="knr-pdp-shipping" {{ block.shopify_attributes }}>
-                <p>{{ block.settings.text | default: 'En stock, livraison estimée Mercredi 25 février.' }}</p>
-              </div>
-
-            {%- comment -%} 10. Slider Indicator Dashes {%- endcomment -%}
-            {%- when 'slider_indicators' -%}
-              <div class="knr-pdp-dashes" {{ block.shopify_attributes }}>
-                <span class="knr-pdp-dash active"></span>
-                <span class="knr-pdp-dash"></span>
-                <span class="knr-pdp-dash"></span>
-              </div>
-
-            {%- comment -%} 11. Collapsible Accordion Tabs {%- endcomment -%}
-            {%- when 'collapsible_tab' -%}
-              <details class="knr-pdp-accordion" {% if block.settings.open_by_default %}open{% endif %} {{ block.shopify_attributes }}>
-                <summary class="knr-pdp-accordion-summary">
-                  <span class="knr-pdp-accordion-title">{{ block.settings.heading }}</span>
-                  <span class="knr-pdp-accordion-icon" aria-hidden="true">
-                    <svg viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5">
-                      <path d="M3 5l4 4 4-4"/>
-                    </svg>
-                  </span>
+            {%- when 'accordion' -%}
+              <details class="pd-acc" {% if block.settings.open %}open{% endif %}>
+                <summary>
+                  <span>{{ block.settings.heading }}</span>
+                  <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4.2l4 4 4-4"/></svg>
                 </summary>
-                <div class="knr-pdp-accordion-content">
-                  {%- if block.settings.content != blank -%}
-                    {{ block.settings.content }}
-                  {%- elsif block.settings.use_product_description -%}
+                <div class="pd-acc__body">
+                  {%- if block.settings.use_product_description -%}
                     {{ product.description }}
+                  {%- else -%}
+                    {{ block.settings.content }}
                   {%- endif -%}
                 </div>
               </details>
 
-            {%- comment -%} 12. Complementary Products ("Complétez votre rituel") {%- endcomment -%}
-            {%- when 'complementary_products' -%}
-              <div class="knr-pdp-cross-sell" {{ block.shopify_attributes }}>
-                <div class="knr-pdp-cross-header">
-                  <span class="knr-pdp-cross-title">{{ block.settings.heading | default: 'COMPLÉTEZ VOTRE RITUEL' }}</span>
-                  <a href="{{ block.settings.link | default: routes.all_products_collection_url }}" class="knr-pdp-cross-arrow" aria-label="Voir la collection">
-                    <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6">
-                      <path d="M6 12l4-4-4-4"/>
-                    </svg>
-                  </a>
-                </div>
-
-                <div class="knr-pdp-cross-grid">
-                  {%- comment -%} Product 1 {%- endcomment -%}
-                  <div class="knr-pdp-cross-card">
-                    <div class="knr-pdp-cross-img-wrap">
-                      {%- if block.settings.product_1 != blank and block.settings.product_1.featured_image != blank -%}
-                        {{ block.settings.product_1.featured_image | image_url: width: 300 | image_tag: loading: 'lazy' }}
-                      {%- elsif product.images.size > 1 -%}
-                        {{ product.images[1] | image_url: width: 300 | image_tag: loading: 'lazy' }}
-                      {%- else -%}
-                        {{ 'product-2' | placeholder_svg_tag: 'knr-pdp-placeholder-svg' }}
-                      {%- endif -%}
-                      <button type="button" class="knr-pdp-cross-plus-btn" aria-label="Ajouter au panier">+</button>
-                    </div>
-                    <p class="knr-pdp-cross-name">{{ block.settings.product_1.title | default: block.settings.product_1_title | default: 'Huile Précieuse' }}</p>
-                    <p class="knr-pdp-cross-price">{{ block.settings.product_1.price | default: 0 | money }}</p>
+            {%- when 'ritual' -%}
+              {%- if block.settings.products.size > 0 -%}
+                <div class="pd-ritual" data-pd-ritual>
+                  <div class="pd-ritual__head">
+                    <span>{{ block.settings.heading }}</span>
+                    <button type="button" class="pd-ritual__next" data-pd-next aria-label="{{ block.settings.next_label | escape }}">
+                      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.2 2l4 4-4 4"/></svg>
+                    </button>
                   </div>
-
-                  {%- comment -%} Product 2 {%- endcomment -%}
-                  <div class="knr-pdp-cross-card">
-                    <div class="knr-pdp-cross-img-wrap">
-                      {%- if block.settings.product_2 != blank and block.settings.product_2.featured_image != blank -%}
-                        {{ block.settings.product_2.featured_image | image_url: width: 300 | image_tag: loading: 'lazy' }}
-                      {%- elsif product.images.size > 2 -%}
-                        {{ product.images[2] | image_url: width: 300 | image_tag: loading: 'lazy' }}
-                      {%- else -%}
-                        {{ 'product-3' | placeholder_svg_tag: 'knr-pdp-placeholder-svg' }}
-                      {%- endif -%}
-                      <button type="button" class="knr-pdp-cross-plus-btn" aria-label="Ajouter au panier">+</button>
-                    </div>
-                    <p class="knr-pdp-cross-name">{{ block.settings.product_2.title | default: block.settings.product_2_title | default: 'Sérum Éclat' }}</p>
-                    <p class="knr-pdp-cross-price">{{ block.settings.product_2.price | default: 0 | money }}</p>
-                  </div>
-
-                  {%- comment -%} Product 3 {%- endcomment -%}
-                  <div class="knr-pdp-cross-card">
-                    <div class="knr-pdp-cross-img-wrap">
-                      {%- if block.settings.product_3 != blank and block.settings.product_3.featured_image != blank -%}
-                        {{ block.settings.product_3.featured_image | image_url: width: 300 | image_tag: loading: 'lazy' }}
-                      {%- elsif product.images.size > 0 -%}
-                        {{ product.images[0] | image_url: width: 300 | image_tag: loading: 'lazy' }}
-                      {%- else -%}
-                        {{ 'product-4' | placeholder_svg_tag: 'knr-pdp-placeholder-svg' }}
-                      {%- endif -%}
-                      <button type="button" class="knr-pdp-cross-plus-btn" aria-label="Ajouter au panier">+</button>
-                    </div>
-                    <p class="knr-pdp-cross-name">{{ block.settings.product_3.title | default: block.settings.product_3_title | default: 'Crème Fondante' }}</p>
-                    <p class="knr-pdp-cross-price">{{ block.settings.product_3.price | default: 0 | money }}</p>
+                  <div class="pd-ritual__track" data-pd-track>
+                    {%- for p in block.settings.products -%}
+                      {%- assign pv = p.selected_or_first_available_variant -%}
+                      <div class="pd-ritual__item">
+                        <div class="pd-ritual__img">
+                          <a href="{{ p.url }}" tabindex="-1" aria-hidden="true">
+                            {%- if p.featured_image -%}{{ p.featured_image | image_url: width: 500 | image_tag: loading: 'lazy', widths: '250, 400, 500', sizes: '200px', alt: p.title }}{%- endif -%}
+                          </a>
+                          {%- if p.available and p.variants.size >= 1 -%}
+                            {%- form 'product', p, data-pd-ajax: '' -%}
+                              <input type="hidden" name="id" value="{{ pv.id }}">
+                              <button type="submit" class="pd-ritual__add" aria-label="{{ block.settings.add_label | escape }} {{ p.title | escape }}">
+                                <svg viewBox="0 0 8 8" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 0v8M0 4h8"/></svg>
+                              </button>
+                            {%- endform -%}
+                          {%- endif -%}
+                        </div>
+                        <div class="pd-ritual__meta">
+                          <a href="{{ p.url }}">{{ p.title }}</a>
+                          <span>{{ p.price | money }}</span>
+                        </div>
+                      </div>
+                    {%- endfor -%}
                   </div>
                 </div>
-              </div>
+              {%- endif -%}
+
+            {%- when 'text' -%}
+              <div class="pd-intro">{{ block.settings.text }}</div>
 
           {%- endcase -%}
+          </div>
         {%- endfor -%}
-
       </div>
     </div>
-
   </div>
+
+  <dialog class="pd-lightbox" data-pd-lightbox><img alt=""></dialog>
+  <script type="application/json" data-pd-variants>{{ product.variants | json }}</script>
 </section>
 
-<style>
-/* ═════════════════════════════════════════════════════════════════
-   KNR PRODUCT DETAIL SECTION - EXACT DESIGN STYLES
-   ═════════════════════════════════════════════════════════════════ */
-.knr-pdp-section {
-  width: 100%;
-  background-color: #ECE7DF;
-  padding: 0;
-  margin: 0;
-  font-family: var(--font-body--family, 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
-  color: #1A1A1A;
-  line-height: 1.5;
-  box-sizing: border-box;
-}
-
-.knr-pdp-section *,
-.knr-pdp-section *::before,
-.knr-pdp-section *::after {
-  box-sizing: border-box;
-}
-
-.knr-pdp-wrapper {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-height: 100vh;
-}
-
-@media (min-width: 990px) {
-  .knr-pdp-wrapper {
-    display: grid;
-    grid-template-columns: 1fr 490px;
-    align-items: start;
-    gap: 0;
-  }
-}
-
-@media (min-width: 1320px) {
-  .knr-pdp-wrapper {
-    grid-template-columns: 1fr 520px;
-  }
-}
-
-/* ── Left Column: Media Gallery ── */
-.knr-pdp-media-column {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  background-color: #ECE7DF;
-}
-
-/* Main featured image: takes full width of the media area */
-.knr-pdp-main-image-container {
-  width: 100%;
-  background-color: #ECE7DF;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.knr-pdp-main-img {
-  width: 100%;
-  height: auto;
-  max-height: 80vh;
-  object-fit: cover;
-  display: block;
-}
-
-.knr-pdp-placeholder-svg {
-  width: 100%;
-  height: 100%;
-  min-height: 480px;
-  max-height: 70vh;
-  display: block;
-  background-color: #ECE7DF;
-  fill: #8C847A;
-}
-
-/* Secondary 2-Column Grid */
-.knr-pdp-secondary-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3px;
-  width: 100%;
-}
-
-.knr-pdp-grid-item {
-  position: relative;
-  aspect-ratio: 1 / 1;
-  background-color: #E5DFC8;
-  overflow: hidden;
-}
-
-.knr-pdp-grid-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* Hotspot "+" button */
-.knr-pdp-hotspot-btn {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  width: 28px;
-  height: 28px;
-  border: none;
-  background: transparent;
-  color: #FFFFFF;
-  font-size: 22px;
-  font-weight: 300;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.45));
-  transition: transform 0.2s ease;
-  z-index: 2;
-}
-
-.knr-pdp-hotspot-btn:hover {
-  transform: scale(1.2);
-}
-
-/* ── Right Column: Sticky Floating White Card ── */
-.knr-pdp-sidebar-column {
-  padding: 16px;
-  background-color: #ECE7DF;
-}
-
-@media (min-width: 990px) {
-  .knr-pdp-sidebar-column {
-    position: sticky;
-    top: 0;
-    padding: 24px 28px 24px 16px;
-    height: 100vh;
-    overflow-y: auto;
-    scrollbar-width: thin;
-  }
-}
-
-.knr-pdp-card {
-  background: #FFFFFF;
-  padding: 34px 38px 40px;
-  color: #1A1A1A;
-}
-
-@media (max-width: 749px) {
-  .knr-pdp-card {
-    padding: 24px 18px;
-  }
-}
-
-/* 1. Breadcrumbs */
-.knr-pdp-breadcrumb {
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  color: #8C847B;
-  margin-bottom: 16px;
-  line-height: 1.4;
-}
-
-/* 2. Badges */
-.knr-pdp-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 18px;
-}
-
-.knr-pdp-badge {
-  display: inline-block;
-  padding: 3px 8px;
-  border: 1px solid #1A1A1A;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #1A1A1A;
-  border-radius: 2px;
-}
-
-/* 3. Title & Rating */
-.knr-pdp-title-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 14px;
-}
-
-.knr-pdp-title {
-  font-size: 21px;
-  font-weight: 500;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  line-height: 1.25;
-  color: #111111;
-  margin: 0;
-  font-family: inherit;
-}
-
-.knr-pdp-rating {
-  text-align: right;
-  flex-shrink: 0;
-}
-
-.knr-pdp-stars {
-  font-size: 11px;
-  color: #55504A;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-  letter-spacing: 0.08em;
-}
-
-.knr-pdp-rating-val {
-  font-weight: 600;
-  color: #222222;
-}
-
-.knr-pdp-reviews-count {
-  display: block;
-  font-size: 10px;
-  color: #8C847A;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  margin-top: 2px;
-}
-
-/* 4. Scores */
-.knr-pdp-scores {
-  font-size: 11px;
-  color: #2B2824;
-  margin-bottom: 16px;
-}
-
-.knr-pdp-score strong {
-  font-weight: 700;
-  color: #000000;
-}
-
-.knr-pdp-score-sep {
-  margin: 0 6px;
-  color: #B5AEA4;
-}
-
-/* 5. Short Description */
-.knr-pdp-desc {
-  font-size: 12px;
-  line-height: 1.65;
-  color: #4A4641;
-  margin-bottom: 22px;
-}
-
-/* 6. Variant Picker */
-.knr-pdp-variants {
-  margin-bottom: 20px;
-}
-
-.knr-pdp-option-group {
-  margin-bottom: 12px;
-}
-
-.knr-pdp-option-label {
-  font-size: 11px;
-  color: #222222;
-  margin-bottom: 8px;
-}
-
-.knr-pdp-option-pills {
-  display: flex;
-  gap: 12px;
-}
-
-.knr-pdp-pill {
-  background: transparent;
-  border: none;
-  border-bottom: 1.5px solid transparent;
-  padding: 4px 6px;
-  font-size: 12px;
-  color: #666666;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
-}
-
-.knr-pdp-pill.active,
-.knr-pdp-pill:hover {
-  color: #000000;
-  font-weight: 600;
-  border-bottom-color: #000000;
-}
-
-/* 7. Price Block */
-.knr-pdp-price-block {
-  margin-bottom: 20px;
-}
-
-.knr-pdp-price-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.knr-pdp-price {
-  font-size: 22px;
-  font-weight: 500;
-  color: #111111;
-  letter-spacing: -0.01em;
-}
-
-.knr-pdp-compare-price {
-  font-size: 13px;
-  color: #A09A92;
-  text-decoration: line-through;
-}
-
-.knr-pdp-unit-price {
-  font-size: 11px;
-  color: #8C847A;
-  margin: 0;
-}
-
-/* 8. Buy Button */
-.knr-pdp-actions {
-  margin-bottom: 12px;
-}
-
-.knr-pdp-add-btn {
-  width: 100%;
-  background: #000000;
-  color: #FFFFFF;
-  padding: 15px 20px;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  border: none;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-  font-family: inherit;
-}
-
-.knr-pdp-add-btn:hover {
-  opacity: 0.88;
-}
-
-.knr-pdp-add-btn:disabled {
-  background: #C4BFB8;
-  cursor: not-allowed;
-}
-
-/* 9. Shipping Notice */
-.knr-pdp-shipping {
-  text-align: center;
-  font-size: 11px;
-  color: #55504A;
-  margin-bottom: 16px;
-}
-
-.knr-pdp-shipping p {
-  margin: 0;
-}
-
-/* 10. Slider Indicator Dashes */
-.knr-pdp-dashes {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  margin-bottom: 24px;
-}
-
-.knr-pdp-dash {
-  width: 22px;
-  height: 1.5px;
-  background-color: #E2DDD5;
-  border-radius: 1px;
-}
-
-.knr-pdp-dash.active {
-  background-color: #55504A;
-}
-
-/* 11. Collapsible Accordions */
-.knr-pdp-accordion {
-  border-top: 1px solid #ECE7E0;
-}
-
-.knr-pdp-accordion-summary {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 0;
-  cursor: pointer;
-  list-style: none;
-  font-size: 12px;
-  font-weight: 500;
-  color: #1A1A1A;
-}
-
-.knr-pdp-accordion-summary::-webkit-details-marker {
-  display: none;
-}
-
-.knr-pdp-accordion-icon svg {
-  transition: transform 0.25s ease;
-  display: block;
-}
-
-.knr-pdp-accordion[open] .knr-pdp-accordion-icon svg {
-  transform: rotate(180deg);
-}
-
-.knr-pdp-accordion-content {
-  padding-bottom: 16px;
-  font-size: 12px;
-  line-height: 1.65;
-  color: #4A4641;
-}
-
-.knr-pdp-accordion-content p {
-  margin: 0;
-}
-
-/* 12. Cross-Sell / "Complétez votre rituel" */
-.knr-pdp-cross-sell {
-  border-top: 1px solid #ECE7E0;
-  padding-top: 20px;
-  margin-top: 8px;
-}
-
-.knr-pdp-cross-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.knr-pdp-cross-title {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #1A1A1A;
-}
-
-.knr-pdp-cross-arrow {
-  color: #1A1A1A;
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-}
-
-.knr-pdp-cross-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.knr-pdp-cross-card {
-  display: flex;
-  flex-direction: column;
-}
-
-.knr-pdp-cross-img-wrap {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  background-color: #ECE7DF;
-  overflow: hidden;
-  border-radius: 2px;
-}
-
-.knr-pdp-cross-img-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.knr-pdp-cross-img-wrap svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-  fill: #8C847A;
-}
-
-.knr-pdp-cross-plus-btn {
-  position: absolute;
-  bottom: 6px;
-  left: 6px;
-  width: 20px;
-  height: 20px;
-  background: #FFFFFF;
-  border-radius: 50%;
-  border: none;
-  font-size: 13px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #111111;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-  transition: transform 0.15s ease;
-}
-
-.knr-pdp-cross-plus-btn:hover {
-  transform: scale(1.15);
-}
-
-.knr-pdp-cross-name {
-  font-size: 10px;
-  font-weight: 500;
-  color: #222222;
-  margin: 6px 0 2px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.knr-pdp-cross-price {
-  font-size: 10px;
-  color: #555555;
-  margin: 0;
-}
-</style>
-
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    /* Interactive Variant Pills */
-    const pills = document.querySelectorAll('.knr-pdp-pill');
-    pills.forEach(pill => {
-      pill.addEventListener('click', function () {
-        const parent = pill.closest('.knr-pdp-option-pills');
-        if (parent) {
-          parent.querySelectorAll('.knr-pdp-pill').forEach(p => p.classList.remove('active'));
-          pill.classList.add('active');
-        }
-      });
+  (() => {
+    const root = document.getElementById('pd-{{ section.id }}');
+    if (!root) return;
+    const sectionId = root.dataset.sectionId;
+
+    /* Lightbox */
+    const box = root.querySelector('[data-pd-lightbox]');
+    root.addEventListener('click', (e) => {
+      const z = e.target.closest('[data-pd-zoom]');
+      if (z) { box.querySelector('img').src = z.dataset.pdZoom; box.showModal(); return; }
+      if (e.target === box || e.target.closest('[data-pd-lightbox]')) box.close();
+      const next = e.target.closest('[data-pd-next]');
+      if (next) {
+        const track = next.closest('[data-pd-ritual]').querySelector('[data-pd-track]');
+        const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+        track.scrollTo({ left: atEnd ? 0 : track.scrollLeft + track.clientWidth * 0.6, behavior: 'smooth' });
+      }
     });
 
-    /* Accordion chevron animation */
-    const accordions = document.querySelectorAll('.knr-pdp-accordion');
-    accordions.forEach(acc => {
-      acc.addEventListener('toggle', function () {
-        const icon = acc.querySelector('.knr-pdp-accordion-icon svg');
-        if (icon) {
-          icon.style.transform = acc.open ? 'rotate(180deg)' : 'rotate(0deg)';
-        }
-      });
+    /* Mobile slider dots */
+    const media = root.querySelector('[data-pd-media]');
+    const dots = root.querySelectorAll('[data-pd-dots] i');
+    media.addEventListener('scroll', () => {
+      const i = Math.round(media.scrollLeft / media.clientWidth);
+      dots.forEach((d, n) => d.classList.toggle('is-active', n === i));
+    }, { passive: true });
+
+    /* Variant switching: re-render price / buy blocks from the server */
+    const variants = JSON.parse(root.querySelector('[data-pd-variants]').textContent);
+    root.addEventListener('change', async (e) => {
+      if (!e.target.closest('[data-pd-option]')) return;
+      const chosen = [...root.querySelectorAll('[data-pd-option]')].map((f) => f.querySelector('input:checked')?.value);
+      const v = variants.find((x) => x.options.every((o, i) => o === chosen[i]));
+      if (!v) {
+        root.querySelectorAll('.pd-buy .pd-atc').forEach((b) => { b.disabled = true; b.textContent = root.dataset.unavailable; });
+        return;
+      }
+      history.replaceState(null, '', `?variant=${v.id}`);
+      try {
+        const res = await fetch(`${location.pathname}?variant=${v.id}&section_id=${sectionId}`);
+        const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+        root.querySelectorAll('[data-pd-dynamic]').forEach((el) => {
+          const fresh = doc.querySelector(`[data-pd-dynamic="${el.dataset.pdDynamic}"]`);
+          if (fresh) el.replaceWith(fresh);
+        });
+      } catch (err) { console.error(err); }
     });
-  });
+
+    /* Ajax add to cart (main button + ritual "+" buttons) */
+    root.addEventListener('submit', async (e) => {
+      const form = e.target.closest('form[data-pd-ajax]');
+      if (!form) return;
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      const label = btn.textContent;
+      btn.disabled = true;
+      try {
+        const base = (window.Shopify && Shopify.routes && Shopify.routes.root) || '/';
+        const res = await fetch(base + 'cart/add.js', { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error((await res.json()).description || 'Error');
+        if (root.dataset.afterAdd === 'cart') { window.location.href = base + 'cart'; return; }
+        document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+        if (btn.classList.contains('pd-atc')) btn.textContent = root.dataset.added;
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setTimeout(() => { btn.disabled = false; if (btn.classList.contains('pd-atc')) btn.textContent = label; }, 1600);
+      }
+    });
+  })();
 </script>
 
 {% schema %}
 {
-  "name": "KNR Product Details",
-  "tag": "section",
-  "class": "knr-pdp-section-wrapper",
+  "name": "Product details",
+  "tag": "div",
+  "class": "section-product-details",
   "settings": [
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "page_color", "label": "Image background", "default": "#d8d4c4" },
+    { "type": "color", "id": "card_color", "label": "Info card background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#000000" },
+    { "type": "color", "id": "muted_color", "label": "Muted text (breadcrumb, unit price…)", "default": "#b8a98f" },
+    { "type": "color", "id": "line_color", "label": "Dividers", "default": "#cfcfcf" },
+    { "type": "color", "id": "button_bg", "label": "Button background", "default": "#000000" },
+    { "type": "color", "id": "button_text", "label": "Button text", "default": "#ffffff" },
+    { "type": "header", "content": "Typography" },
+    { "type": "font_picker", "id": "font", "label": "Font", "default": "inter_n4" },
+    { "type": "header", "content": "Cart & delivery" },
+    { "type": "range", "id": "delivery_days", "label": "Estimated delivery (days from today)", "min": 1, "max": 21, "step": 1, "default": 3 },
     {
-      "type": "image_picker",
-      "id": "main_image",
-      "label": "Image produit principale (remplacement optionnel)"
+      "type": "select", "id": "after_add", "label": "After adding to cart",
+      "options": [
+        { "value": "stay", "label": "Stay on page (fires cart:refresh event)" },
+        { "value": "cart", "label": "Go to cart page" }
+      ],
+      "default": "stay"
     },
-    {
-      "type": "image_picker",
-      "id": "secondary_image_1",
-      "label": "Photo éditoriale 1 (gauche, optionnel)"
-    },
-    {
-      "type": "image_picker",
-      "id": "secondary_image_2",
-      "label": "Photo éditoriale 2 (droite, optionnel)"
-    }
+    { "type": "text", "id": "sold_out_label", "label": "Sold out label", "default": "Épuisé" },
+    { "type": "text", "id": "added_label", "label": "Added label", "default": "Ajouté ✓" },
+    { "type": "text", "id": "zoom_label", "label": "Zoom button accessibility label", "default": "Agrandir l'image" }
   ],
   "blocks": [
     {
       "type": "breadcrumb",
-      "name": "Fil d'Ariane",
+      "name": "Breadcrumb",
       "limit": 1,
       "settings": [
-        {
-          "type": "text",
-          "id": "text",
-          "label": "Texte",
-          "default": "Soins anti-âge / Collection Cactus"
-        }
+        { "type": "text", "id": "label_1", "label": "Level 1 label", "default": "Soins anti-âge" },
+        { "type": "url", "id": "url_1", "label": "Level 1 link" },
+        { "type": "text", "id": "label_2", "label": "Level 2 label (defaults to first collection)" },
+        { "type": "url", "id": "url_2", "label": "Level 2 link" }
       ]
     },
     {
@@ -953,291 +472,111 @@
       "name": "Badges",
       "limit": 1,
       "settings": [
-        {
-          "type": "text",
-          "id": "badge_1",
-          "label": "Badge 1",
-          "default": "UNIFIE"
-        },
-        {
-          "type": "text",
-          "id": "badge_2",
-          "label": "Badge 2",
-          "default": "PROTÈGE"
-        },
-        {
-          "type": "text",
-          "id": "badge_3",
-          "label": "Badge 3"
-        }
+        { "type": "text", "id": "badges", "label": "Badges (comma separated)", "default": "Unifie, Protège" }
       ]
     },
     {
-      "type": "title_and_rating",
-      "name": "Titre et Avis",
+      "type": "title",
+      "name": "Title & rating",
       "limit": 1,
       "settings": [
-        {
-          "type": "text",
-          "id": "custom_title",
-          "label": "Titre personnalisé",
-          "default": "SÉRUM PRÉCIEUX RÉGÉNÉRANT"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_rating",
-          "label": "Afficher les avis",
-          "default": true
-        },
-        {
-          "type": "text",
-          "id": "rating_score",
-          "label": "Note",
-          "default": "4.7"
-        },
-        {
-          "type": "text",
-          "id": "review_count",
-          "label": "Nombre d'avis",
-          "default": "200 avis"
-        }
+        { "type": "checkbox", "id": "show_rating", "label": "Show rating", "default": true },
+        { "type": "paragraph", "content": "Reads the metafields reviews.rating and reviews.rating_count. Values below are used when those are empty." },
+        { "type": "range", "id": "fallback_rating", "label": "Fallback rating", "min": 0, "max": 5, "step": 0.1, "default": 4.7 },
+        { "type": "number", "id": "fallback_count", "label": "Fallback review count", "default": 200 },
+        { "type": "text", "id": "reviews_label", "label": "Reviews label", "default": "avis" }
       ]
     },
     {
       "type": "scores",
-      "name": "Scores Yuka / INCI",
-      "limit": 1,
+      "name": "Scores (Yuka / INCI)",
       "settings": [
-        {
-          "type": "text",
-          "id": "yuka_score",
-          "label": "Score Yuka",
-          "default": "100/100"
-        },
-        {
-          "type": "text",
-          "id": "inci_score",
-          "label": "Score INCI Beauty",
-          "default": "20/20"
-        }
+        { "type": "text", "id": "label_1", "label": "Label 1", "default": "Yuka" },
+        { "type": "text", "id": "score_1", "label": "Score 1", "default": "100/100" },
+        { "type": "text", "id": "label_2", "label": "Label 2", "default": "INCI Beauty" },
+        { "type": "text", "id": "score_2", "label": "Score 2", "default": "20/20" }
       ]
     },
     {
-      "type": "short_description",
-      "name": "Description courte",
-      "limit": 1,
+      "type": "intro",
+      "name": "Short description",
       "settings": [
-        {
-          "type": "textarea",
-          "id": "text",
-          "label": "Texte court",
-          "default": "Une huile anti-âge sèche ultra fine qui travaille en synergie avec la peau pour la maintenir ferme, pleine de vitalité tout en lissant les rides."
-        }
+        { "type": "richtext", "id": "text", "label": "Text (empty = product description excerpt)", "default": "<p>Une huile anti-âge sèche ultra fine qui travaille en synergie avec la peau pour la maintenir ferme, pleine de vitalité tout en lissant les rides.</p>" }
       ]
     },
-    {
-      "type": "variant_picker",
-      "name": "Sélecteur de variantes",
-      "limit": 1,
-      "settings": [
-        {
-          "type": "text",
-          "id": "fallback_label",
-          "label": "Label de repli",
-          "default": "Taille"
-        },
-        {
-          "type": "text",
-          "id": "fallback_val_1",
-          "label": "Option 1",
-          "default": "15 mL"
-        },
-        {
-          "type": "text",
-          "id": "fallback_val_2",
-          "label": "Option 2",
-          "default": "150 mL"
-        }
-      ]
-    },
+    { "type": "variant_picker", "name": "Variant picker", "limit": 1, "settings": [] },
     {
       "type": "price",
-      "name": "Prix",
+      "name": "Price",
       "limit": 1,
       "settings": [
-        {
-          "type": "text",
-          "id": "unit_price_text",
-          "label": "Prix au 100 mL",
-          "default": "€75.00 par 100 mL"
-        },
-        {
-          "type": "text",
-          "id": "demo_compare_price",
-          "label": "Prix barré démo (en centimes)",
-          "default": "8500"
-        }
+        { "type": "text", "id": "per_label", "label": "Unit price label", "default": "par" }
       ]
     },
     {
       "type": "buy_buttons",
-      "name": "Bouton d'achat",
+      "name": "Add to cart",
       "limit": 1,
       "settings": [
-        {
-          "type": "text",
-          "id": "button_text",
-          "label": "Texte du bouton",
-          "default": "Ajouter au panier"
-        }
+        { "type": "text", "id": "button_label", "label": "Button label", "default": "Ajouter au panier" },
+        { "type": "checkbox", "id": "show_delivery", "label": "Show stock & delivery text", "default": true },
+        { "type": "text", "id": "in_stock_label", "label": "In stock label", "default": "En stock" },
+        { "type": "text", "id": "delivery_label", "label": "Delivery label", "default": "livraison estimée" }
       ]
     },
     {
-      "type": "shipping_notice",
-      "name": "Notice d'expédition & stock",
-      "limit": 1,
+      "type": "accordion",
+      "name": "Accordion",
       "settings": [
-        {
-          "type": "text",
-          "id": "text",
-          "label": "Texte de livraison",
-          "default": "En stock, livraison estimée Mercredi 25 février."
-        }
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Description" },
+        { "type": "checkbox", "id": "use_product_description", "label": "Use product description", "default": false },
+        { "type": "richtext", "id": "content", "label": "Content" },
+        { "type": "checkbox", "id": "open", "label": "Open by default", "default": false }
       ]
     },
     {
-      "type": "slider_indicators",
-      "name": "Indicateurs de progression",
+      "type": "ritual",
+      "name": "Complete the ritual",
       "limit": 1,
-      "settings": []
-    },
-    {
-      "type": "collapsible_tab",
-      "name": "Onglet accordéon",
       "settings": [
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Titre",
-          "default": "Description"
-        },
-        {
-          "type": "richtext",
-          "id": "content",
-          "label": "Contenu",
-          "default": "<p>Formulé à partir de 97 % d'ingrédients d'origine naturelle, ce sérum précieux active les mécanismes naturels de régénération cellulaire.</p>"
-        },
-        {
-          "type": "checkbox",
-          "id": "use_product_description",
-          "label": "Utiliser la description produit Shopify",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "open_by_default",
-          "label": "Ouvert par défaut",
-          "default": false
-        }
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Complétez votre rituel" },
+        { "type": "product_list", "id": "products", "label": "Products", "limit": 8 },
+        { "type": "text", "id": "add_label", "label": "Quick-add accessibility label", "default": "Ajouter" },
+        { "type": "text", "id": "next_label", "label": "Next accessibility label", "default": "Suivant" }
       ]
     },
     {
-      "type": "complementary_products",
-      "name": "Complétez votre rituel",
-      "limit": 1,
+      "type": "text",
+      "name": "Custom text",
       "settings": [
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Titre",
-          "default": "COMPLÉTEZ VOTRE RITUEL"
-        },
-        {
-          "type": "product",
-          "id": "product_1",
-          "label": "Produit 1"
-        },
-        {
-          "type": "text",
-          "id": "product_1_title",
-          "label": "Titre repli 1",
-          "default": "Huile Précieuse"
-        },
-        {
-          "type": "product",
-          "id": "product_2",
-          "label": "Produit 2"
-        },
-        {
-          "type": "text",
-          "id": "product_2_title",
-          "label": "Titre repli 2",
-          "default": "Sérum Éclat"
-        },
-        {
-          "type": "product",
-          "id": "product_3",
-          "label": "Produit 3"
-        },
-        {
-          "type": "text",
-          "id": "product_3_title",
-          "label": "Titre repli 3",
-          "default": "Crème Fondante"
-        },
-        {
-          "type": "url",
-          "id": "link",
-          "label": "Lien de la flèche"
-        }
+        { "type": "richtext", "id": "text", "label": "Text" }
       ]
     }
   ],
   "presets": [
     {
-      "name": "KNR Product Details",
-      "category": "Product",
+      "name": "Product details",
       "blocks": [
         { "type": "breadcrumb" },
         { "type": "badges" },
-        { "type": "title_and_rating" },
+        { "type": "title" },
         { "type": "scores" },
-        { "type": "short_description" },
+        { "type": "intro" },
         { "type": "variant_picker" },
         { "type": "price" },
         { "type": "buy_buttons" },
-        { "type": "shipping_notice" },
-        { "type": "slider_indicators" },
         {
-          "type": "collapsible_tab",
+          "type": "accordion",
           "settings": {
             "heading": "Description",
-            "open_by_default": true,
-            "content": "<p>Formulé à partir de 97 % d'ingrédients d'origine naturelle, ce sérum précieux active les mécanismes naturels de régénération cellulaire.</p>"
+            "use_product_description": true,
+            "open": true
           }
         },
-        {
-          "type": "collapsible_tab",
-          "settings": {
-            "heading": "Bienfaits",
-            "content": "<p>Hydrate en profondeur, lisse l'apparence des ridules et redonne éclat et élasticité dès la première application.</p>"
-          }
-        },
-        {
-          "type": "collapsible_tab",
-          "settings": {
-            "heading": "Ingrédients clés",
-            "content": "<p>Huile de pépins de figue de Barbarie bio, acide hyaluronique pur d'origine végétale, vitamine E naturelle.</p>"
-          }
-        },
-        {
-          "type": "collapsible_tab",
-          "settings": {
-            "heading": "Adapté aux peaux",
-            "content": "<p>Convient à tous types de peaux, y compris les peaux sensibles, déshydratées ou matures.</p>"
-          }
-        },
-        { "type": "complementary_products" }
+        { "type": "accordion", "settings": { "heading": "Bienfaits" } },
+        { "type": "accordion", "settings": { "heading": "Ingrédients clés" } },
+        { "type": "accordion", "settings": { "heading": "Adapté aux peaux" } },
+        { "type": "ritual" }
       ]
     }
   ]
