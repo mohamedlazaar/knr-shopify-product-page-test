@@ -1,0 +1,584 @@
+{%- comment -%}
+  sections/product-details.liquid
+  Product details section — big hero + 2-col gallery on the left, sticky white info card on the right.
+  Use it in templates/product.json (or product.liquid).
+{%- endcomment -%}
+
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign form_id = 'pd-form-' | append: section.id
+  assign delivery_days = section.settings.delivery_days
+  assign now_ts = 'now' | date: '%s' | plus: 0
+  assign delivery_ts = delivery_days | times: 86400 | plus: now_ts
+  assign fr_days = 'Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi' | split: ','
+  assign fr_months = 'janvier,février,mars,avril,mai,juin,juillet,août,septembre,octobre,novembre,décembre' | split: ','
+  assign d_idx = delivery_ts | date: '%w' | plus: 0
+  assign m_idx = delivery_ts | date: '%-m' | plus: 0 | minus: 1
+  assign d_num = delivery_ts | date: '%-d'
+  assign delivery_date = fr_days[d_idx] | append: ' ' | append: d_num | append: ' ' | append: fr_months[m_idx]
+-%}
+
+{{ section.settings.font | font_face: font_display: 'swap' }}
+
+{% style %}
+  #pd-{{ section.id }} {
+    --pd-text: {{ section.settings.text_color }};
+    --pd-muted: {{ section.settings.muted_color }};
+    --pd-line: {{ section.settings.line_color }};
+    --pd-card: {{ section.settings.card_color }};
+    --pd-btn-bg: {{ section.settings.button_bg }};
+    --pd-btn-text: {{ section.settings.button_text }};
+    --pd-page: {{ section.settings.page_color }};
+    --pd-font: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
+    --pd-gap: 9px;
+  }
+  #pd-{{ section.id }} { background: var(--pd-page); color: var(--pd-text); font-family: var(--pd-font); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  #pd-{{ section.id }} *, #pd-{{ section.id }} *::before, #pd-{{ section.id }} *::after { box-sizing: border-box; }
+  #pd-{{ section.id }} img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  #pd-{{ section.id }} button { font: inherit; color: inherit; cursor: pointer; }
+  #pd-{{ section.id }} a { color: inherit; text-decoration: none; }
+  #pd-{{ section.id }} :focus-visible { outline: 2px solid var(--pd-text); outline-offset: 3px; }
+
+  /* ---------- Layout ---------- */
+  #pd-{{ section.id }} .pd { display: grid; grid-template-columns: minmax(0, 65.6%) minmax(0, 1fr); background: var(--pd-card); }
+  #pd-{{ section.id }} .pd__media { display: contents; }
+  #pd-{{ section.id }} .pd__hero { grid-column: 1 / -1; grid-row: 1; aspect-ratio: 1526 / 730; position: relative; background: var(--pd-page); overflow: hidden; }
+  #pd-{{ section.id }} .pd__grid { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; gap: var(--pd-gap); margin-top: var(--pd-gap); align-content: start; }
+  #pd-{{ section.id }} .pd__tile { position: relative; aspect-ratio: 495 / 647; overflow: hidden; background: var(--pd-page); }
+  #pd-{{ section.id }} .pd__zoom { position: absolute; right: 16px; bottom: 16px; width: 28px; height: 28px; display: grid; place-items: center; background: none; border: 0; padding: 0; color: #fff; }
+  #pd-{{ section.id }} .pd__zoom svg { width: 20px; height: 20px; }
+  #pd-{{ section.id }} .pd__dots { display: none; }
+
+  #pd-{{ section.id }} .pd__info { grid-column: 2; grid-row: 1 / span 2; padding: 59px 41px 0 0; position: relative; z-index: 2; pointer-events: none; }
+  #pd-{{ section.id }} .pd__card { pointer-events: auto; position: sticky; top: 20px; background: var(--pd-card); padding: 42px 42px 48px; }
+
+  /* ---------- Blocks ---------- */
+  #pd-{{ section.id }} .pd-breadcrumb { font-size: 11px; color: var(--pd-muted); margin: 0 0 40px; }
+  #pd-{{ section.id }} .pd-breadcrumb a:hover { text-decoration: underline; }
+  #pd-{{ section.id }} .pd-badges { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 32px; padding: 0; list-style: none; }
+  #pd-{{ section.id }} .pd-badges li { border: 1px solid var(--pd-text); border-radius: 2px; padding: 2px 4px; font-size: 13px; line-height: 1.4; text-transform: uppercase; }
+  #pd-{{ section.id }} .pd-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin: 0 0 30px; }
+  #pd-{{ section.id }} .pd-title { margin: 0; font-size: 26px; line-height: 1.3; font-weight: 400; text-transform: uppercase; }
+  #pd-{{ section.id }} .pd-rating { flex: none; text-align: right; font-size: 11px; color: var(--pd-muted); padding-top: 2px; line-height: 1.6; }
+  #pd-{{ section.id }} .pd-stars { position: relative; display: inline-block; font-size: 10px; letter-spacing: 2px; line-height: 1; }
+  #pd-{{ section.id }} .pd-stars__bg { opacity: .35; }
+  #pd-{{ section.id }} .pd-stars__fg { position: absolute; inset: 0 auto 0 0; overflow: hidden; white-space: nowrap; }
+  #pd-{{ section.id }} .pd-rating__count { display: block; opacity: .8; margin-top: 4px; }
+  #pd-{{ section.id }} .pd-scores { margin: 0 0 22px; }
+  #pd-{{ section.id }} .pd-scores strong { font-weight: 600; }
+  #pd-{{ section.id }} .pd-scores span { margin: 0 4px; }
+  #pd-{{ section.id }} .pd-intro { margin: 0 0 46px; line-height: 1.75; }
+  #pd-{{ section.id }} .pd-intro p { margin: 0; }
+
+  #pd-{{ section.id }} .pd-option { border: 0; margin: 0 0 40px; padding: 0; min-width: 0; }
+  #pd-{{ section.id }} .pd-option legend { padding: 0; margin: 0 0 24px; }
+  #pd-{{ section.id }} .pd-option__values { display: flex; flex-wrap: wrap; gap: 6px 10px; }
+  #pd-{{ section.id }} .pd-option input { position: absolute; opacity: 0; pointer-events: none; }
+  #pd-{{ section.id }} .pd-option label { cursor: pointer; padding-bottom: 2px; border-bottom: 1px solid transparent; }
+  #pd-{{ section.id }} .pd-option input:checked + label { border-bottom-color: var(--pd-text); }
+  #pd-{{ section.id }} .pd-option input:focus-visible + label { outline: 2px solid var(--pd-text); outline-offset: 3px; }
+  #pd-{{ section.id }} .pd-option input:disabled + label { opacity: .4; text-decoration: line-through; }
+
+  #pd-{{ section.id }} .pd-price { margin: 0 0 34px; }
+  #pd-{{ section.id }} .pd-price__row { display: flex; align-items: baseline; gap: 6px; }
+  #pd-{{ section.id }} .pd-price__now { font-size: 26px; line-height: 1.2; }
+  #pd-{{ section.id }} .pd-price__was { font-size: 11px; color: var(--pd-muted); text-decoration: line-through; }
+  #pd-{{ section.id }} .pd-price__unit { margin: 8px 0 0; font-size: 12px; color: var(--pd-muted); }
+
+  #pd-{{ section.id }} .pd-buy { margin: 0 0 26px; }
+  #pd-{{ section.id }} .pd-atc { width: 100%; height: 51px; background: var(--pd-btn-bg); color: var(--pd-btn-text) !important; border: 1px solid var(--pd-btn-bg); border-radius: 0; font-size: 14px; transition: opacity .2s; }
+  #pd-{{ section.id }} .pd-atc:hover { opacity: .85; }
+  #pd-{{ section.id }} .pd-atc:disabled { opacity: .45; cursor: not-allowed; }
+  #pd-{{ section.id }} .pd-delivery { margin: 16px 0 0; text-align: center; font-size: 12px; }
+
+  #pd-{{ section.id }} .pd-acc { border-top: 1px solid var(--pd-line); }
+  #pd-{{ section.id }} .pd-acc summary { list-style: none; display: flex; justify-content: space-between; align-items: center; padding: 24px 0; cursor: pointer; }
+  #pd-{{ section.id }} .pd-acc summary::-webkit-details-marker { display: none; }
+  #pd-{{ section.id }} .pd-acc svg { width: 12px; height: 12px; transition: transform .25s; flex: none; }
+  #pd-{{ section.id }} .pd-acc[open] svg { transform: rotate(180deg); }
+  #pd-{{ section.id }} .pd-acc__body { padding: 0 0 24px; line-height: 1.75; }
+  #pd-{{ section.id }} .pd-acc__body > :first-child { margin-top: 0; }
+  #pd-{{ section.id }} .pd-acc__body > :last-child { margin-bottom: 0; }
+  #pd-{{ section.id }} .pd-acc[open] summary { padding-bottom: 18px; }
+
+  #pd-{{ section.id }} .pd-ritual { margin-top: 44px; }
+  #pd-{{ section.id }} .pd-ritual__head { display: flex; justify-content: space-between; align-items: center; margin: 0 0 20px; text-transform: uppercase; }
+  #pd-{{ section.id }} .pd-ritual__next { background: none; border: 0; padding: 0; width: 20px; height: 20px; display: grid; place-items: center; }
+  #pd-{{ section.id }} .pd-ritual__next svg { width: 12px; height: 12px; }
+  #pd-{{ section.id }} .pd-ritual__track { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-right: -42px; padding-right: 42px; }
+  #pd-{{ section.id }} .pd-ritual__track::-webkit-scrollbar { display: none; }
+  #pd-{{ section.id }} .pd-ritual__item { flex: 0 0 42.4%; scroll-snap-align: start; min-width: 0; }
+  #pd-{{ section.id }} .pd-ritual__img { position: relative; aspect-ratio: 169 / 221; background: var(--pd-page); overflow: hidden; }
+  #pd-{{ section.id }} .pd-ritual__add { position: absolute; left: 10px; bottom: 10px; width: 16px; height: 16px; display: grid; place-items: center; background: #fff; border: 0; padding: 0; }
+  #pd-{{ section.id }} .pd-ritual__add svg { width: 8px; height: 8px; }
+  #pd-{{ section.id }} .pd-ritual__meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; font-size: 12px; }
+  #pd-{{ section.id }} .pd-ritual__meta span:last-child { white-space: nowrap; }
+
+  #pd-{{ section.id }} .pd-lightbox { border: 0; padding: 0; background: transparent; max-width: 92vw; max-height: 92vh; }
+  #pd-{{ section.id }} .pd-lightbox::backdrop { background: rgba(0,0,0,.75); }
+  #pd-{{ section.id }} .pd-lightbox img { width: auto; height: auto; max-width: 92vw; max-height: 92vh; object-fit: contain; }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width: 989px) {
+    #pd-{{ section.id }} .pd { display: block; }
+    #pd-{{ section.id }} .pd__media { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; position: relative; }
+    #pd-{{ section.id }} .pd__media::-webkit-scrollbar { display: none; }
+    #pd-{{ section.id }} .pd__grid { display: contents; }
+    #pd-{{ section.id }} .pd__hero, #pd-{{ section.id }} .pd__tile { flex: 0 0 100%; aspect-ratio: 4 / 5; scroll-snap-align: start; margin: 0; }
+    #pd-{{ section.id }} .pd__dots { display: flex; justify-content: center; gap: 6px; padding: 14px 0 0; background: var(--pd-card); }
+    #pd-{{ section.id }} .pd__dots i { width: 20px; height: 2px; background: var(--pd-line); }
+    #pd-{{ section.id }} .pd__dots i.is-active { background: var(--pd-text); }
+    #pd-{{ section.id }} .pd__info { padding: 0; pointer-events: auto; }
+    #pd-{{ section.id }} .pd__card { position: static; padding: 28px 20px 40px; }
+    #pd-{{ section.id }} .pd-ritual__track { margin-right: -20px; padding-right: 20px; }
+    #pd-{{ section.id }} .pd-title { font-size: 22px; }
+  }
+{% endstyle %}
+
+<section id="pd-{{ section.id }}" data-section-id="{{ section.id }}" data-after-add="{{ section.settings.after_add }}" data-unavailable="{{ section.settings.sold_out_label | escape }}" data-added="{{ section.settings.added_label | escape }}">
+  <div class="pd">
+
+    {%- comment -%} ---------- Gallery ---------- {%- endcomment -%}
+    <div class="pd__media" data-pd-media>
+      {%- for media in product.media -%}
+        {%- if forloop.first -%}
+          <div class="pd__hero">
+            {{ media.preview_image | image_url: width: 2000 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '750, 1100, 1500, 2000', sizes: '100vw', alt: media.alt | default: product.title }}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      <div class="pd__grid">
+        {%- for media in product.media offset: 1 -%}
+          <div class="pd__tile">
+            {{ media.preview_image | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '400, 600, 800, 1200', sizes: '(min-width: 990px) 33vw, 100vw', alt: media.alt | default: product.title }}
+            <button type="button" class="pd__zoom" data-pd-zoom="{{ media.preview_image | image_url: width: 2000 }}" aria-label="{{ section.settings.zoom_label | escape }}">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3v14M3 10h14"/></svg>
+            </button>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+    <div class="pd__dots" data-pd-dots aria-hidden="true">
+      {%- for media in product.media -%}<i{% if forloop.first %} class="is-active"{% endif %}></i>{%- endfor -%}
+    </div>
+
+    {%- comment -%} ---------- Info card ---------- {%- endcomment -%}
+    <div class="pd__info">
+      <div class="pd__card">
+        {%- for block in section.blocks -%}
+          <div {{ block.shopify_attributes }}>
+          {%- case block.type -%}
+
+            {%- when 'breadcrumb' -%}
+              {%- liquid
+                assign c1_label = block.settings.label_1
+                assign c1_url = block.settings.url_1
+                assign c2_label = block.settings.label_2
+                assign c2_url = block.settings.url_2
+                if c1_label == blank
+                  assign c1_label = product.type
+                endif
+                if c2_label == blank and product.collections.size > 0
+                  assign c2_label = product.collections.first.title
+                  assign c2_url = product.collections.first.url
+                endif
+              -%}
+              <nav class="pd-breadcrumb" aria-label="Breadcrumb">
+                {%- if c1_label != blank -%}{% if c1_url != blank %}<a href="{{ c1_url }}">{{ c1_label }}</a>{% else %}{{ c1_label }}{% endif %}{%- endif -%}
+                {%- if c1_label != blank and c2_label != blank %} / {% endif -%}
+                {%- if c2_label != blank -%}{% if c2_url != blank %}<a href="{{ c2_url }}">{{ c2_label }}</a>{% else %}{{ c2_label }}{% endif %}{%- endif -%}
+              </nav>
+
+            {%- when 'badges' -%}
+              {%- assign badge_list = block.settings.badges | split: ',' -%}
+              {%- if badge_list.size > 0 -%}
+                <ul class="pd-badges">
+                  {%- for b in badge_list -%}{%- assign bt = b | strip -%}{%- if bt != blank -%}<li>{{ bt }}</li>{%- endif -%}{%- endfor -%}
+                </ul>
+              {%- endif -%}
+
+            {%- when 'title' -%}
+              {%- liquid
+                assign rating = product.metafields.reviews.rating.value.rating
+                assign rating_count = product.metafields.reviews.rating_count
+                if rating == blank
+                  assign rating = block.settings.fallback_rating
+                endif
+                if rating_count == blank
+                  assign rating_count = block.settings.fallback_count
+                endif
+                assign rating_pct = rating | times: 20.0
+              -%}
+              <div class="pd-title-row">
+                <h1 class="pd-title">{{ product.title }}</h1>
+                {%- if block.settings.show_rating and rating != blank and rating != 0 -%}
+                  <div class="pd-rating">
+                    <span class="pd-stars" role="img" aria-label="{{ rating }} / 5">
+                      <span class="pd-stars__bg">★★★★★</span>
+                      <span class="pd-stars__fg" style="width: {{ rating_pct }}%">★★★★★</span>
+                    </span>
+                    <span>{{ rating }}</span>
+                    <span class="pd-rating__count">{{ rating_count }} {{ block.settings.reviews_label }}</span>
+                  </div>
+                {%- endif -%}
+              </div>
+
+            {%- when 'scores' -%}
+              <p class="pd-scores">
+                {%- if block.settings.label_1 != blank -%}<strong>{{ block.settings.label_1 }}</strong> {{ block.settings.score_1 }}{%- endif -%}
+                {%- if block.settings.label_2 != blank -%}<span>·</span><strong>{{ block.settings.label_2 }}</strong> {{ block.settings.score_2 }}{%- endif -%}
+              </p>
+
+            {%- when 'intro' -%}
+              <div class="pd-intro">
+                {%- if block.settings.text != blank -%}{{ block.settings.text }}{%- else -%}<p>{{ product.description | strip_html | truncatewords: 40 }}</p>{%- endif -%}
+              </div>
+
+            {%- when 'variant_picker' -%}
+              {%- unless product.has_only_default_variant -%}
+                {%- for option in product.options_with_values -%}
+                  <fieldset class="pd-option" data-pd-option>
+                    <legend>{{ option.name }}</legend>
+                    <div class="pd-option__values">
+                      {%- for value in option.values -%}
+                        {%- assign oid = 'pd-' | append: section.id | append: '-' | append: option.position | append: '-' | append: forloop.index -%}
+                        <input type="radio" id="{{ oid }}" name="pd-option-{{ option.position }}" value="{{ value | escape }}" {% if option.selected_value == value %}checked{% endif %}>
+                        <label for="{{ oid }}">{{ value }}</label>
+                      {%- endfor -%}
+                    </div>
+                  </fieldset>
+                {%- endfor -%}
+              {%- endunless -%}
+
+            {%- when 'price' -%}
+              <div class="pd-price" data-pd-dynamic="{{ block.id }}">
+                <div class="pd-price__row">
+                  <span class="pd-price__now">{{ variant.price | money }}</span>
+                  {%- if variant.compare_at_price > variant.price -%}
+                    <s class="pd-price__was">{{ variant.compare_at_price | money }}</s>
+                  {%- endif -%}
+                </div>
+                {%- if variant.unit_price_measurement -%}
+                  <p class="pd-price__unit">
+                    {{ variant.unit_price | money }} {{ block.settings.per_label }}
+                    {% if variant.unit_price_measurement.reference_value != 1 %}{{ variant.unit_price_measurement.reference_value }}{% endif %}
+                    {{ variant.unit_price_measurement.reference_unit }}
+                  </p>
+                {%- endif -%}
+              </div>
+
+            {%- when 'buy_buttons' -%}
+              <div class="pd-buy" data-pd-dynamic="{{ block.id }}">
+                {%- form 'product', product, id: form_id, data-pd-ajax: '' -%}
+                  <input type="hidden" name="id" value="{{ variant.id }}">
+                  <button type="submit" class="pd-atc" {% unless variant.available %}disabled{% endunless %}>
+                    {%- if variant.available -%}{{ block.settings.button_label }}{%- else -%}{{ section.settings.sold_out_label }}{%- endif -%}
+                  </button>
+                {%- endform -%}
+                {%- if block.settings.show_delivery -%}
+                  <p class="pd-delivery">
+                    {%- if variant.available -%}
+                      {{ block.settings.in_stock_label }}, {{ block.settings.delivery_label }} {{ delivery_date }}.
+                    {%- else -%}
+                      {{ section.settings.sold_out_label }}
+                    {%- endif -%}
+                  </p>
+                {%- endif -%}
+              </div>
+
+            {%- when 'accordion' -%}
+              <details class="pd-acc" {% if block.settings.open %}open{% endif %}>
+                <summary>
+                  <span>{{ block.settings.heading }}</span>
+                  <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4.2l4 4 4-4"/></svg>
+                </summary>
+                <div class="pd-acc__body">
+                  {%- if block.settings.use_product_description -%}
+                    {{ product.description }}
+                  {%- else -%}
+                    {{ block.settings.content }}
+                  {%- endif -%}
+                </div>
+              </details>
+
+            {%- when 'ritual' -%}
+              {%- if block.settings.products.size > 0 -%}
+                <div class="pd-ritual" data-pd-ritual>
+                  <div class="pd-ritual__head">
+                    <span>{{ block.settings.heading }}</span>
+                    <button type="button" class="pd-ritual__next" data-pd-next aria-label="{{ block.settings.next_label | escape }}">
+                      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.2 2l4 4-4 4"/></svg>
+                    </button>
+                  </div>
+                  <div class="pd-ritual__track" data-pd-track>
+                    {%- for p in block.settings.products -%}
+                      {%- assign pv = p.selected_or_first_available_variant -%}
+                      <div class="pd-ritual__item">
+                        <div class="pd-ritual__img">
+                          <a href="{{ p.url }}" tabindex="-1" aria-hidden="true">
+                            {%- if p.featured_image -%}{{ p.featured_image | image_url: width: 500 | image_tag: loading: 'lazy', widths: '250, 400, 500', sizes: '200px', alt: p.title }}{%- endif -%}
+                          </a>
+                          {%- if p.available and p.variants.size >= 1 -%}
+                            {%- form 'product', p, data-pd-ajax: '' -%}
+                              <input type="hidden" name="id" value="{{ pv.id }}">
+                              <button type="submit" class="pd-ritual__add" aria-label="{{ block.settings.add_label | escape }} {{ p.title | escape }}">
+                                <svg viewBox="0 0 8 8" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 0v8M0 4h8"/></svg>
+                              </button>
+                            {%- endform -%}
+                          {%- endif -%}
+                        </div>
+                        <div class="pd-ritual__meta">
+                          <a href="{{ p.url }}">{{ p.title }}</a>
+                          <span>{{ p.price | money }}</span>
+                        </div>
+                      </div>
+                    {%- endfor -%}
+                  </div>
+                </div>
+              {%- endif -%}
+
+            {%- when 'text' -%}
+              <div class="pd-intro">{{ block.settings.text }}</div>
+
+          {%- endcase -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+
+  <dialog class="pd-lightbox" data-pd-lightbox><img alt=""></dialog>
+  <script type="application/json" data-pd-variants>{{ product.variants | json }}</script>
+</section>
+
+<script>
+  (() => {
+    const root = document.getElementById('pd-{{ section.id }}');
+    if (!root) return;
+    const sectionId = root.dataset.sectionId;
+
+    /* Lightbox */
+    const box = root.querySelector('[data-pd-lightbox]');
+    root.addEventListener('click', (e) => {
+      const z = e.target.closest('[data-pd-zoom]');
+      if (z) { box.querySelector('img').src = z.dataset.pdZoom; box.showModal(); return; }
+      if (e.target === box || e.target.closest('[data-pd-lightbox]')) box.close();
+      const next = e.target.closest('[data-pd-next]');
+      if (next) {
+        const track = next.closest('[data-pd-ritual]').querySelector('[data-pd-track]');
+        const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+        track.scrollTo({ left: atEnd ? 0 : track.scrollLeft + track.clientWidth * 0.6, behavior: 'smooth' });
+      }
+    });
+
+    /* Mobile slider dots */
+    const media = root.querySelector('[data-pd-media]');
+    const dots = root.querySelectorAll('[data-pd-dots] i');
+    media.addEventListener('scroll', () => {
+      const i = Math.round(media.scrollLeft / media.clientWidth);
+      dots.forEach((d, n) => d.classList.toggle('is-active', n === i));
+    }, { passive: true });
+
+    /* Variant switching: re-render price / buy blocks from the server */
+    const variants = JSON.parse(root.querySelector('[data-pd-variants]').textContent);
+    root.addEventListener('change', async (e) => {
+      if (!e.target.closest('[data-pd-option]')) return;
+      const chosen = [...root.querySelectorAll('[data-pd-option]')].map((f) => f.querySelector('input:checked')?.value);
+      const v = variants.find((x) => x.options.every((o, i) => o === chosen[i]));
+      if (!v) {
+        root.querySelectorAll('.pd-buy .pd-atc').forEach((b) => { b.disabled = true; b.textContent = root.dataset.unavailable; });
+        return;
+      }
+      history.replaceState(null, '', `?variant=${v.id}`);
+      try {
+        const res = await fetch(`${location.pathname}?variant=${v.id}&section_id=${sectionId}`);
+        const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+        root.querySelectorAll('[data-pd-dynamic]').forEach((el) => {
+          const fresh = doc.querySelector(`[data-pd-dynamic="${el.dataset.pdDynamic}"]`);
+          if (fresh) el.replaceWith(fresh);
+        });
+      } catch (err) { console.error(err); }
+    });
+
+    /* Ajax add to cart (main button + ritual "+" buttons) */
+    root.addEventListener('submit', async (e) => {
+      const form = e.target.closest('form[data-pd-ajax]');
+      if (!form) return;
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      const label = btn.textContent;
+      btn.disabled = true;
+      try {
+        const base = (window.Shopify && Shopify.routes && Shopify.routes.root) || '/';
+        const res = await fetch(base + 'cart/add.js', { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error((await res.json()).description || 'Error');
+        if (root.dataset.afterAdd === 'cart') { window.location.href = base + 'cart'; return; }
+        document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+        if (btn.classList.contains('pd-atc')) btn.textContent = root.dataset.added;
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setTimeout(() => { btn.disabled = false; if (btn.classList.contains('pd-atc')) btn.textContent = label; }, 1600);
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product details",
+  "tag": "div",
+  "class": "section-product-details",
+  "settings": [
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "page_color", "label": "Image background", "default": "#d8d4c4" },
+    { "type": "color", "id": "card_color", "label": "Info card background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#000000" },
+    { "type": "color", "id": "muted_color", "label": "Muted text (breadcrumb, unit price…)", "default": "#b8a98f" },
+    { "type": "color", "id": "line_color", "label": "Dividers", "default": "#cfcfcf" },
+    { "type": "color", "id": "button_bg", "label": "Button background", "default": "#000000" },
+    { "type": "color", "id": "button_text", "label": "Button text", "default": "#ffffff" },
+    { "type": "header", "content": "Typography" },
+    { "type": "font_picker", "id": "font", "label": "Font", "default": "inter_n4" },
+    { "type": "header", "content": "Cart & delivery" },
+    { "type": "range", "id": "delivery_days", "label": "Estimated delivery (days from today)", "min": 1, "max": 21, "step": 1, "default": 3 },
+    {
+      "type": "select", "id": "after_add", "label": "After adding to cart",
+      "options": [
+        { "value": "stay", "label": "Stay on page (fires cart:refresh event)" },
+        { "value": "cart", "label": "Go to cart page" }
+      ],
+      "default": "stay"
+    },
+    { "type": "text", "id": "sold_out_label", "label": "Sold out label", "default": "Épuisé" },
+    { "type": "text", "id": "added_label", "label": "Added label", "default": "Ajouté ✓" },
+    { "type": "text", "id": "zoom_label", "label": "Zoom button accessibility label", "default": "Agrandir l'image" }
+  ],
+  "blocks": [
+    {
+      "type": "breadcrumb",
+      "name": "Breadcrumb",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "label_1", "label": "Level 1 label", "default": "Soins anti-âge" },
+        { "type": "url", "id": "url_1", "label": "Level 1 link" },
+        { "type": "text", "id": "label_2", "label": "Level 2 label (defaults to first collection)" },
+        { "type": "url", "id": "url_2", "label": "Level 2 link" }
+      ]
+    },
+    {
+      "type": "badges",
+      "name": "Badges",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "badges", "label": "Badges (comma separated)", "default": "Unifie, Protège" }
+      ]
+    },
+    {
+      "type": "title",
+      "name": "Title & rating",
+      "limit": 1,
+      "settings": [
+        { "type": "checkbox", "id": "show_rating", "label": "Show rating", "default": true },
+        { "type": "paragraph", "content": "Reads the metafields reviews.rating and reviews.rating_count. Values below are used when those are empty." },
+        { "type": "range", "id": "fallback_rating", "label": "Fallback rating", "min": 0, "max": 5, "step": 0.1, "default": 4.7 },
+        { "type": "number", "id": "fallback_count", "label": "Fallback review count", "default": 200 },
+        { "type": "text", "id": "reviews_label", "label": "Reviews label", "default": "avis" }
+      ]
+    },
+    {
+      "type": "scores",
+      "name": "Scores (Yuka / INCI)",
+      "settings": [
+        { "type": "text", "id": "label_1", "label": "Label 1", "default": "Yuka" },
+        { "type": "text", "id": "score_1", "label": "Score 1", "default": "100/100" },
+        { "type": "text", "id": "label_2", "label": "Label 2", "default": "INCI Beauty" },
+        { "type": "text", "id": "score_2", "label": "Score 2", "default": "20/20" }
+      ]
+    },
+    {
+      "type": "intro",
+      "name": "Short description",
+      "settings": [
+        { "type": "richtext", "id": "text", "label": "Text (empty = product description excerpt)", "default": "<p>Une huile anti-âge sèche ultra fine qui travaille en synergie avec la peau pour la maintenir ferme, pleine de vitalité tout en lissant les rides.</p>" }
+      ]
+    },
+    { "type": "variant_picker", "name": "Variant picker", "limit": 1, "settings": [] },
+    {
+      "type": "price",
+      "name": "Price",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "per_label", "label": "Unit price label", "default": "par" }
+      ]
+    },
+    {
+      "type": "buy_buttons",
+      "name": "Add to cart",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "button_label", "label": "Button label", "default": "Ajouter au panier" },
+        { "type": "checkbox", "id": "show_delivery", "label": "Show stock & delivery text", "default": true },
+        { "type": "text", "id": "in_stock_label", "label": "In stock label", "default": "En stock" },
+        { "type": "text", "id": "delivery_label", "label": "Delivery label", "default": "livraison estimée" }
+      ]
+    },
+    {
+      "type": "accordion",
+      "name": "Accordion",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Description" },
+        { "type": "checkbox", "id": "use_product_description", "label": "Use product description", "default": false },
+        { "type": "richtext", "id": "content", "label": "Content" },
+        { "type": "checkbox", "id": "open", "label": "Open by default", "default": false }
+      ]
+    },
+    {
+      "type": "ritual",
+      "name": "Complete the ritual",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Complétez votre rituel" },
+        { "type": "product_list", "id": "products", "label": "Products", "limit": 8 },
+        { "type": "text", "id": "add_label", "label": "Quick-add accessibility label", "default": "Ajouter" },
+        { "type": "text", "id": "next_label", "label": "Next accessibility label", "default": "Suivant" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Custom text",
+      "settings": [
+        { "type": "richtext", "id": "text", "label": "Text" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product details",
+      "blocks": [
+        { "type": "breadcrumb" },
+        { "type": "badges" },
+        { "type": "title" },
+        { "type": "scores" },
+        { "type": "intro" },
+        { "type": "variant_picker" },
+        { "type": "price" },
+        { "type": "buy_buttons" },
+        {
+          "type": "accordion",
+          "settings": {
+            "heading": "Description",
+            "use_product_description": true,
+            "open": true
+          }
+        },
+        { "type": "accordion", "settings": { "heading": "Bienfaits" } },
+        { "type": "accordion", "settings": { "heading": "Ingrédients clés" } },
+        { "type": "accordion", "settings": { "heading": "Adapté aux peaux" } },
+        { "type": "ritual" }
+      ]
+    }
+  ]
+}
+{% endschema %}
