@@ -1,12 +1,3 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "knr_hero": {
@@ -192,13 +183,10 @@
     },
     "knr_faq": {
       "type": "knr-faq",
-<<<<<<< HEAD
-=======
       "settings": {
         "heading": "Questions & answers",
         "view_all_text": "View all"
       },
->>>>>>> 41dc314 (...)
       "blocks": {
         "faq_1": {
           "type": "faq_item",
@@ -303,47 +291,41 @@
       "type": "knr-testimonial",
       "settings": {
         "quote": "This serum has completely transformed my skincare routine. My skin feels hydrated, luminous, and healthier than ever before.",
-<<<<<<< HEAD
-        "author": "Sophie Laurent, Beauty Editor",
-        "background_color": ""
-      }
-=======
         "author": "Sophie Laurent, Beauty Editor"
+      },
+      "blocks": {
+        "bg_1": {
+          "type": "bg_image"
+        },
+        "bg_2": {
+          "type": "bg_image"
+        },
+        "bg_3": {
+          "type": "bg_image"
+        }
+      },
+      "block_order": [
+        "bg_1",
+        "bg_2",
+        "bg_3"
+      ]
     },
-    "blocks": {
-      "bg_1": {
-        "type": "bg_image"
-      },
-      "bg_2": {
-        "type": "bg_image"
-      },
-      "bg_3": {
-        "type": "bg_image"
+    "knr_brand_footer": {
+      "type": "knr-brand-footer",
+      "settings": {
+        "brand_name": "maison célestine"
       }
-    },
-    "block_order": [
-      "bg_1",
-      "bg_2",
-      "bg_3"
-    ]
->>>>>>> 41dc314 (...)
-  },
-  "knr_brand_footer": {
-    "type": "knr-brand-footer",
-    "settings": {
-      "brand_name": "maison célestine"
     }
-  }
-},
-"order": [
-  "knr_hero",
-  "knr_features_1",
-  "knr_features_2",
-  "knr_howto",
-  "knr_ritual",
-  "knr_faq",
-  "knr_gallery",
-  "knr_testimonial",
-  "knr_brand_footer"
-]
+  },
+  "order": [
+    "knr_hero",
+    "knr_features_1",
+    "knr_features_2",
+    "knr_howto",
+    "knr_ritual",
+    "knr_faq",
+    "knr_gallery",
+    "knr_testimonial",
+    "knr_brand_footer"
+  ]
 }
