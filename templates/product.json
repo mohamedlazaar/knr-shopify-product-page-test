@@ -292,23 +292,7 @@
       "settings": {
         "quote": "This serum has completely transformed my skincare routine. My skin feels hydrated, luminous, and healthier than ever before.",
         "author": "Sophie Laurent, Beauty Editor"
-      },
-      "blocks": {
-        "bg_1": {
-          "type": "bg_image"
-        },
-        "bg_2": {
-          "type": "bg_image"
-        },
-        "bg_3": {
-          "type": "bg_image"
-        }
-      },
-      "block_order": [
-        "bg_1",
-        "bg_2",
-        "bg_3"
-      ]
+      }
     },
     "knr_brand_footer": {
       "type": "knr-brand-footer",
