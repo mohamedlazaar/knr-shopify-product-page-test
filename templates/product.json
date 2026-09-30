@@ -338,71 +338,6 @@
         "tag": "Support",
         "heading": "Questions & answers"
       }
-    },
-    "knr_gallery": {
-      "type": "knr-gallery-grid",
-      "blocks": {
-        "img_1": {
-          "type": "gallery_image",
-          "settings": {
-            "alt_text": "",
-            "wide": false
-          }
-        },
-        "img_2": {
-          "type": "gallery_image",
-          "settings": {
-            "alt_text": "",
-            "wide": false
-          }
-        },
-        "img_3": {
-          "type": "gallery_image",
-          "settings": {
-            "alt_text": "",
-            "wide": false
-          }
-        },
-        "img_4": {
-          "type": "gallery_image",
-          "settings": {
-            "alt_text": "",
-            "wide": false
-          }
-        },
-        "img_5": {
-          "type": "gallery_image",
-          "settings": {
-            "alt_text": "",
-            "wide": true
-          }
-        },
-        "img_6": {
-          "type": "gallery_image",
-          "settings": {
-            "alt_text": "",
-            "wide": true
-          }
-        }
-      },
-      "block_order": [
-        "img_1",
-        "img_2",
-        "img_3",
-        "img_4",
-        "img_5",
-        "img_6"
-      ],
-      "settings": {
-        "tag": "",
-        "heading": ""
-      }
-    },
-    "knr_brand_footer": {
-      "type": "knr-brand-footer",
-      "settings": {
-        "brand_name": "maison célestine"
-      }
     }
   },
   "order": [
@@ -410,8 +345,6 @@
     "knr_features_1",
     "knr_howto",
     "knr_testimonial",
-    "knr_faq",
-    "knr_gallery",
-    "knr_brand_footer"
+    "knr_faq"
   ]
 }
