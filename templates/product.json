@@ -1,27 +1,24 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "knr_product_hero": {
       "type": "knr-product-hero",
-      "settings": {
-        "text_color": "#000000",
-        "muted_color": "#888888",
-        "line_color": "#e5e5e5",
-        "card_color": "#ffffff",
-        "button_bg": "#000000",
-        "button_text": "#ffffff",
-        "page_color": "#f5f0eb",
-        "sold_out_label": "Épuisé",
-        "added_label": "Ajouté ✓",
-        "after_add": "added",
-        "zoom_label": "Agrandir",
-        "delivery_days": 4
-      },
       "blocks": {
         "b_breadcrumb": {
           "type": "breadcrumb",
           "settings": {
             "label_1": "Soins anti-âge",
-            "label_2": "Collection Cactus"
+            "url_1": "",
+            "label_2": "Collection Cactus",
+            "url_2": ""
           }
         },
         "b_badges": {
@@ -113,6 +110,7 @@
           "type": "ritual",
           "settings": {
             "heading": "COMPLÉTEZ VOTRE RITUEL",
+            "products": [],
             "next_label": "Suivant",
             "add_label": "Ajouter"
           }
@@ -132,17 +130,33 @@
         "b_acc_ingredients",
         "b_acc_peaux",
         "b_ritual"
-      ]
+      ],
+      "settings": {
+        "text_color": "#000000",
+        "muted_color": "#888888",
+        "line_color": "#e5e5e5",
+        "card_color": "#ffffff",
+        "button_bg": "#000000",
+        "button_text": "#ffffff",
+        "page_color": "#f5f0eb",
+        "font": "sans_serif_n4",
+        "sold_out_label": "Épuisé",
+        "added_label": "Ajouté ✓",
+        "after_add": "added",
+        "zoom_label": "Agrandir",
+        "delivery_days": 4
+      }
     },
     "knr_product_details": {
       "type": "knr-product-details",
-      "settings": {},
       "blocks": {
         "block_breadcrumb": {
           "type": "breadcrumb",
           "settings": {
             "label_1": "Soins anti-âge",
-            "label_2": "Collection Cactus"
+            "url_1": "",
+            "label_2": "Collection Cactus",
+            "url_2": ""
           }
         },
         "block_badges": {
@@ -198,36 +212,36 @@
           "type": "accordion",
           "settings": {
             "heading": "Description",
-            "open": true,
             "use_product_description": false,
-            "content": "<p>Formulé à partir de 97 % d'ingrédients d'origine naturelle, ce sérum précieux active les mécanismes naturels de régénération cellulaire.</p>"
+            "content": "<p>Formulé à partir de 97 % d'ingrédients d'origine naturelle, ce sérum précieux active les mécanismes naturels de régénération cellulaire.</p>",
+            "open": true
           }
         },
         "tab_bienfaits": {
           "type": "accordion",
           "settings": {
             "heading": "Bienfaits",
-            "open": false,
             "use_product_description": false,
-            "content": "<p>Hydrate en profondeur, lisse l'apparence des ridules et redonne éclat et élasticité dès la première application.</p>"
+            "content": "<p>Hydrate en profondeur, lisse l'apparence des ridules et redonne éclat et élasticité dès la première application.</p>",
+            "open": false
           }
         },
         "tab_ingredients": {
           "type": "accordion",
           "settings": {
             "heading": "Ingrédients clés",
-            "open": false,
             "use_product_description": false,
-            "content": "<p>Huile de pépins de figue de Barbarie bio, acide hyaluronique pur d'origine végétale, vitamine E naturelle.</p>"
+            "content": "<p>Huile de pépins de figue de Barbarie bio, acide hyaluronique pur d'origine végétale, vitamine E naturelle.</p>",
+            "open": false
           }
         },
         "tab_peaux": {
           "type": "accordion",
           "settings": {
             "heading": "Adapté aux peaux",
-            "open": false,
             "use_product_description": false,
-            "content": "<p>Convient à tous types de peaux, y compris les peaux sensibles, déshydratées ou matures.</p>"
+            "content": "<p>Convient à tous types de peaux, y compris les peaux sensibles, déshydratées ou matures.</p>",
+            "open": false
           }
         }
       },
@@ -244,7 +258,23 @@
         "tab_bienfaits",
         "tab_ingredients",
         "tab_peaux"
-      ]
+      ],
+      "disabled": true,
+      "settings": {
+        "page_color": "#d8d4c4",
+        "card_color": "#ffffff",
+        "text_color": "#000000",
+        "muted_color": "#b8a98f",
+        "line_color": "#cfcfcf",
+        "button_bg": "#000000",
+        "button_text": "#ffffff",
+        "font": "inter_n4",
+        "delivery_days": 3,
+        "after_add": "stay",
+        "sold_out_label": "Épuisé",
+        "added_label": "Ajouté ✓",
+        "zoom_label": "Agrandir l'image"
+      }
     },
     "knr_features_1": {
       "type": "knr-features",
@@ -282,7 +312,6 @@
       ],
       "settings": {
         "image_position": "left",
-        "dark_content": false,
         "tag": "Why Choose Us",
         "heading": "Crafted with the finest natural ingredients",
         "text": "<p>Our products are carefully formulated with premium botanical extracts and cutting-edge science to deliver visible results for every skin type.</p>",
@@ -326,7 +355,6 @@
       ],
       "settings": {
         "image_position": "right",
-        "dark_content": true,
         "tag": "Ingredients",
         "heading": "Pure botanicals meet advanced science",
         "text": "<p>Each ingredient is carefully selected for its proven efficacy. From hyaluronic acid for deep hydration to vitamin C for radiance — every drop works in harmony with your skin's natural renewal process.</p>",
@@ -387,10 +415,6 @@
     },
     "knr_faq": {
       "type": "knr-faq",
-      "settings": {
-        "tag": "Support",
-        "heading": "Questions & answers"
-      },
       "blocks": {
         "faq_1": {
           "type": "faq_item",
@@ -426,7 +450,11 @@
         "faq_2",
         "faq_3",
         "faq_4"
-      ]
+      ],
+      "settings": {
+        "tag": "Support",
+        "heading": "Questions & answers"
+      }
     },
     "knr_gallery": {
       "type": "knr-gallery-grid",
@@ -491,7 +519,8 @@
       "type": "knr-testimonial",
       "settings": {
         "quote": "This serum has completely transformed my skincare routine. My skin feels hydrated, luminous, and healthier than ever before.",
-        "author": "Sophie Laurent, Beauty Editor"
+        "author": "Sophie Laurent, Beauty Editor",
+        "background_color": ""
       }
     },
     "knr_brand_footer": {
