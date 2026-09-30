@@ -1,7 +1,13 @@
 {
   "sections": {
-    "knr_product_details": {
-      "type": "knr-product-details",
+  "knr_product_hero": {
+    "type": "knr-product-hero",
+    "blocks": {},
+    "settings": {}
+  },
+
+      "knr_product_details": {
+        "type": "knr-product-details",
       "blocks": {
         "block_breadcrumb": {
           "type": "breadcrumb",
@@ -389,6 +395,7 @@
     }
   },
   "order": [
+    "knr_product_hero",
     "knr_product_details",
     "knr_features_1",
     "knr_features_2",
