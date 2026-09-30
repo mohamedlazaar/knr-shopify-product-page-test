@@ -311,6 +311,7 @@
         "feat_4"
       ],
       "settings": {
+        "image": "shopify://shop_images/Product_Image.png",
         "image_position": "left",
         "tag": "Why Choose Us",
         "heading": "Crafted with the finest natural ingredients",
