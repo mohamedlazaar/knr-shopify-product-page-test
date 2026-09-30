@@ -246,7 +246,7 @@
         "testimonial_pGyUej": {
           "type": "testimonial",
           "settings": {
-            "before_image": "shopify://shop_images/Before_and_After_Image.png",
+            "before_image": "shopify://shop_images/Before_Image.png",
             "after_image": "shopify://shop_images/Before_and_After_Image.png",
             "rating": 5,
             "name": "Clara T.",
