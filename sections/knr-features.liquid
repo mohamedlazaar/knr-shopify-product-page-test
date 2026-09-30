@@ -30,17 +30,19 @@
   #fb-{{ section.id }} .fb-statement { margin: 0; font-size: var(--fb-size); line-height: 1.22; font-weight: 300; letter-spacing: -0.005em; }
   #fb-{{ section.id }} .fb-statement p { margin: 0; }
   #fb-{{ section.id }} .fb-attribution { margin: 20px 0 0; font-size: 12px; opacity: .85; }
+  #fb-{{ section.id }} .fb-caption::after { content: ''; display: block; width: 12px; height: 1px; margin-top: 10px; background: currentColor; }
   #fb-{{ section.id }} .fb-caption { position: absolute; left: 2.8vw; top: 48%; max-width: 240px; margin: 0; font-size: 11px; line-height: 1.4; opacity: .55; }
 
   #fb-{{ section.id }} picture { display: contents; }
 
   @media (max-width: 989px) {
     #fb-{{ section.id }} { aspect-ratio: {{ section.settings.mobile_ratio }}; min-height: 0; }
-    #fb-{{ section.id }} .fb__inner { align-items: flex-end; justify-content: flex-start; padding: 24px 24px 28px; }
+    #fb-{{ section.id }} .fb__overlay { background: linear-gradient(to top, rgba(0,0,0,.3), rgba(0,0,0,0) 60%), rgba(0,0,0,var(--fb-overlay)); }
+    #fb-{{ section.id }} .fb__inner { align-items: flex-end; justify-content: flex-start; padding: 24px 20px 64px; }
     #fb-{{ section.id }} .fb__col { width: 100%; min-width: 0; margin-top: 0; }
     #fb-{{ section.id }} .fb-statement { font-size: var(--fb-size-m); line-height: 1.2; }
-    #fb-{{ section.id }} .fb-attribution { margin-top: 14px; font-size: 11px; }
-    #fb-{{ section.id }} .fb-caption { top: 14%; left: 24px; right: 24px; max-width: none; font-size: 10px; }
+    #fb-{{ section.id }} .fb-attribution { margin-top: 16px; font-size: 10px; }
+    #fb-{{ section.id }} .fb-caption { top: 12%; left: 20px; right: 20px; max-width: none; font-size: 10.5px; opacity: .9; }
   }
 {% endstyle %}
 
@@ -88,15 +90,15 @@
     { "type": "range", "id": "text_size", "label": "Statement size", "min": 18, "max": 48, "step": 1, "unit": "px", "default": 28 },
     { "type": "range", "id": "offset_top", "label": "Text vertical offset", "min": -120, "max": 120, "step": 5, "unit": "px", "default": 40 },
     { "type": "header", "content": "Mobile" },
-    { "type": "range", "id": "text_size_mobile", "label": "Statement size", "min": 14, "max": 32, "step": 1, "unit": "px", "default": 20 },
+    { "type": "range", "id": "text_size_mobile", "label": "Statement size", "min": 14, "max": 32, "step": 1, "unit": "px", "default": 17 },
     {
       "type": "select", "id": "mobile_ratio", "label": "Banner ratio",
       "options": [
         { "value": "4 / 5", "label": "4:5" },
-        { "value": "39 / 66", "label": "Tall (default)" },
+        { "value": "61 / 100", "label": "Tall (default)" },
         { "value": "9 / 16", "label": "9:16" }
       ],
-      "default": "39 / 66"
+      "default": "61 / 100"
     }
   ],
   "blocks": [
@@ -113,7 +115,7 @@
       "name": "Small text under statement",
       "limit": 1,
       "settings": [
-        { "type": "text", "id": "text", "label": "Text", "default": "Sanaris" }
+        { "type": "text", "id": "text", "label": "Text", "default": "Doctor Name" }
       ]
     },
     {
@@ -121,7 +123,7 @@
       "name": "Caption (left)",
       "limit": 1,
       "settings": [
-        { "type": "text", "id": "text", "label": "Text", "default": "Un geste simple, une texture légère." }
+        { "type": "text", "id": "text", "label": "Text", "default": "Notre engagement pour une beauté régénérée" }
       ]
     }
   ],

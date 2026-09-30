@@ -29,21 +29,24 @@
   #htu-{{ section.id }} .htu__text { margin: 0; max-width: 46ch; font-size: 13px; line-height: 1.5; color: var(--htu-muted); }
   #htu-{{ section.id }} .htu__text p { margin: 0; }
 
-  #htu-{{ section.id }} .htu__more { display: none; }
+  #htu-{{ section.id }} .htu__more, #htu-{{ section.id }} .htu__bar { display: none; }
 
   @media (max-width: 989px) {
     #htu-{{ section.id }} { padding-left: 24px; padding-right: 0; }
-    #htu-{{ section.id }} .htu__title { font-size: 26px; margin-bottom: 20px; }
-    #htu-{{ section.id }} .htu__grid { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-right: 24px; scroll-padding-left: 24px; }
+    #htu-{{ section.id }} .htu__title { font-size: 26px; margin-bottom: 32px; }
+    #htu-{{ section.id }} .htu__grid { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-right: 24px; scroll-padding-left: 24px; }
     #htu-{{ section.id }} .htu__grid::-webkit-scrollbar { display: none; }
     #htu-{{ section.id }} .htu__card { flex: 0 0 var(--htu-card-m); scroll-snap-align: start; }
     #htu-{{ section.id }} .htu__media { aspect-ratio: {{ section.settings.mobile_image_ratio }}; }
-    #htu-{{ section.id }} .htu__num { margin: 16px 0 18px; }
-    #htu-{{ section.id }} .htu__step-title { font-size: 20px; }
-    #htu-{{ section.id }} .htu__text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden; }
+    #htu-{{ section.id }} .htu__num, #htu-{{ section.id }} .htu__step-title, #htu-{{ section.id }} .htu__text, #htu-{{ section.id }} .htu__more { padding-left: 15px; padding-right: 8px; }
+    #htu-{{ section.id }} .htu__num { margin: 22px 0 16px; font-size: 12px; }
+    #htu-{{ section.id }} .htu__step-title { font-size: 22px; margin-bottom: 12px; }
+    #htu-{{ section.id }} .htu__text { font-size: 13.5px; line-height: 1.55; color: var(--htu-text); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
     #htu-{{ section.id }} .htu__card.is-open .htu__text { display: block; -webkit-line-clamp: unset; overflow: visible; }
-    #htu-{{ section.id }} .htu__more { display: none; margin-top: 8px; padding: 0; background: none; border: 0; font: inherit; font-size: 12px; color: var(--htu-text); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-    #htu-{{ section.id }} .htu__card.is-clamped .htu__more { display: inline-block; }
+    #htu-{{ section.id }} .htu__more { margin: 6px 0 0 15px; padding: 0 0 1px; background: none; border: 0; border-bottom: 1px solid #999; font: inherit; font-size: 12px; color: var(--htu-text); cursor: pointer; line-height: 1.3; }
+    #htu-{{ section.id }} .htu__card.is-clamped .htu__more, #htu-{{ section.id }} .htu__card.is-open .htu__more { display: inline-block; }
+    #htu-{{ section.id }} .htu__bar { display: block; position: relative; width: 25vw; height: 1px; margin: 44px 0 0 calc(50vw - 24px - 12.5vw); background: #e6e1d6; }
+    #htu-{{ section.id }} .htu__bar i { position: absolute; left: 0; top: 0; height: 100%; width: 35%; background: var(--htu-text); }
   }
 {% endstyle %}
 
@@ -71,6 +74,7 @@
       </article>
     {%- endfor -%}
   </div>
+  <div class="htu__bar" aria-hidden="true"><i></i></div>
 </section>
 
 <script>
@@ -95,6 +99,17 @@
       btn.textContent = open ? btn.dataset.less : btn.dataset.more;
       if (!open) requestAnimationFrame(check);
     });
+    const grid = root.querySelector('.htu__grid');
+    const thumb = root.querySelector('.htu__bar i');
+    const bar = () => {
+      const max = grid.scrollWidth - grid.clientWidth;
+      const ratio = max > 0 ? grid.clientWidth / grid.scrollWidth : 1;
+      thumb.style.width = Math.max(ratio * 100, 15) + '%';
+      thumb.style.left = (max > 0 ? (grid.scrollLeft / max) * (100 - parseFloat(thumb.style.width)) : 0) + '%';
+    };
+    grid.addEventListener('scroll', bar, { passive: true });
+    window.addEventListener('resize', () => { check(); bar(); });
+    bar();
     window.addEventListener('resize', check);
     document.fonts && document.fonts.ready.then(check);
     check();
@@ -119,7 +134,7 @@
       "default": "1 / 1"
     },
     { "type": "header", "content": "Mobile" },
-    { "type": "range", "id": "mobile_card_width", "label": "Card width", "min": 40, "max": 90, "step": 1, "unit": "vw", "default": 46 },
+    { "type": "range", "id": "mobile_card_width", "label": "Card width", "min": 40, "max": 90, "step": 1, "unit": "vw", "default": 65 },
     {
       "type": "select", "id": "mobile_image_ratio", "label": "Image ratio",
       "options": [
@@ -127,7 +142,7 @@
         { "value": "4 / 5", "label": "Portrait" },
         { "value": "2 / 3", "label": "Tall portrait" }
       ],
-      "default": "2 / 3"
+      "default": "1 / 1"
     },
     { "type": "text", "id": "read_more_label", "label": "Read more label", "default": "Lire plus" },
     { "type": "text", "id": "read_less_label", "label": "Read less label", "default": "Lire moins" },
@@ -155,9 +170,9 @@
     {
       "name": "KNR How to use",
       "blocks": [
-        { "type": "step", "settings": { "title": "Découvrir", "text": "<p>Concentré de pureté active. Huile végétale aux propriétés anti-oxydantes puissantes pour un éclat retrouvé.</p>" } },
-        { "type": "step", "settings": { "title": "Découvrir", "text": "<p>Éclat et uniformité retrouvés. Cible les taches et les irrégularités de grain de peau.</p>" } },
-        { "type": "step", "settings": { "title": "Découvrir", "text": "<p>Fermeté et nutrition intense. Répare la barrière cutanée et lisse les contours du visage.</p>" } }
+        { "type": "step", "settings": { "title": "Régénérer & Lisser", "text": "<p>Concentré de pureté active. Huile végétale aux propriétés anti-oxydantes puissantes pour un éclat retrouvé.</p>" } },
+        { "type": "step", "settings": { "title": "Hydrater", "text": "<p>Éclat et uniformité retrouvés. Cible les taches et les irrégularités de grain de peau.</p>" } },
+        { "type": "step", "settings": { "title": "Protéger", "text": "<p>Fermeté et nutrition intense. Répare la barrière cutanée et lisse les contours du visage.</p>" } }
       ]
     }
   ]
