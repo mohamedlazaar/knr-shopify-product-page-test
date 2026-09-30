@@ -183,9 +183,9 @@
         "overlay": 15,
         "text_color": "#ffffff",
         "font": "inter_n3",
-        "text_size": 28,
+        "text_size": 30,
         "offset_top": 40,
-        "text_size_mobile": 17,
+        "text_size_mobile": 20,
         "mobile_ratio": "61 / 100"
       }
     },
