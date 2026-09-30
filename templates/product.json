@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "knr_product_hero": {
@@ -234,11 +243,25 @@
     "knr_testimonial": {
       "type": "knr-testimonial",
       "blocks": {
+        "testimonial_PJtc6a": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "name": "Clara",
+            "quote": "<p>J'utilise ce sérum depuis trois mois et la différence est saisissante. Mes rides d'expression se sont considérablement atténuées et mon teint a retrouvé une luminosité que je n'avais plus depuis des années. Une texture soyeuse qui pénètre instantanément. Je ne peux plus m'en passer.</p>"
+          }
+        },
+        "testimonial_GQkBRr": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "name": "Clara T.",
+            "quote": "<p>J'utilise ce sérum depuis trois mois et la différence est saisissante. Mes rides d'expression se sont considérablement atténuées et mon teint a retrouvé une luminosité que je n'avais plus depuis des années. Une texture soyeuse qui pénètre instantanément. Je ne peux plus m'en passer.</p>"
+          }
+        },
         "testimonial_pGyUej": {
           "type": "testimonial",
           "settings": {
-            "before_image": "shopify://shop_images/Before_Image.png",
-            "after_image": "shopify://shop_images/Before_and_After_Image.png",
             "rating": 5,
             "name": "Clara T.",
             "quote": "<p>J'utilise ce sérum depuis trois mois et la différence est saisissante. Mes rides d'expression se sont considérablement atténuées et mon teint a retrouvé une luminosité que je n'avais plus depuis des années. Une texture soyeuse qui pénètre instantanément. Je ne peux plus m'en passer.</p>"
@@ -246,6 +269,8 @@
         }
       },
       "block_order": [
+        "testimonial_PJtc6a",
+        "testimonial_GQkBRr",
         "testimonial_pGyUej"
       ],
       "settings": {
