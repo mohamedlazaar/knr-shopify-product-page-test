@@ -136,112 +136,98 @@
     },
     "knr_product_details": {
       "type": "knr-product-details",
+      "settings": {},
       "blocks": {
         "block_breadcrumb": {
           "type": "breadcrumb",
           "settings": {
-            "text": "Soins anti-âge / Collection Cactus"
+            "label_1": "Soins anti-âge",
+            "label_2": "Collection Cactus"
           }
         },
         "block_badges": {
           "type": "badges",
           "settings": {
-            "badge_1": "UNIFIE",
-            "badge_2": "PROTÈGE"
+            "badges": "Unifie, Protège"
           }
         },
         "block_title": {
-          "type": "title_and_rating",
+          "type": "title",
           "settings": {
-            "custom_title": "SÉRUM PRÉCIEUX RÉGÉNÉRANT",
             "show_rating": true,
-            "rating_score": "4.7",
-            "review_count": "200 avis"
+            "fallback_rating": 4.7,
+            "fallback_count": 200,
+            "reviews_label": "avis"
           }
         },
         "block_scores": {
           "type": "scores",
           "settings": {
-            "yuka_score": "100/100",
-            "inci_score": "20/20"
+            "label_1": "Yuka",
+            "score_1": "100/100",
+            "label_2": "INCI Beauty",
+            "score_2": "20/20"
           }
         },
-        "block_desc": {
-          "type": "short_description",
+        "block_intro": {
+          "type": "intro",
           "settings": {
-            "text": "Une huile anti-âge sèche ultra fine qui travaille en synergie avec la peau pour la maintenir ferme, pleine de vitalité tout en lissant les rides."
+            "text": "<p>Une huile anti-âge sèche ultra fine qui travaille en synergie avec la peau pour la maintenir ferme, pleine de vitalité tout en lissant les rides.</p>"
           }
         },
         "block_variants": {
           "type": "variant_picker",
-          "settings": {
-            "fallback_label": "Taille",
-            "fallback_val_1": "15 mL",
-            "fallback_val_2": "150 mL"
-          }
+          "settings": {}
         },
         "block_price": {
           "type": "price",
           "settings": {
-            "unit_price_text": "€75.00 par 100 mL",
-            "demo_compare_price": "8500"
+            "per_label": "par 100 mL"
           }
         },
         "block_buy": {
           "type": "buy_buttons",
           "settings": {
-            "button_text": "Ajouter au panier"
+            "button_label": "Ajouter au panier",
+            "show_delivery": true,
+            "in_stock_label": "En stock",
+            "delivery_label": "livraison estimée"
           }
-        },
-        "block_shipping": {
-          "type": "shipping_notice",
-          "settings": {
-            "text": "En stock, livraison estimée Mercredi 25 février."
-          }
-        },
-        "block_indicators": {
-          "type": "slider_indicators",
-          "settings": {}
         },
         "tab_desc": {
-          "type": "collapsible_tab",
+          "type": "accordion",
           "settings": {
             "heading": "Description",
-            "open_by_default": true,
+            "open": true,
+            "use_product_description": false,
             "content": "<p>Formulé à partir de 97 % d'ingrédients d'origine naturelle, ce sérum précieux active les mécanismes naturels de régénération cellulaire.</p>"
           }
         },
         "tab_bienfaits": {
-          "type": "collapsible_tab",
+          "type": "accordion",
           "settings": {
             "heading": "Bienfaits",
-            "open_by_default": false,
+            "open": false,
+            "use_product_description": false,
             "content": "<p>Hydrate en profondeur, lisse l'apparence des ridules et redonne éclat et élasticité dès la première application.</p>"
           }
         },
         "tab_ingredients": {
-          "type": "collapsible_tab",
+          "type": "accordion",
           "settings": {
             "heading": "Ingrédients clés",
-            "open_by_default": false,
+            "open": false,
+            "use_product_description": false,
             "content": "<p>Huile de pépins de figue de Barbarie bio, acide hyaluronique pur d'origine végétale, vitamine E naturelle.</p>"
           }
         },
         "tab_peaux": {
-          "type": "collapsible_tab",
+          "type": "accordion",
           "settings": {
             "heading": "Adapté aux peaux",
-            "open_by_default": false,
+            "open": false,
+            "use_product_description": false,
             "content": "<p>Convient à tous types de peaux, y compris les peaux sensibles, déshydratées ou matures.</p>"
-          }
-        },
-        "block_ritual": {
-          "type": "complementary_products",
-          "settings": {
-            "heading": "COMPLÉTEZ VOTRE RITUEL",
-            "product_1_title": "Huile Précieuse",
-            "product_2_title": "Sérum Éclat",
-            "product_3_title": "Crème Fondante"
           }
         }
       },
@@ -250,17 +236,14 @@
         "block_badges",
         "block_title",
         "block_scores",
-        "block_desc",
+        "block_intro",
         "block_variants",
         "block_price",
         "block_buy",
-        "block_shipping",
-        "block_indicators",
         "tab_desc",
         "tab_bienfaits",
         "tab_ingredients",
-        "tab_peaux",
-        "block_ritual"
+        "tab_peaux"
       ]
     },
     "knr_features_1": {
