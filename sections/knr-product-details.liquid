@@ -18,6 +18,7 @@
   assign delivery_date = fr_days[d_idx] | append: ' ' | append: d_num | append: ' ' | append: fr_months[m_idx]
 -%}
 
+{{ section.settings.font | font_face: font_display: 'swap' }}
 
 {% style %}
   #pd-{{ section.id }} {
@@ -39,7 +40,7 @@
   #pd-{{ section.id }} :focus-visible { outline: 2px solid var(--pd-text); outline-offset: 3px; }
 
   /* ---------- Layout ---------- */
-  #pd-{{ section.id }} .pd { display: grid; grid-template-columns: minmax(0, 65.6%) minmax(0, 1fr); container-type: inline-size; background: var(--pd-card); }
+  #pd-{{ section.id }} .pd { display: grid; grid-template-columns: minmax(0, 65.6%) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); background: var(--pd-card); }
   #pd-{{ section.id }} .pd__media { display: contents; }
   #pd-{{ section.id }} .pd__hero { grid-column: 1 / -1; grid-row: 1; aspect-ratio: 1526 / 730; position: relative; background: var(--pd-page); overflow: hidden; }
   #pd-{{ section.id }} .pd__grid { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; gap: var(--pd-gap); margin-top: var(--pd-gap); align-content: start; }
@@ -48,7 +49,7 @@
   #pd-{{ section.id }} .pd__zoom svg { width: 20px; height: 20px; }
   #pd-{{ section.id }} .pd__dots { display: none; }
 
-  #pd-{{ section.id }} .pd__info { grid-column: 2; grid-row: 2; margin-top: calc(-100cqw * 730 / 1526); padding: 59px 41px 0 0; position: relative; z-index: 2; pointer-events: none; }
+  #pd-{{ section.id }} .pd__info { grid-column: 2; grid-row: 1 / span 2; padding: 59px 41px 0 0; position: relative; z-index: 2; pointer-events: none; }
   #pd-{{ section.id }} .pd__card { pointer-events: auto; position: sticky; top: 20px; background: var(--pd-card); padding: 42px 42px 48px; }
 
   /* ---------- Blocks ---------- */
@@ -127,7 +128,7 @@
     #pd-{{ section.id }} .pd__dots { display: flex; justify-content: center; gap: 6px; padding: 14px 0 0; background: var(--pd-card); }
     #pd-{{ section.id }} .pd__dots i { width: 20px; height: 2px; background: var(--pd-line); }
     #pd-{{ section.id }} .pd__dots i.is-active { background: var(--pd-text); }
-    #pd-{{ section.id }} .pd__info { margin-top: 0; padding: 0; pointer-events: auto; }
+    #pd-{{ section.id }} .pd__info { padding: 0; pointer-events: auto; }
     #pd-{{ section.id }} .pd__card { position: static; padding: 28px 20px 40px; }
     #pd-{{ section.id }} .pd-ritual__track { margin-right: -20px; padding-right: 20px; }
     #pd-{{ section.id }} .pd-title { font-size: 22px; }
