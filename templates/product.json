@@ -240,12 +240,42 @@
         "padding_bottom": 48
       }
     },
-    "knr_ritual": {
-      "type": "knr-skin-ritual",
+    "knr_testimonial": {
+      "type": "knr-testimonial",
+      "blocks": {
+        "testimonial_pGyUej": {
+          "type": "testimonial",
+          "settings": {
+            "before_image": "shopify://shop_images/Before_and_After_Image.png",
+            "after_image": "shopify://shop_images/Before_and_After_Image.png",
+            "rating": 5,
+            "name": "Clara T.",
+            "quote": "<p>J'utilise ce sérum depuis trois mois et la différence est saisissante. Mes rides d'expression se sont considérablement atténuées et mon teint a retrouvé une luminosité que je n'avais plus depuis des années. Une texture soyeuse qui pénètre instantanément. Je ne peux plus m'en passer.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_pGyUej"
+      ],
       "settings": {
-        "tag": "Your Ritual",
-        "heading": "Embrace your natural glow",
-        "description": "<p>Indulge in a daily skincare ritual that combines the power of nature with advanced dermatological science. Our formulations are designed to nourish, protect, and rejuvenate your skin, delivering visible results and a luminous, healthy complexion that radiates from within.</p>"
+        "heading": "Ce que disent nos clientes",
+        "subheading": "<p>Des transformations visibles dès 4 semaines. Nos clientes témoignent d'une peau visiblement régénérée, plus ferme et lumineuse.</p>",
+        "before_label": "Before",
+        "after_label": "After",
+        "slider_label": "Comparaison avant / après",
+        "image_ratio": "2 / 1",
+        "image_ratio_mobile": "16 / 9",
+        "prev_label": "Précédent",
+        "next_label": "Suivant",
+        "bg_color": "#f8f7f2",
+        "text_color": "#000000",
+        "accent_color": "#b8a98f",
+        "label_color": "#000000",
+        "font": "inter_n4",
+        "padding_top": 80,
+        "padding_bottom": 88,
+        "padding_top_mobile": 64,
+        "padding_bottom_mobile": 64
       }
     },
     "knr_faq": {
@@ -350,14 +380,6 @@
         "heading": ""
       }
     },
-    "knr_testimonial": {
-      "type": "knr-testimonial",
-      "settings": {
-        "quote": "This serum has completely transformed my skincare routine. My skin feels hydrated, luminous, and healthier than ever before.",
-        "author": "Sophie Laurent, Beauty Editor",
-        "background_color": ""
-      }
-    },
     "knr_brand_footer": {
       "type": "knr-brand-footer",
       "settings": {
@@ -369,10 +391,9 @@
     "knr_product_hero",
     "knr_features_1",
     "knr_howto",
-    "knr_ritual",
+    "knr_testimonial",
     "knr_faq",
     "knr_gallery",
-    "knr_testimonial",
     "knr_brand_footer"
   ]
 }
