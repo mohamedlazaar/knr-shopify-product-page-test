@@ -110,7 +110,11 @@
           "type": "ritual",
           "settings": {
             "heading": "COMPLÉTEZ VOTRE RITUEL",
-            "products": [],
+            "products": [
+              "the-3p-fulfilled-snowboard",
+              "the-collection-snowboard-hydrogen",
+              "the-collection-snowboard-liquid"
+            ],
             "next_label": "Suivant",
             "add_label": "Ajouter"
           }
