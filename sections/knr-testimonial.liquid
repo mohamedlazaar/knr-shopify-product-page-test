@@ -1,90 +1,237 @@
-{% comment %}
-  Section 7: Testimonial Banner
-  Dark full-width banner with background images and centered quote.
-  Uses serif font for the quote text.
-{% endcomment %}
+{%- comment -%}
+  sections/testimonials.liquid
+  Centered heading + subtitle, then a carousel of testimonials.
+  Each testimonial (block) = before/after image slider + rating + name + quote.
 
-<section class="knr-section knr-testimonial" data-section-id="{{ section.id }}">
 
-  {%- comment -%} Background images layer {%- endcomment -%}
-  {%- assign has_bg_images = false -%}
-  {%- for block in section.blocks -%}
-    {%- if block.type == 'bg_image' and block.settings.image != blank -%}
-      {%- assign has_bg_images = true -%}
-      {%- break -%}
-    {%- endif -%}
-  {%- endfor -%}
+{{ section.settings.font | font_face: font_display: 'swap' }}
+{%- endcomment -%}
+{% style %}
+  #tm-{{ section.id }} {
+    --tm-font: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
+    --tm-bg: {{ section.settings.bg_color }};
+    --tm-text: {{ section.settings.text_color }};
+    --tm-accent: {{ section.settings.accent_color }};
+    --tm-label: {{ section.settings.label_color }};
+    --tm-ratio: {{ section.settings.image_ratio }};
+    --tm-ratio-m: {{ section.settings.image_ratio_mobile }};
+    background: var(--tm-bg);
+    color: var(--tm-text);
+    font-family: var(--tm-font);
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+    text-align: center;
+    -webkit-font-smoothing: antialiased;
+  }
+  #tm-{{ section.id }} * { box-sizing: border-box; }
+  #tm-{{ section.id }} .tm__title { margin: 0; padding: 0 20px; font-size: 34px; font-weight: 400; line-height: 1.25; }
+  #tm-{{ section.id }} .tm__sub { max-width: 540px; margin: 18px auto 0; padding: 0 20px; font-size: 13px; line-height: 1.5; }
+  #tm-{{ section.id }} .tm__sub p { margin: 0; }
 
-  {%- if has_bg_images -%}
-    <div class="knr-testimonial__bg">
-      {%- for block in section.blocks -%}
-        {%- if block.type == 'bg_image' -%}
-          {%- if block.settings.image != blank -%}
-            {{ block.settings.image | image_url: width: 600 | image_tag:
-              loading: 'lazy',
-              alt: '',
-              class: 'knr-testimonial__bg-img'
-            }}
+  #tm-{{ section.id }} .tm__slides { display: grid; margin-top: 44px; }
+  #tm-{{ section.id }} .tm__slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility .45s; }
+  #tm-{{ section.id }} .tm__slide.is-active { opacity: 1; visibility: visible; }
+
+  /* Before / after */
+  #tm-{{ section.id }} .tm-cmp { --pos: 50%; position: relative; margin: 0 5.5vw; aspect-ratio: var(--tm-ratio); overflow: hidden; background: #e8e5dc; touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: ew-resize; }
+  #tm-{{ section.id }} .tm-cmp img, #tm-{{ section.id }} .tm-cmp svg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+  #tm-{{ section.id }} .tm-cmp__before { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+  #tm-{{ section.id }} .tm-cmp__label { position: absolute; top: 46px; font-size: 12.5px; letter-spacing: .01em; text-transform: uppercase; color: var(--tm-label); z-index: 2; pointer-events: none; }
+  #tm-{{ section.id }} .tm-cmp__label--l { left: 40px; }
+  #tm-{{ section.id }} .tm-cmp__label--r { right: 40px; }
+  #tm-{{ section.id }} .tm-cmp__line { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 2px; margin-left: -1px; background: #fff; z-index: 3; pointer-events: none; }
+  #tm-{{ section.id }} .tm-cmp__handle { position: absolute; top: 50%; left: var(--pos); width: 38px; height: 38px; margin: -19px 0 0 -19px; border-radius: 50%; background: #fff; display: grid; place-items: center; z-index: 4; box-shadow: 0 1px 6px rgba(0,0,0,.12); }
+  #tm-{{ section.id }} .tm-cmp__handle svg { position: static; width: 10px; height: 10px; }
+  #tm-{{ section.id }} .tm-cmp:focus-visible { outline: 2px solid var(--tm-text); outline-offset: 3px; }
+
+  /* Quote */
+  #tm-{{ section.id }} .tm__meta { display: flex; justify-content: center; align-items: center; gap: 6px; margin: 58px 0 24px; font-size: 10px; color: var(--tm-accent); }
+  #tm-{{ section.id }} .tm__stars { font-size: 10px; letter-spacing: 1px; line-height: 1; }
+  #tm-{{ section.id }} .tm__quote { max-width: 960px; margin: 0 auto; padding: 0 20px; font-size: 26px; line-height: 1.5; font-weight: 400; letter-spacing: -0.005em; }
+  #tm-{{ section.id }} .tm__quote p { margin: 0; }
+
+  #tm-{{ section.id }} .tm__nav { display: flex; justify-content: center; gap: 50px; margin-top: 52px; }
+  #tm-{{ section.id }} .tm__nav button { width: 24px; height: 24px; display: grid; place-items: center; background: none; border: 0; padding: 0; color: inherit; cursor: pointer; }
+  #tm-{{ section.id }} .tm__nav svg { width: 10px; height: 10px; }
+  #tm-{{ section.id }} .tm__nav[hidden] { display: none; }
+
+  @media (max-width: 989px) {
+    #tm-{{ section.id }} { padding-top: {{ section.settings.padding_top_mobile }}px; padding-bottom: {{ section.settings.padding_bottom_mobile }}px; }
+    #tm-{{ section.id }} .tm__title { font-size: 28px; line-height: 1.35; }
+    #tm-{{ section.id }} .tm__sub { margin-top: 20px; padding: 0 24px; }
+    #tm-{{ section.id }} .tm__slides { margin-top: 34px; }
+    #tm-{{ section.id }} .tm-cmp { margin: 0 20px; aspect-ratio: var(--tm-ratio-m); }
+    #tm-{{ section.id }} .tm-cmp__label { top: 28px; font-size: 12px; }
+    #tm-{{ section.id }} .tm-cmp__label--l { left: 24px; }
+    #tm-{{ section.id }} .tm-cmp__label--r { right: 24px; }
+    #tm-{{ section.id }} .tm__meta { margin: 34px 0 22px; }
+    #tm-{{ section.id }} .tm__quote { font-size: 20px; padding: 0 16px; }
+    #tm-{{ section.id }} .tm__nav { gap: 60px; margin-top: 46px; }
+  }
+{% endstyle %}
+
+<section id="tm-{{ section.id }}" data-tm>
+  {%- if section.settings.heading != blank -%}<h2 class="tm__title">{{ section.settings.heading }}</h2>{%- endif -%}
+  {%- if section.settings.subheading != blank -%}<div class="tm__sub">{{ section.settings.subheading }}</div>{%- endif -%}
+
+  <div class="tm__slides" aria-live="polite">
+    {%- for block in section.blocks -%}
+      <article class="tm__slide{% if forloop.first %} is-active{% endif %}" data-tm-slide {{ block.shopify_attributes }}>
+        <div class="tm-cmp" role="slider" tabindex="0" aria-label="{{ section.settings.slider_label | escape }}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" data-tm-cmp>
+          {%- if block.settings.after_image != blank -%}
+            {{ block.settings.after_image | image_url: width: 2000 | image_tag: loading: 'lazy', widths: '750, 1100, 1500, 2000', sizes: '(min-width: 990px) 89vw, 100vw', alt: '' }}
+          {%- else -%}
+            {{ 'lifestyle-2' | placeholder_svg_tag }}
           {%- endif -%}
-        {%- endif -%}
-      {%- endfor -%}
-    </div>
-  {%- endif -%}
+          <div class="tm-cmp__before">
+            {%- if block.settings.before_image != blank -%}
+              {{ block.settings.before_image | image_url: width: 2000 | image_tag: loading: 'lazy', widths: '750, 1100, 1500, 2000', sizes: '(min-width: 990px) 89vw, 100vw', alt: '' }}
+            {%- else -%}
+              {{ 'lifestyle-1' | placeholder_svg_tag }}
+            {%- endif -%}
+          </div>
+          <span class="tm-cmp__label tm-cmp__label--l">{{ section.settings.before_label }}</span>
+          <span class="tm-cmp__label tm-cmp__label--r">{{ section.settings.after_label }}</span>
+          <span class="tm-cmp__line"></span>
+          <span class="tm-cmp__handle" aria-hidden="true">
+            <svg viewBox="0 0 10 10" fill="none" stroke="#000" stroke-width="1.2" stroke-linecap="round"><path d="M1.5 2v6M5 2v6M8.5 2v6"/></svg>
+          </span>
+        </div>
 
-  <div class="knr-container">
-    <div class="knr-testimonial__inner knr-animate">
-      {%- if section.settings.quote != blank -%}
-        <blockquote class="knr-testimonial__quote">
-          {{ section.settings.quote }}
-        </blockquote>
-      {%- endif -%}
+        <div class="tm__meta">
+          {%- if block.settings.rating > 0 -%}
+            <span class="tm__stars" role="img" aria-label="{{ block.settings.rating }} / 5">{% for i in (1..block.settings.rating) %}★{% endfor %}</span>
+          {%- endif -%}
+          <span>{{ block.settings.name }}</span>
+        </div>
+        <div class="tm__quote">{{ block.settings.quote }}</div>
+      </article>
+    {%- endfor -%}
+  </div>
 
-      {%- if section.settings.author != blank -%}
-        <cite class="knr-testimonial__author">— {{ section.settings.author }}</cite>
-      {%- endif -%}
-    </div>
+  <div class="tm__nav" data-tm-nav{% if section.blocks.size < 2 %} hidden{% endif %}>
+    <button type="button" data-tm-prev aria-label="{{ section.settings.prev_label | escape }}">
+      <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 1.5L3 5l3.5 3.5"/></svg>
+    </button>
+    <button type="button" data-tm-next aria-label="{{ section.settings.next_label | escape }}">
+      <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 1.5L7 5 3.5 8.5"/></svg>
+    </button>
   </div>
 </section>
 
+<script>
+  (() => {
+    const root = document.getElementById('tm-{{ section.id }}');
+    if (!root) return;
+
+    /* ---- Before / after sliders ---- */
+    root.querySelectorAll('[data-tm-cmp]').forEach((cmp) => {
+      const set = (pct) => {
+        pct = Math.min(100, Math.max(0, pct));
+        cmp.style.setProperty('--pos', pct + '%');
+        cmp.setAttribute('aria-valuenow', Math.round(pct));
+      };
+      const fromEvent = (e) => {
+        const r = cmp.getBoundingClientRect();
+        set(((e.clientX - r.left) / r.width) * 100);
+      };
+      let down = false;
+      cmp.addEventListener('pointerdown', (e) => { down = true; cmp.setPointerCapture(e.pointerId); fromEvent(e); });
+      cmp.addEventListener('pointermove', (e) => { if (down) fromEvent(e); });
+      ['pointerup', 'pointercancel'].forEach((t) => cmp.addEventListener(t, () => { down = false; }));
+      cmp.addEventListener('keydown', (e) => {
+        const cur = parseFloat(cmp.getAttribute('aria-valuenow'));
+        if (e.key === 'ArrowLeft') { set(cur - 3); e.preventDefault(); }
+        if (e.key === 'ArrowRight') { set(cur + 3); e.preventDefault(); }
+      });
+    });
+
+    /* ---- Testimonial carousel ---- */
+    const slides = [...root.querySelectorAll('[data-tm-slide]')];
+    if (slides.length < 2) return;
+    let i = 0;
+    const show = (n) => {
+      i = (n + slides.length) % slides.length;
+      slides.forEach((s, k) => s.classList.toggle('is-active', k === i));
+    };
+    root.querySelector('[data-tm-prev]').addEventListener('click', () => show(i - 1));
+    root.querySelector('[data-tm-next]').addEventListener('click', () => show(i + 1));
+
+    /* Theme editor: jump to the block being edited */
+    document.addEventListener('shopify:block:select', (e) => {
+      const k = slides.indexOf(e.target);
+      if (k > -1 && root.contains(e.target)) show(k);
+    });
+  })();
+</script>
+
 {% schema %}
 {
-  "name": "KNR Testimonial",
-  "tag": "section",
+  "name": "KNR Testimonials",
+  "tag": "div",
   "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Ce que disent nos clientes" },
+    { "type": "richtext", "id": "subheading", "label": "Subheading", "default": "<p>Des transformations visibles dès 4 semaines. Nos clientes témoignent d'une peau visiblement régénérée, plus ferme et lumineuse.</p>" },
+    { "type": "header", "content": "Before / after" },
+    { "type": "text", "id": "before_label", "label": "Before label", "default": "Before" },
+    { "type": "text", "id": "after_label", "label": "After label", "default": "After" },
+    { "type": "text", "id": "slider_label", "label": "Slider accessibility label", "default": "Comparaison avant / après" },
     {
-      "type": "textarea",
-      "id": "quote",
-      "label": "Quote",
-      "default": "This serum has completely transformed my skincare routine. My skin feels hydrated, luminous, and healthier than ever before."
+      "type": "select", "id": "image_ratio", "label": "Image ratio (desktop)",
+      "options": [
+        { "value": "2 / 1", "label": "2:1" },
+        { "value": "16 / 9", "label": "16:9" },
+        { "value": "3 / 2", "label": "3:2" }
+      ],
+      "default": "2 / 1"
     },
     {
-      "type": "text",
-      "id": "author",
-      "label": "Author name",
-      "default": "Sophie Laurent, Beauty Editor"
-    }
+      "type": "select", "id": "image_ratio_mobile", "label": "Image ratio (mobile)",
+      "options": [
+        { "value": "16 / 9", "label": "16:9" },
+        { "value": "4 / 3", "label": "4:3" },
+        { "value": "1 / 1", "label": "Square" }
+      ],
+      "default": "16 / 9"
+    },
+    { "type": "header", "content": "Carousel" },
+    { "type": "text", "id": "prev_label", "label": "Previous label", "default": "Précédent" },
+    { "type": "text", "id": "next_label", "label": "Next label", "default": "Suivant" },
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#f8f7f2" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#000000" },
+    { "type": "color", "id": "accent_color", "label": "Stars & name", "default": "#b8a98f" },
+    { "type": "color", "id": "label_color", "label": "Before / after labels", "default": "#000000" },
+    { "type": "font_picker", "id": "font", "label": "Font", "default": "inter_n4" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 88 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Top padding (mobile)", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Bottom padding (mobile)", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 64 }
   ],
   "blocks": [
     {
-      "type": "bg_image",
-      "name": "Background image",
+      "type": "testimonial",
+      "name": "Testimonial",
       "settings": [
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Background image"
-        }
+        { "type": "image_picker", "id": "before_image", "label": "Before image" },
+        { "type": "image_picker", "id": "after_image", "label": "After image" },
+        { "type": "range", "id": "rating", "label": "Rating", "min": 0, "max": 5, "step": 1, "default": 5 },
+        { "type": "text", "id": "name", "label": "Name", "default": "Clara T." },
+        { "type": "richtext", "id": "quote", "label": "Quote", "default": "<p>J'utilise ce sérum depuis trois mois et la différence est saisissante. Mes rides d'expression se sont considérablement atténuées et mon teint a retrouvé une luminosité que je n'avais plus depuis des années. Une texture soyeuse qui pénètre instantanément. Je ne peux plus m'en passer.</p>" }
       ]
     }
   ],
   "presets": [
     {
-      "name": "KNR Testimonial",
-      "category": "Product",
+      "name": "KNR Testimonials",
       "blocks": [
-        { "type": "bg_image" },
-        { "type": "bg_image" },
-        { "type": "bg_image" }
+        { "type": "testimonial" },
+        {
+          "type": "testimonial",
+          "settings": {
+            "name": "Mathilde S.",
+            "quote": "<p>Ma peau est plus douce, plus ferme et visiblement plus lumineuse dès les premières semaines. Un vrai rituel de bien-être que je recommande.</p>"
+          }
+        }
       ]
     }
   ]
