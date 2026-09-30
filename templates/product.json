@@ -276,6 +276,8 @@
       "settings": {
         "heading": "Ce que disent nos clientes",
         "subheading": "<p>Des transformations visibles dès 4 semaines. Nos clientes témoignent d'une peau visiblement régénérée, plus ferme et lumineuse.</p>",
+        "before_image": "shopify://shop_images/Before_and_After_Image.png",
+        "after_image": "shopify://shop_images/Before_and_After_Image.png",
         "before_label": "Before",
         "after_label": "After",
         "slider_label": "Comparaison avant / après",
