@@ -34,7 +34,7 @@
   #pd-{{ section.id }} :focus-visible { outline: 2px solid var(--pd-text); outline-offset: 3px; }
 
   /* ---------- Layout ---------- */
-  #pd-{{ section.id }} .pd { display: grid; grid-template-columns: minmax(0, 65.6%) minmax(0, 1fr); background: var(--pd-card); }
+  #pd-{{ section.id }} .pd { display: grid; grid-template-columns: minmax(0, 65.6%) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); background: var(--pd-card); }
   #pd-{{ section.id }} .pd__media { display: contents; }
   #pd-{{ section.id }} .pd__hero { grid-column: 1 / -1; grid-row: 1; aspect-ratio: 1526 / 730; position: relative; background: var(--pd-page); overflow: hidden; }
   #pd-{{ section.id }} .pd__grid { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; gap: var(--pd-gap); margin-top: var(--pd-gap); align-content: start; }
