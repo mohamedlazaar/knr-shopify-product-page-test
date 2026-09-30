@@ -180,6 +180,7 @@
       ],
       "settings": {
         "image": "shopify://shop_images/Product_Image.png",
+        "image_mobile": "shopify://shop_images/Image.png",
         "overlay": 15,
         "text_color": "#ffffff",
         "font": "inter_n3",
