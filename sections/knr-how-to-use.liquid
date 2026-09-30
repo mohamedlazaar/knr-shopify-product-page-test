@@ -5,7 +5,6 @@
 
 {{ section.settings.font | font_face: font_display: 'swap' }}
 {%- endcomment -%}
-
 {% style %}
   #htu-{{ section.id }} {
     --htu-font: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
@@ -13,6 +12,7 @@
     --htu-text: {{ section.settings.text_color }};
     --htu-muted: {{ section.settings.muted_color }};
     --htu-cols: {{ section.settings.columns }};
+    --htu-card-m: {{ section.settings.mobile_card_width }}vw;
     background: var(--htu-bg);
     color: var(--htu-text);
     font-family: var(--htu-font);
@@ -29,11 +29,21 @@
   #htu-{{ section.id }} .htu__text { margin: 0; max-width: 46ch; font-size: 13px; line-height: 1.5; color: var(--htu-muted); }
   #htu-{{ section.id }} .htu__text p { margin: 0; }
 
+  #htu-{{ section.id }} .htu__more { display: none; }
+
   @media (max-width: 989px) {
-    #htu-{{ section.id }} { padding-left: 20px; padding-right: 20px; }
-    #htu-{{ section.id }} .htu__grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-right: -20px; padding-right: 20px; }
+    #htu-{{ section.id }} { padding-left: 24px; padding-right: 0; }
+    #htu-{{ section.id }} .htu__title { font-size: 26px; margin-bottom: 20px; }
+    #htu-{{ section.id }} .htu__grid { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-right: 24px; scroll-padding-left: 24px; }
     #htu-{{ section.id }} .htu__grid::-webkit-scrollbar { display: none; }
-    #htu-{{ section.id }} .htu__card { flex: 0 0 80%; scroll-snap-align: start; }
+    #htu-{{ section.id }} .htu__card { flex: 0 0 var(--htu-card-m); scroll-snap-align: start; }
+    #htu-{{ section.id }} .htu__media { aspect-ratio: {{ section.settings.mobile_image_ratio }}; }
+    #htu-{{ section.id }} .htu__num { margin: 16px 0 18px; }
+    #htu-{{ section.id }} .htu__step-title { font-size: 20px; }
+    #htu-{{ section.id }} .htu__text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 5; overflow: hidden; }
+    #htu-{{ section.id }} .htu__card.is-open .htu__text { display: block; -webkit-line-clamp: unset; overflow: visible; }
+    #htu-{{ section.id }} .htu__more { display: none; margin-top: 8px; padding: 0; background: none; border: 0; font: inherit; font-size: 12px; color: var(--htu-text); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    #htu-{{ section.id }} .htu__card.is-clamped .htu__more { display: inline-block; }
   }
 {% endstyle %}
 
@@ -57,10 +67,39 @@
         {%- endif -%}
         <h3 class="htu__step-title">{{ block.settings.title }}</h3>
         <div class="htu__text">{{ block.settings.text }}</div>
+        <button type="button" class="htu__more" data-more="{{ section.settings.read_more_label | escape }}" data-less="{{ section.settings.read_less_label | escape }}" aria-expanded="false">{{ section.settings.read_more_label }}</button>
       </article>
     {%- endfor -%}
   </div>
 </section>
+
+<script>
+  (() => {
+    const root = document.getElementById('htu-{{ section.id }}');
+    if (!root) return;
+    const mq = window.matchMedia('(max-width: 989px)');
+    const check = () => {
+      root.querySelectorAll('.htu__card').forEach((card) => {
+        const text = card.querySelector('.htu__text');
+        const wasOpen = card.classList.contains('is-open');
+        if (wasOpen) return;
+        card.classList.toggle('is-clamped', mq.matches && text.scrollHeight > text.clientHeight + 1);
+      });
+    };
+    root.addEventListener('click', (e) => {
+      const btn = e.target.closest('.htu__more');
+      if (!btn) return;
+      const card = btn.closest('.htu__card');
+      const open = card.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', open);
+      btn.textContent = open ? btn.dataset.less : btn.dataset.more;
+      if (!open) requestAnimationFrame(check);
+    });
+    window.addEventListener('resize', check);
+    document.fonts && document.fonts.ready.then(check);
+    check();
+  })();
+</script>
 
 {% schema %}
 {
@@ -79,6 +118,19 @@
       ],
       "default": "1 / 1"
     },
+    { "type": "header", "content": "Mobile" },
+    { "type": "range", "id": "mobile_card_width", "label": "Card width", "min": 40, "max": 90, "step": 1, "unit": "vw", "default": 46 },
+    {
+      "type": "select", "id": "mobile_image_ratio", "label": "Image ratio",
+      "options": [
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 5", "label": "Portrait" },
+        { "value": "2 / 3", "label": "Tall portrait" }
+      ],
+      "default": "2 / 3"
+    },
+    { "type": "text", "id": "read_more_label", "label": "Read more label", "default": "Lire plus" },
+    { "type": "text", "id": "read_less_label", "label": "Read less label", "default": "Lire moins" },
     { "type": "header", "content": "Style" },
     { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
     { "type": "color", "id": "text_color", "label": "Text", "default": "#000000" },
@@ -101,7 +153,7 @@
   "max_blocks": 6,
   "presets": [
     {
-      "name": "How to use",
+      "name": "KNR How to use",
       "blocks": [
         { "type": "step", "settings": { "title": "Découvrir", "text": "<p>Concentré de pureté active. Huile végétale aux propriétés anti-oxydantes puissantes pour un éclat retrouvé.</p>" } },
         { "type": "step", "settings": { "title": "Découvrir", "text": "<p>Éclat et uniformité retrouvés. Cible les taches et les irrégularités de grain de peau.</p>" } },
