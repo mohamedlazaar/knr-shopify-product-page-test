@@ -1,13 +1,141 @@
 {
   "sections": {
-  "knr_product_hero": {
-    "type": "knr-product-hero",
-    "blocks": {},
-    "settings": {}
-  },
-
-      "knr_product_details": {
-        "type": "knr-product-details",
+    "knr_product_hero": {
+      "type": "knr-product-hero",
+      "settings": {
+        "text_color": "#000000",
+        "muted_color": "#888888",
+        "line_color": "#e5e5e5",
+        "card_color": "#ffffff",
+        "button_bg": "#000000",
+        "button_text": "#ffffff",
+        "page_color": "#f5f0eb",
+        "sold_out_label": "Épuisé",
+        "added_label": "Ajouté ✓",
+        "after_add": "added",
+        "zoom_label": "Agrandir",
+        "delivery_days": 4
+      },
+      "blocks": {
+        "b_breadcrumb": {
+          "type": "breadcrumb",
+          "settings": {
+            "label_1": "Soins anti-âge",
+            "label_2": "Collection Cactus"
+          }
+        },
+        "b_badges": {
+          "type": "badges",
+          "settings": {
+            "badges": "UNIFIE, PROTÈGE"
+          }
+        },
+        "b_title": {
+          "type": "title",
+          "settings": {
+            "show_rating": true,
+            "fallback_rating": "4.7",
+            "fallback_count": "200",
+            "reviews_label": "avis"
+          }
+        },
+        "b_scores": {
+          "type": "scores",
+          "settings": {
+            "label_1": "Yuka",
+            "score_1": "100/100",
+            "label_2": "INCI Beauty",
+            "score_2": "20/20"
+          }
+        },
+        "b_intro": {
+          "type": "intro",
+          "settings": {
+            "text": "<p>Une huile anti-âge sèche ultra fine qui travaille en synergie avec la peau pour la maintenir ferme, pleine de vitalité tout en lissant les rides.</p>"
+          }
+        },
+        "b_variants": {
+          "type": "variant_picker",
+          "settings": {}
+        },
+        "b_price": {
+          "type": "price",
+          "settings": {
+            "per_label": "par 100 mL"
+          }
+        },
+        "b_buy": {
+          "type": "buy_buttons",
+          "settings": {
+            "button_label": "Ajouter au panier",
+            "show_delivery": true,
+            "in_stock_label": "En stock",
+            "delivery_label": "livraison estimée"
+          }
+        },
+        "b_acc_desc": {
+          "type": "accordion",
+          "settings": {
+            "heading": "Description",
+            "open": true,
+            "use_product_description": false,
+            "content": "<p>Formulé à partir de 97 % d'ingrédients d'origine naturelle, ce sérum précieux active les mécanismes naturels de régénération cellulaire.</p>"
+          }
+        },
+        "b_acc_bienfaits": {
+          "type": "accordion",
+          "settings": {
+            "heading": "Bienfaits",
+            "open": false,
+            "use_product_description": false,
+            "content": "<p>Hydrate en profondeur, lisse l'apparence des ridules et redonne éclat et élasticité dès la première application.</p>"
+          }
+        },
+        "b_acc_ingredients": {
+          "type": "accordion",
+          "settings": {
+            "heading": "Ingrédients clés",
+            "open": false,
+            "use_product_description": false,
+            "content": "<p>Huile de pépins de figue de Barbarie bio, acide hyaluronique pur d'origine végétale, vitamine E naturelle.</p>"
+          }
+        },
+        "b_acc_peaux": {
+          "type": "accordion",
+          "settings": {
+            "heading": "Adapté aux peaux",
+            "open": false,
+            "use_product_description": false,
+            "content": "<p>Convient à tous types de peaux, y compris les peaux sensibles, déshydratées ou matures.</p>"
+          }
+        },
+        "b_ritual": {
+          "type": "ritual",
+          "settings": {
+            "heading": "COMPLÉTEZ VOTRE RITUEL",
+            "next_label": "Suivant",
+            "add_label": "Ajouter"
+          }
+        }
+      },
+      "block_order": [
+        "b_breadcrumb",
+        "b_badges",
+        "b_title",
+        "b_scores",
+        "b_intro",
+        "b_variants",
+        "b_price",
+        "b_buy",
+        "b_acc_desc",
+        "b_acc_bienfaits",
+        "b_acc_ingredients",
+        "b_acc_peaux",
+        "b_ritual"
+      ]
+    },
+    "knr_product_details": {
+      "type": "knr-product-details",
       "blocks": {
         "block_breadcrumb": {
           "type": "breadcrumb",
@@ -277,8 +405,8 @@
     "knr_faq": {
       "type": "knr-faq",
       "settings": {
-        "heading": "Questions & answers",
-        "view_all_text": "View all"
+        "tag": "Support",
+        "heading": "Questions & answers"
       },
       "blocks": {
         "faq_1": {
@@ -315,11 +443,7 @@
         "faq_2",
         "faq_3",
         "faq_4"
-      ],
-      "settings": {
-        "tag": "Support",
-        "heading": "Questions & answers"
-      }
+      ]
     },
     "knr_gallery": {
       "type": "knr-gallery-grid",
