@@ -1,0 +1,295 @@
+{%- comment -%}
+  sections/reviews.liquid
+  "Avis clients": heading, rating summary + distribution bars + action buttons,
+  a rating filter, a list of reviews (blocks) and a "load more" button.
+{%- endcomment -%}
+
+
+{%- liquid
+  assign c5 = section.settings.count_5 | default: 0
+  assign c4 = section.settings.count_4 | default: 0
+  assign c3 = section.settings.count_3 | default: 0
+  assign c2 = section.settings.count_2 | default: 0
+  assign c1 = section.settings.count_1 | default: 0
+  assign counts = c5 | append: ',' | append: c4 | append: ',' | append: c3 | append: ',' | append: c2 | append: ',' | append: c1 | split: ','
+  assign max_count = 1
+  for c in counts
+    assign cn = c | plus: 0
+    if cn > max_count
+      assign max_count = cn
+    endif
+  endfor
+  assign avg_pct = section.settings.average | times: 20.0
+-%}
+
+{% style %}
+  #rv-{{ section.id }} {
+    --rv-font: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
+    --rv-bg: {{ section.settings.bg_color }};
+    --rv-text: {{ section.settings.text_color }};
+    --rv-accent: {{ section.settings.accent_color }};
+    --rv-bar: {{ section.settings.bar_color }};
+    --rv-bar-bg: {{ section.settings.bar_bg_color }};
+    --rv-line: {{ section.settings.line_color }};
+    background: var(--rv-bg);
+    color: var(--rv-text);
+    font-family: var(--rv-font);
+    padding: {{ section.settings.padding_top }}px 20px {{ section.settings.padding_bottom }}px;
+    -webkit-font-smoothing: antialiased;
+  }
+  #rv-{{ section.id }} * { box-sizing: border-box; }
+  #rv-{{ section.id }} .rv { max-width: 720px; margin: 0 auto; }
+  #rv-{{ section.id }} .rv__title { margin: 0 0 64px; text-align: center; font-size: 28px; font-weight: 400; line-height: 1.25; }
+
+  /* Summary row */
+  #rv-{{ section.id }} .rv__top { display: grid; grid-template-columns: 1fr 1fr 234px; align-items: start; }
+  #rv-{{ section.id }} .rv__avg { color: var(--rv-accent); font-size: 10px; line-height: 1.6; }
+  #rv-{{ section.id }} .rv__avg-row { display: flex; align-items: center; gap: 6px; }
+  #rv-{{ section.id }} .rv__stars { font-size: 10px; letter-spacing: 1px; line-height: 1; color: var(--rv-accent); white-space: nowrap; }
+  #rv-{{ section.id }} .rv__based { margin-top: 2px; font-size: 9px; }
+  #rv-{{ section.id }} .rv__dist { list-style: none; margin: 0; padding: 0; max-width: 176px; }
+  #rv-{{ section.id }} .rv__dist li { display: grid; grid-template-columns: 58px 1fr 22px; align-items: center; gap: 4px; margin-bottom: 4px; font-size: 9px; color: var(--rv-accent); }
+  #rv-{{ section.id }} .rv__bar { height: 10px; background: var(--rv-bar-bg); }
+  #rv-{{ section.id }} .rv__bar i { display: block; height: 100%; background: var(--rv-bar); }
+  #rv-{{ section.id }} .rv__count { padding-left: 6px; }
+  #rv-{{ section.id }} .rv__actions { display: grid; gap: 4px; }
+  #rv-{{ section.id }} .rv-btn { display: flex; align-items: center; justify-content: center; height: 45px; border: 1px solid var(--rv-text); font: inherit; font-size: 13px; color: var(--rv-text); background: transparent; text-decoration: none; cursor: pointer; transition: opacity .2s; }
+  #rv-{{ section.id }} .rv-btn:hover { opacity: .8; }
+  #rv-{{ section.id }} .rv-btn--solid { background: var(--rv-text); color: var(--rv-bg); }
+
+  /* Filter */
+  #rv-{{ section.id }} .rv__filter { margin-top: 36px; }
+  #rv-{{ section.id }} .rv__filter-btn { display: inline-flex; align-items: center; gap: 12px; padding: 0 0 22px; background: none; border: 0; font: inherit; font-size: 12px; color: inherit; cursor: pointer; }
+  #rv-{{ section.id }} .rv__filter-btn svg { width: 15px; height: 15px; }
+  #rv-{{ section.id }} .rv__chips { display: none; gap: 6px; flex-wrap: wrap; padding: 0 0 20px; }
+  #rv-{{ section.id }} .rv__chips.is-open { display: flex; }
+  #rv-{{ section.id }} .rv__chip { padding: 4px 10px; border: 1px solid var(--rv-line); background: transparent; font: inherit; font-size: 12px; color: inherit; cursor: pointer; }
+  #rv-{{ section.id }} .rv__chip[aria-pressed="true"] { border-color: var(--rv-text); }
+
+  /* List */
+  #rv-{{ section.id }} .rv__list { border-top: 1px solid var(--rv-line); }
+  #rv-{{ section.id }} .rv-item { padding: 18px 0 20px; border-bottom: 1px solid var(--rv-line); }
+  #rv-{{ section.id }} .rv-item[hidden] { display: none; }
+  #rv-{{ section.id }} .rv-item__head { display: flex; justify-content: space-between; align-items: center; }
+  #rv-{{ section.id }} .rv-item__date { font-size: 11px; }
+  #rv-{{ section.id }} .rv-item__name { display: flex; align-items: center; gap: 8px; margin: 16px 0 18px; font-size: 13px; }
+  #rv-{{ section.id }} .rv-item__badge { padding: 1px 4px; border: 1px solid var(--rv-text); border-radius: 2px; font-size: 8px; line-height: 1.4; text-transform: uppercase; }
+  #rv-{{ section.id }} .rv-item__title { margin: 0 0 8px; font-size: 13px; }
+  #rv-{{ section.id }} .rv-item__text { margin: 0; max-width: 560px; font-size: 13px; line-height: 1.6; }
+  #rv-{{ section.id }} .rv-item__text p { margin: 0; }
+  #rv-{{ section.id }} .rv__empty { padding: 28px 0; text-align: center; font-size: 13px; }
+  #rv-{{ section.id }} .rv__empty[hidden] { display: none; }
+  #rv-{{ section.id }} .rv__more { display: flex; justify-content: center; margin-top: 38px; }
+  #rv-{{ section.id }} .rv__more[hidden] { display: none; }
+  #rv-{{ section.id }} .rv__more .rv-btn { width: 234px; }
+
+  /* Mobile */
+  @media (max-width: 989px) {
+    #rv-{{ section.id }} { padding-top: {{ section.settings.padding_top_mobile }}px; padding-bottom: {{ section.settings.padding_bottom_mobile }}px; }
+    #rv-{{ section.id }} .rv__title { margin-bottom: 44px; }
+    #rv-{{ section.id }} .rv__top { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+    #rv-{{ section.id }} .rv__avg { text-align: center; font-size: 12px; }
+    #rv-{{ section.id }} .rv__avg-row { justify-content: center; }
+    #rv-{{ section.id }} .rv__stars { font-size: 12px; }
+    #rv-{{ section.id }} .rv__based { font-size: 11px; margin-top: 6px; }
+    #rv-{{ section.id }} .rv__dist { width: 100%; max-width: 260px; }
+    #rv-{{ section.id }} .rv__dist li { grid-template-columns: 78px 1fr 26px; margin-bottom: 8px; font-size: 11px; }
+    #rv-{{ section.id }} .rv__bar { height: 12px; }
+    #rv-{{ section.id }} .rv__actions { width: 100%; margin-top: 16px; }
+    #rv-{{ section.id }} .rv__filter { margin-top: 40px; }
+    #rv-{{ section.id }} .rv-item__name, #rv-{{ section.id }} .rv-item__title, #rv-{{ section.id }} .rv-item__text { font-size: 14px; }
+    #rv-{{ section.id }} .rv__more .rv-btn { width: 100%; }
+  }
+{% endstyle %}
+
+<section id="rv-{{ section.id }}" data-rv data-step="{{ section.settings.per_page }}">
+  <div class="rv">
+    {%- if section.settings.heading != blank -%}<h2 class="rv__title">{{ section.settings.heading }}</h2>{%- endif -%}
+
+    <div class="rv__top">
+      <div class="rv__avg">
+        <div class="rv__avg-row">
+          <span class="rv__stars" role="img" aria-label="{{ section.settings.average }} / 5">{% for i in (1..5) %}★{% endfor %}</span>
+          <span>{{ section.settings.average }} {{ section.settings.out_of_label }}</span>
+        </div>
+        <div class="rv__based">{{ section.settings.based_on_label }} {{ section.settings.total_count }} {{ section.settings.reviews_label }}</div>
+      </div>
+
+      <ul class="rv__dist">
+        {%- assign ratings = '5,4,3,2,1' | split: ',' -%}
+        {%- for r in ratings -%}
+          {%- assign idx = forloop.index0 -%}
+          {%- assign n = counts[idx] | plus: 0 -%}
+          {%- assign pct = n | times: 100.0 | divided_by: max_count -%}
+          {%- assign rn = r | plus: 0 -%}
+          {%- assign empty = 5 | minus: rn -%}
+          <li>
+            <span class="rv__stars" aria-hidden="true">
+              {%- for i in (1..rn) -%}★{%- endfor -%}{%- if empty > 0 -%}{%- for i in (1..empty) -%}☆{%- endfor -%}{%- endif -%}
+            </span>
+            <span class="rv__bar" role="img" aria-label="{{ r }} ★ : {{ n }}"><i style="width: {{ pct | round: 1 }}%"></i></span>
+            <span class="rv__count">{{ n }}</span>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      <div class="rv__actions">
+        <a class="rv-btn rv-btn--solid" href="{{ section.settings.write_url | default: '#' }}">{{ section.settings.write_label }}</a>
+        <a class="rv-btn" href="{{ section.settings.ask_url | default: '#' }}">{{ section.settings.ask_label }}</a>
+      </div>
+    </div>
+
+    <div class="rv__filter">
+      <button type="button" class="rv__filter-btn" data-rv-filter aria-expanded="false">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><path d="M1 4h14M3.5 8h9M6 12h4"/></svg>
+        {{ section.settings.filter_label }}
+      </button>
+      <div class="rv__chips" data-rv-chips>
+        <button type="button" class="rv__chip" data-rating="all" aria-pressed="true">{{ section.settings.all_label }}</button>
+        {%- for r in ratings -%}
+          <button type="button" class="rv__chip" data-rating="{{ r }}" aria-pressed="false">{{ r }} ★</button>
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <div class="rv__list" data-rv-list>
+      {%- for block in section.blocks -%}
+        {%- assign rt = block.settings.rating | plus: 0 -%}
+        {%- assign empty = 5 | minus: rt -%}
+        <article class="rv-item" data-rv-item data-rating="{{ rt }}" {{ block.shopify_attributes }}>
+          <div class="rv-item__head">
+            <span class="rv__stars" role="img" aria-label="{{ rt }} / 5">
+              {%- if rt > 0 -%}{%- for i in (1..rt) -%}★{%- endfor -%}{%- endif -%}{%- if empty > 0 -%}{%- for i in (1..empty) -%}☆{%- endfor -%}{%- endif -%}
+            </span>
+            <span class="rv-item__date">{{ block.settings.date }}</span>
+          </div>
+          <div class="rv-item__name">
+            <span>{{ block.settings.name }}</span>
+            {%- if block.settings.verified -%}<span class="rv-item__badge">{{ section.settings.verified_label }}</span>{%- endif -%}
+          </div>
+          {%- if block.settings.title != blank -%}<p class="rv-item__title">{{ block.settings.title }}</p>{%- endif -%}
+          <div class="rv-item__text">{{ block.settings.text }}</div>
+        </article>
+      {%- endfor -%}
+      <p class="rv__empty" data-rv-empty hidden>{{ section.settings.empty_label }}</p>
+    </div>
+
+    <div class="rv__more" data-rv-more hidden>
+      <button type="button" class="rv-btn" data-rv-load>{{ section.settings.load_more_label }}</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const root = document.getElementById('rv-{{ section.id }}');
+    if (!root) return;
+    const step = parseInt(root.dataset.step, 10) || 3;
+    const items = [...root.querySelectorAll('[data-rv-item]')];
+    const more = root.querySelector('[data-rv-more]');
+    const empty = root.querySelector('[data-rv-empty]');
+    let rating = 'all';
+    let shown = step;
+
+    const render = () => {
+      const match = items.filter((it) => rating === 'all' || it.dataset.rating === rating);
+      items.forEach((it) => { it.hidden = true; });
+      match.slice(0, shown).forEach((it) => { it.hidden = false; });
+      more.hidden = match.length <= shown;
+      empty.hidden = match.length > 0;
+    };
+
+    root.querySelector('[data-rv-load]').addEventListener('click', () => { shown += step; render(); });
+
+    const filterBtn = root.querySelector('[data-rv-filter]');
+    const chips = root.querySelector('[data-rv-chips]');
+    filterBtn.addEventListener('click', () => {
+      const open = chips.classList.toggle('is-open');
+      filterBtn.setAttribute('aria-expanded', open);
+    });
+    chips.addEventListener('click', (e) => {
+      const chip = e.target.closest('.rv__chip');
+      if (!chip) return;
+      rating = chip.dataset.rating;
+      shown = step;
+      chips.querySelectorAll('.rv__chip').forEach((c) => c.setAttribute('aria-pressed', c === chip));
+      render();
+    });
+
+    /* Theme editor: make sure a selected review is visible */
+    document.addEventListener('shopify:block:select', (e) => {
+      if (root.contains(e.target)) { rating = 'all'; shown = items.length; render(); }
+    });
+
+    render();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "KNR Reviews",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Avis clients" },
+    { "type": "header", "content": "Rating summary" },
+    { "type": "range", "id": "average", "label": "Average rating", "min": 1, "max": 5, "step": 0.1, "default": 4.7 },
+    { "type": "number", "id": "total_count", "label": "Total reviews", "default": 200 },
+    { "type": "number", "id": "count_5", "label": "5-star count", "default": 32 },
+    { "type": "number", "id": "count_4", "label": "4-star count", "default": 10 },
+    { "type": "number", "id": "count_3", "label": "3-star count", "default": 5 },
+    { "type": "number", "id": "count_2", "label": "2-star count", "default": 6 },
+    { "type": "number", "id": "count_1", "label": "1-star count", "default": 1 },
+    { "type": "text", "id": "out_of_label", "label": "\"out of 5\" label", "default": "sur 5" },
+    { "type": "text", "id": "based_on_label", "label": "\"Based on\" label", "default": "Basé sur" },
+    { "type": "text", "id": "reviews_label", "label": "Reviews label", "default": "avis" },
+    { "type": "header", "content": "Buttons" },
+    { "type": "text", "id": "write_label", "label": "Write a review label", "default": "Écrire un avis" },
+    { "type": "url", "id": "write_url", "label": "Write a review link" },
+    { "type": "text", "id": "ask_label", "label": "Ask a question label", "default": "Poser une question" },
+    { "type": "url", "id": "ask_url", "label": "Ask a question link" },
+    { "type": "header", "content": "List" },
+    { "type": "text", "id": "filter_label", "label": "Filter label", "default": "Filtrer" },
+    { "type": "text", "id": "all_label", "label": "\"All\" filter label", "default": "Tous" },
+    { "type": "text", "id": "verified_label", "label": "Verified badge", "default": "Vérifié" },
+    { "type": "text", "id": "empty_label", "label": "No results label", "default": "Aucun avis pour ce filtre." },
+    { "type": "range", "id": "per_page", "label": "Reviews shown at a time", "min": 1, "max": 10, "step": 1, "default": 3 },
+    { "type": "text", "id": "load_more_label", "label": "Load more label", "default": "Charger plus" },
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#000000" },
+    { "type": "color", "id": "accent_color", "label": "Stars & small text", "default": "#b8a98f" },
+    { "type": "color", "id": "bar_color", "label": "Rating bars", "default": "#d9d2c0" },
+    { "type": "color", "id": "bar_bg_color", "label": "Rating bars track", "default": "#f6f4ef" },
+    { "type": "color", "id": "line_color", "label": "Dividers", "default": "#d8dbe0" },
+    { "type": "font_picker", "id": "font", "label": "Font", "default": "inter_n4" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 88 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Top padding (mobile)", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Bottom padding (mobile)", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        { "type": "range", "id": "rating", "label": "Rating", "min": 1, "max": 5, "step": 1, "default": 5 },
+        { "type": "text", "id": "date", "label": "Date", "default": "09/02/26" },
+        { "type": "text", "id": "name", "label": "Name", "default": "Mathilde S" },
+        { "type": "checkbox", "id": "verified", "label": "Verified buyer", "default": true },
+        { "type": "text", "id": "title", "label": "Title", "default": "Après usage d'1 mois" },
+        { "type": "richtext", "id": "text", "label": "Review", "default": "<p>Maison Célestine est une marque de soins anti-âge haut de gamme formulée autour d'actifs rares et certifiés biologiques, guidée par une expertise médicale et un rituel simple, précis et efficace.</p>" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KNR Reviews",
+      "blocks": [
+        { "type": "review" },
+        { "type": "review" },
+        { "type": "review" }
+      ]
+    }
+  ]
+}
+{% endschema %}
