@@ -198,7 +198,8 @@
           "settings": {
             "image": "shopify://shop_images/Product_Image_Container.png",
             "title": "Découvrir",
-            "text": "<p>Concentré de pureté active. Huile végétale aux propriétés anti-oxydantes puissantes pour un éclat retrouvé.</p>"
+            "text": "<p>Concentré de pureté active. Huile végétale aux propriétés anti-oxydantes puissantes pour un éclat retrouvé.</p>",
+            "url": ""
           }
         },
         "step_2": {
@@ -206,7 +207,8 @@
           "settings": {
             "image": "shopify://shop_images/Product_Image_Container-1.png",
             "title": "Découvrir",
-            "text": "<p>Éclat et uniformité retrouvés. Cible les taches et les irrégularités de grain de peau.</p>"
+            "text": "<p>Éclat et uniformité retrouvés. Cible les taches et les irrégularités de grain de peau.</p>",
+            "url": ""
           }
         },
         "step_3": {
@@ -214,7 +216,8 @@
           "settings": {
             "image": "shopify://shop_images/Product_Image_Container-2.png",
             "title": "Découvrir",
-            "text": "<p>Fermeté et nutrition intense. Répare la barrière cutanée et lisse les contours du visage.</p>"
+            "text": "<p>Fermeté et nutrition intense. Répare la barrière cutanée et lisse les contours du visage.</p>",
+            "url": ""
           }
         }
       },
@@ -563,6 +566,26 @@
         "padding_top_mobile": 64,
         "padding_bottom_mobile": 76
       }
+    },
+    "knr_sticky_add_to_cart_JpMX8n": {
+      "type": "knr-sticky-add-to-cart",
+      "name": "KNR Sticky",
+      "settings": {
+        "trigger": 200,
+        "button_label": "Ajouter au panier",
+        "sold_out_label": "Épuisé",
+        "added_label": "Ajouté ✓",
+        "after_add": "stay",
+        "bg_color": "#ffffff",
+        "text_color": "#000000",
+        "muted_color": "#b8a98f",
+        "line_color": "#e6e3dc",
+        "thumb_bg": "#e8e5dc",
+        "button_bg": "#000000",
+        "button_text": "#ffffff",
+        "font": "inter_n4",
+        "z_index": 60
+      }
     }
   },
   "order": [
@@ -574,6 +597,7 @@
     "knr_reviews_RwTyAL",
     "knr_blog_columns_UXDdAm",
     "knr_newsletter_banner_fE6iJT",
-    "knr_service_strip_krQbBM"
+    "knr_service_strip_krQbBM",
+    "knr_sticky_add_to_cart_JpMX8n"
   ]
 }
