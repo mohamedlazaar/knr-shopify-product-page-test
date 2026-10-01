@@ -584,7 +584,7 @@
         "button_bg": "#000000",
         "button_text": "#ffffff",
         "font": "inter_n4",
-        "z_index": 60
+        "z_index": 200
       }
     }
   },
