@@ -338,6 +338,148 @@
         "tag": "Support",
         "heading": "Questions & answers"
       }
+    },
+    "knr_reviews_RwTyAL": {
+      "type": "knr-reviews",
+      "blocks": {
+        "review_8qQEBz": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "date": "09/02/26",
+            "name": "Mathilde S",
+            "verified": true,
+            "title": "Après usage d'1 mois",
+            "text": "<p>Maison Célestine est une marque de soins anti-âge haut de gamme formulée autour d'actifs rares et certifiés biologiques, guidée par une expertise médicale et un rituel simple, précis et efficace.</p>"
+          }
+        },
+        "review_AirnUb": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "date": "09/02/26",
+            "name": "Mathilde S",
+            "verified": true,
+            "title": "Après usage d'1 mois",
+            "text": "<p>Maison Célestine est une marque de soins anti-âge haut de gamme formulée autour d'actifs rares et certifiés biologiques, guidée par une expertise médicale et un rituel simple, précis et efficace.</p>"
+          }
+        },
+        "review_yRRpDG": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "date": "09/02/26",
+            "name": "Mathilde S",
+            "verified": true,
+            "title": "Après usage d'1 mois",
+            "text": "<p>Maison Célestine est une marque de soins anti-âge haut de gamme formulée autour d'actifs rares et certifiés biologiques, guidée par une expertise médicale et un rituel simple, précis et efficace.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "review_8qQEBz",
+        "review_AirnUb",
+        "review_yRRpDG"
+      ],
+      "name": "KNR Reviews",
+      "settings": {
+        "heading": "Avis clients",
+        "average": 4.7,
+        "total_count": 200,
+        "count_5": 32,
+        "count_4": 10,
+        "count_3": 5,
+        "count_2": 6,
+        "count_1": 1,
+        "out_of_label": "sur 5",
+        "based_on_label": "Basé sur",
+        "reviews_label": "avis",
+        "write_label": "Écrire un avis",
+        "write_url": "",
+        "ask_label": "Poser une question",
+        "ask_url": "",
+        "filter_label": "Filtrer",
+        "all_label": "Tous",
+        "verified_label": "Vérifié",
+        "empty_label": "Aucun avis pour ce filtre.",
+        "per_page": 3,
+        "load_more_label": "Charger plus",
+        "bg_color": "#ffffff",
+        "text_color": "#000000",
+        "accent_color": "#b8a98f",
+        "bar_color": "#d9d2c0",
+        "bar_bg_color": "#f6f4ef",
+        "line_color": "#d8dbe0",
+        "font": "inter_n4",
+        "padding_top": 80,
+        "padding_bottom": 88,
+        "padding_top_mobile": 64,
+        "padding_bottom_mobile": 64
+      }
+    },
+    "knr_blog_columns_UXDdAm": {
+      "type": "knr-blog-columns",
+      "blocks": {
+        "article_iXN7HJ": {
+          "type": "article",
+          "settings": {
+            "label": "L'origine",
+            "title": "Fondée en 2012\ndans les Alpes",
+            "text": "<p>Maison Célestine est née de la passion d'une botaniste pour les plantes alpines et leurs propriétés régénérantes exceptionnelles.</p>",
+            "url": ""
+          }
+        },
+        "article_RV3mXw": {
+          "type": "article",
+          "settings": {
+            "label": "La formule",
+            "title": "12 ingrédients\nactifs sélectionnés",
+            "text": "<p>Chaque ingrédient est sourcé chez des producteurs engagés : huile de rosier muscat, rétinol végétal, extrait de cactus Cactaceae.</p>",
+            "url": ""
+          }
+        },
+        "article_KnwL3t": {
+          "type": "article",
+          "settings": {
+            "label": "L'expertise",
+            "title": "15 ans de\nrecherche en lab",
+            "text": "<p>Notre laboratoire indépendant teste chaque formule sur des panels de peaux diverses, garantissant efficacité et tolérance.</p>",
+            "url": ""
+          }
+        },
+        "article_aezqk4": {
+          "type": "article",
+          "settings": {
+            "label": "L'engagement",
+            "title": "97 % naturel\ncertifié",
+            "text": "<p>Emballages recyclables, formules biodégradables, compensation carbone intégrale. Beauté responsable, du champ au flacon.</p>",
+            "url": ""
+          }
+        }
+      },
+      "block_order": [
+        "article_iXN7HJ",
+        "article_RV3mXw",
+        "article_KnwL3t",
+        "article_aezqk4"
+      ],
+      "name": "Latest news",
+      "settings": {
+        "heading": "Latest news",
+        "link_label": "Voir tous les articles",
+        "link_url": "",
+        "columns": 4,
+        "image_ratio": "1 / 1",
+        "mobile_card_width": 65,
+        "bg_color": "#ffffff",
+        "text_color": "#000000",
+        "accent_color": "#c9bfa6",
+        "font": "inter_n4",
+        "padding_top": 56,
+        "padding_bottom": 64,
+        "padding_top_mobile": 48,
+        "padding_bottom_mobile": 48
+      }
     }
   },
   "order": [
@@ -345,6 +487,8 @@
     "knr_features_1",
     "knr_howto",
     "knr_testimonial",
-    "knr_faq"
+    "knr_faq",
+    "knr_reviews_RwTyAL",
+    "knr_blog_columns_UXDdAm"
   ]
 }
