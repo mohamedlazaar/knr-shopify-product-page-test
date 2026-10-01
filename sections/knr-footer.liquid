@@ -4,11 +4,11 @@
   (country/language selectors, copyright, social icons).
   Mobile: link columns become accordions, bottom bar is centered and stacked.
   Add it to a section group: sections/footer-group.json
-{%- endcomment -%}
+
 
 {{ section.settings.font | font_face: font_display: 'swap' }}
 {{ section.settings.wordmark_font | font_face: font_display: 'swap' }}
-
+{%- endcomment -%}
 {% style %}
   #ft-{{ section.id }} {
     --ft-font: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
