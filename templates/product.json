@@ -489,6 +489,7 @@
       "type": "knr-newsletter-banner",
       "name": "Newsletter banner",
       "settings": {
+        "image": "shopify://shop_images/Reinsurance_Image.jpg",
         "image_ratio": "5 / 4",
         "heading": "L'alliance de la science botanique et du luxe naturel pour une peau visiblement rajeunie en 4 semaines.",
         "heading_mobile": "Sérum précieux régénérant — l'alliance de la science botanique et du luxe naturel pour une peau visiblement rajeunie en 4 semaines.",
