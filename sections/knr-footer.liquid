@@ -233,17 +233,17 @@
   "tag": "div",
   "settings": [
     { "type": "header", "content": "Wordmark" },
-    { "type": "text", "id": "wordmark", "label": "Wordmark text", "default": "maison célestine" },
-    { "type": "image_picker", "id": "wordmark_image", "label": "Wordmark image (overrides text)", "info": "Use an SVG/PNG logo if you prefer; it is stretched to full width." },
+    { "type": "text", "id": "wordmark", "label": "Wordmark", "default": "maison célestine" },
+    { "type": "image_picker", "id": "wordmark_image", "label": "Wordmark img", "info": "Use an SVG/PNG logo if you prefer; it is stretched to full width." },
     { "type": "font_picker", "id": "wordmark_font", "label": "Wordmark font", "default": "inter_n4" },
     { "type": "range", "id": "wordmark_spacing", "label": "Letter spacing", "min": -0.1, "max": 0.05, "step": 0.005, "unit": "em", "default": -0.04 },
-    { "type": "range", "id": "wordmark_top", "label": "Space above wordmark", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "wordmark_top", "label": "Space top wordmark", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 96 },
     { "type": "header", "content": "Bottom bar" },
-    { "type": "checkbox", "id": "show_country", "label": "Show country / currency selector", "default": true },
-    { "type": "checkbox", "id": "show_language", "label": "Show language selector", "default": true },
-    { "type": "text", "id": "country_label", "label": "Country selector accessibility label", "default": "Pays / région" },
-    { "type": "text", "id": "language_label", "label": "Language selector accessibility label", "default": "Langue" },
-    { "type": "text", "id": "copyright", "label": "Copyright text (after \"© year\")", "default": "Maison Célestine. Tous droits réservés." },
+    { "type": "checkbox", "id": "show_country", "label": "country/currency", "default": true },
+    { "type": "checkbox", "id": "show_language", "label": "Show language", "default": true },
+    { "type": "text", "id": "country_label", "label": "Country label", "default": "Pays / région" },
+    { "type": "text", "id": "language_label", "label": "Language label", "default": "Langue" },
+    { "type": "text", "id": "copyright", "label": "Copyright", "default": "Maison Célestine. Tous droits réservés." },
     { "type": "url", "id": "facebook", "label": "Facebook" },
     { "type": "url", "id": "instagram", "label": "Instagram" },
     { "type": "url", "id": "tiktok", "label": "TikTok" },
@@ -267,16 +267,16 @@
     },
     {
       "type": "about",
-      "name": "About / certification",
+      "name": "About",
       "limit": 1,
       "settings": [
         { "type": "text", "id": "heading", "label": "Heading", "default": "À propos de Maison Célestine" },
         { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Maison Célestine est une marque de soins anti-âge haut de gamme formulée autour d'actifs rares et certifiés biologiques, guidée par une expertise médicale et un rituel simple, précis et efficace.</p>" },
-        { "type": "image_picker", "id": "badge", "label": "Certification badge" },
-        { "type": "text", "id": "cert_text", "label": "Certification text", "default": "Certifié COSMOS ORGANIC par ECOCERT Greenlife" },
+        { "type": "image_picker", "id": "badge", "label": "Certification" },
+        { "type": "text", "id": "cert_text", "label": "Certification", "default": "Certifié COSMOS ORGANIC par ECOCERT Greenlife" },
         { "type": "text", "id": "link_label", "label": "Link label", "default": "Voir le certificat" },
         { "type": "url", "id": "link_url", "label": "Link" },
-        { "type": "checkbox", "id": "link_new_tab", "label": "Open link in a new tab", "default": true }
+        { "type": "checkbox", "id": "link_new_tab", "label": "Open link", "default": true }
       ]
     }
   ],
@@ -287,7 +287,7 @@
       "blocks": [
         { "type": "links", "settings": { "heading": "Découvrir" } },
         { "type": "links", "settings": { "heading": "Service client" } },
-        { "type": "links", "settings": { "heading": "Légal & Transparence" } },
+        { "type": "links", "settings": { "heading": "Legal" } },
         { "type": "about" }
       ]
     }
