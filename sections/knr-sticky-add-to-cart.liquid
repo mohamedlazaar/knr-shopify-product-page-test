@@ -1,0 +1,222 @@
+{%- comment -%}
+  sections/sticky-add-to-cart.liquid
+  Standalone sticky bar fixed to the bottom of the product page.
+  - Hidden at the top of the page; slides up after the visitor scrolls.
+  - Hidden again while the main add-to-cart button is on screen.
+  - Stays in sync with the Product details section (size picker / price) via the "pd:variant" event.
+  Add it to templates/product.json (any position — it renders fixed to the viewport).
+{%- endcomment -%}
+
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign opt = product.options_with_values.first
+-%}
+
+{{ section.settings.font | font_face: font_display: 'swap' }}
+
+{% style %}
+  #sc-{{ section.id }} {
+    --sc-font: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
+    --sc-bg: {{ section.settings.bg_color }};
+    --sc-text: {{ section.settings.text_color }};
+    --sc-muted: {{ section.settings.muted_color }};
+    --sc-line: {{ section.settings.line_color }};
+    --sc-btn-bg: {{ section.settings.button_bg }};
+    --sc-btn-text: {{ section.settings.button_text }};
+    --sc-thumb-bg: {{ section.settings.thumb_bg }};
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: {{ section.settings.z_index }};
+    display: flex; align-items: center; gap: 14px;
+    padding: 4px 20px calc(4px + env(safe-area-inset-bottom, 0px)) 4px;
+    background: var(--sc-bg); color: var(--sc-text); font-family: var(--sc-font);
+    border-top: 1px solid var(--sc-line); box-shadow: 0 -6px 24px rgba(0,0,0,.06);
+    transform: translateY(110%); transition: transform .35s ease; will-change: transform;
+    -webkit-font-smoothing: antialiased;
+  }
+  #sc-{{ section.id }}.is-visible { transform: none; }
+  #sc-{{ section.id }} *, #sc-{{ section.id }} *::before, #sc-{{ section.id }} *::after { box-sizing: border-box; }
+  #sc-{{ section.id }} button { font: inherit; color: inherit; cursor: pointer; }
+  #sc-{{ section.id }} :focus-visible { outline: 2px solid var(--sc-text); outline-offset: 3px; }
+
+  #sc-{{ section.id }} .sc__thumb { flex: none; width: 92px; height: 92px; background: var(--sc-thumb-bg); overflow: hidden; }
+  #sc-{{ section.id }} .sc__thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  #sc-{{ section.id }} .sc__info { flex: 1 1 auto; min-width: 0; }
+  #sc-{{ section.id }} .sc__title { margin: 0 0 12px; font-size: 13px; line-height: 1.3; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #sc-{{ section.id }} .sc__opts { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0 0 12px; }
+  #sc-{{ section.id }} .sc__opt { padding: 0 0 2px; background: none; border: 0; border-bottom: 1px solid transparent; font-size: 13px; line-height: 1.3; }
+  #sc-{{ section.id }} .sc__opt[aria-pressed="true"] { border-bottom-color: var(--sc-text); }
+  #sc-{{ section.id }} .sc__opt:disabled { opacity: .4; }
+  #sc-{{ section.id }} .sc__price { display: flex; align-items: baseline; gap: 6px; font-size: 15px; line-height: 1.2; }
+  #sc-{{ section.id }} .sc__was { font-size: 11px; color: var(--sc-muted); text-decoration: line-through; }
+  #sc-{{ section.id }} .sc__was[hidden] { display: none; }
+  #sc-{{ section.id }} .sc__cta { flex: 0 0 min(34%, 360px); margin: 0; }
+  #sc-{{ section.id }} .sc__btn { width: 100%; height: 50px; background: var(--sc-btn-bg); color: var(--sc-btn-text); border: 1px solid var(--sc-btn-bg); border-radius: 0; font-size: 14px; transition: opacity .2s; }
+  #sc-{{ section.id }} .sc__btn:hover { opacity: .85; }
+  #sc-{{ section.id }} .sc__btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  @media (max-width: 989px) {
+    #sc-{{ section.id }} { gap: 10px; padding-right: 12px; }
+    #sc-{{ section.id }} .sc__thumb { width: 72px; height: 72px; }
+    #sc-{{ section.id }} .sc__title { margin-bottom: 8px; font-size: 12px; }
+    #sc-{{ section.id }} .sc__opts { margin-bottom: 8px; }
+    #sc-{{ section.id }} .sc__opt { font-size: 12px; }
+    #sc-{{ section.id }} .sc__price { font-size: 14px; }
+    #sc-{{ section.id }} .sc__cta { flex: 0 0 38%; }
+    #sc-{{ section.id }} .sc__btn { height: 46px; font-size: 13px; }
+  }
+  @media (prefers-reduced-motion: reduce) { #sc-{{ section.id }} { transition: none; } }
+{% endstyle %}
+
+<div id="sc-{{ section.id }}" data-trigger="{{ section.settings.trigger }}" data-after-add="{{ section.settings.after_add }}" data-added="{{ section.settings.added_label | escape }}" data-sold-out="{{ section.settings.sold_out_label | escape }}" data-label="{{ section.settings.button_label | escape }}" aria-hidden="true" inert>
+  <div class="sc__thumb">
+    {%- if product.featured_image -%}
+      {{ product.featured_image | image_url: width: 300 | image_tag: loading: 'lazy', widths: '150, 300', sizes: '92px', alt: '' }}
+    {%- endif -%}
+  </div>
+
+  <div class="sc__info">
+    <p class="sc__title">{{ product.title }}</p>
+    {%- unless product.has_only_default_variant -%}
+      <div class="sc__opts" role="group" aria-label="{{ opt.name | escape }}" data-sc-opts>
+        {%- for value in opt.values -%}
+          <button type="button" class="sc__opt" data-value="{{ value | escape }}" aria-pressed="{% if opt.selected_value == value %}true{% else %}false{% endif %}">{{ value }}</button>
+        {%- endfor -%}
+      </div>
+    {%- endunless -%}
+    <div class="sc__price">
+      <span data-sc-price>{{ variant.price | money }}</span>
+      <s class="sc__was" data-sc-was{% unless variant.compare_at_price > variant.price %} hidden{% endunless %}>{% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money }}{% endif %}</s>
+    </div>
+  </div>
+
+  {%- form 'product', product, id: 'sc-form', class: 'sc__cta' -%}
+    <input type="hidden" name="id" value="{{ variant.id }}" data-sc-id>
+    <button type="submit" class="sc__btn" data-sc-btn{% unless variant.available %} disabled{% endunless %}>
+      {%- if variant.available -%}{{ section.settings.button_label }}{%- else -%}{{ section.settings.sold_out_label }}{%- endif -%}
+    </button>
+  {%- endform -%}
+
+  <script type="application/json" data-sc-variants>
+    [
+      {%- for v in product.variants -%}
+        {"id": {{ v.id }}, "options": {{ v.options | json }}, "available": {{ v.available | json }}, "price": {{ v.price | money | json }}, "compare": {% if v.compare_at_price > v.price %}{{ v.compare_at_price | money | json }}{% else %}null{% endif %}}{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  </script>
+</div>
+
+<script>
+  (() => {
+    const bar = document.getElementById('sc-{{ section.id }}');
+    if (!bar) return;
+    const trigger = parseInt(bar.dataset.trigger, 10) || 0;
+    const variants = JSON.parse(bar.querySelector('[data-sc-variants]').textContent);
+    const idInput = bar.querySelector('[data-sc-id]');
+    const btn = bar.querySelector('[data-sc-btn]');
+    const priceEl = bar.querySelector('[data-sc-price]');
+    const wasEl = bar.querySelector('[data-sc-was]');
+    const optBtns = [...bar.querySelectorAll('.sc__opt')];
+    let current = variants.find((v) => v.id === Number(idInput.value)) || variants[0];
+
+    /* ---------- Visibility ---------- */
+    let anchorVisible = false;
+    const update = () => {
+      const show = window.scrollY > trigger && !anchorVisible;
+      bar.classList.toggle('is-visible', show);
+      bar.setAttribute('aria-hidden', String(!show));
+      bar.inert = !show;
+    };
+    const findAnchor = () =>
+      document.querySelector('.pd-b--buy_buttons') ||
+      [...document.querySelectorAll('form[action*="/cart/add"]')].find((f) => !bar.contains(f));
+    const anchor = findAnchor();
+    if (anchor && 'IntersectionObserver' in window) {
+      new IntersectionObserver(([en]) => { anchorVisible = en.isIntersecting; update(); }).observe(anchor);
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+
+    /* ---------- Variant state ---------- */
+    const render = () => {
+      idInput.value = current.id;
+      priceEl.textContent = current.price;
+      wasEl.hidden = !current.compare;
+      wasEl.textContent = current.compare || '';
+      btn.disabled = !current.available;
+      btn.textContent = current.available ? bar.dataset.label : bar.dataset.soldOut;
+      optBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.value === current.options[0])));
+    };
+
+    optBtns.forEach((b) => b.addEventListener('click', () => {
+      const keep = current.options.slice(1);
+      const next =
+        variants.find((v) => v.options[0] === b.dataset.value && keep.every((o, i) => v.options[i + 1] === o)) ||
+        variants.find((v) => v.options[0] === b.dataset.value);
+      if (!next) return;
+      current = next;
+      render();
+      history.replaceState(null, '', `?variant=${next.id}`);
+      document.dispatchEvent(new CustomEvent('pd:variant', { detail: { id: next.id, options: next.options, source: 'sticky' } }));
+    }));
+
+    /* The Product details section tells us when the visitor picks a size there */
+    document.addEventListener('pd:variant', (e) => {
+      if (e.detail.source === 'sticky') return;
+      const v = variants.find((x) => x.id === e.detail.id);
+      if (v) { current = v; render(); }
+    });
+
+    /* ---------- Ajax add to cart ---------- */
+    bar.querySelector('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const label = btn.textContent;
+      btn.disabled = true;
+      try {
+        const base = (window.Shopify && Shopify.routes && Shopify.routes.root) || '/';
+        const res = await fetch(base + 'cart/add.js', { method: 'POST', body: new FormData(e.target), headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error((await res.json()).description || 'Error');
+        if (bar.dataset.afterAdd === 'cart') { window.location.href = base + 'cart'; return; }
+        document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+        btn.textContent = bar.dataset.added;
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setTimeout(() => { btn.disabled = !current.available; btn.textContent = label === bar.dataset.added ? (current.available ? bar.dataset.label : bar.dataset.soldOut) : label; }, 1600);
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "KNR Sticky",
+  "tag": "div",
+  "settings": [
+    { "type": "paragraph", "content": "Fixed bar at the bottom of the product page. It appears after scrolling and hides while the main add-to-cart button is visible." },
+    { "type": "range", "id": "trigger", "label": "Appears after scrolling", "min": 0, "max": 1000, "step": 20, "unit": "px", "default": 200 },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Ajouter au panier" },
+    { "type": "text", "id": "sold_out_label", "label": "Sold out label", "default": "Épuisé" },
+    { "type": "text", "id": "added_label", "label": "Added label", "default": "Ajouté ✓" },
+    {
+      "type": "select", "id": "after_add", "label": "After adding to cart",
+      "options": [
+        { "value": "stay", "label": "Stay on page (fires cart:refresh event)" },
+        { "value": "cart", "label": "Go to cart page" }
+      ],
+      "default": "stay"
+    },
+    { "type": "header", "content": "Style" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#000000" },
+    { "type": "color", "id": "muted_color", "label": "Muted text", "default": "#b8a98f" },
+    { "type": "color", "id": "line_color", "label": "Top border", "default": "#e6e3dc" },
+    { "type": "color", "id": "thumb_bg", "label": "Image background", "default": "#e8e5dc" },
+    { "type": "color", "id": "button_bg", "label": "Button background", "default": "#000000" },
+    { "type": "color", "id": "button_text", "label": "Button text", "default": "#ffffff" },
+    { "type": "font_picker", "id": "font", "label": "Font", "default": "inter_n4" },
+    { "type": "range", "id": "z_index", "label": "Layer (z-index)", "min": 10, "max": 200, "step": 5, "default": 60, "info": "Raise it if the bar appears under your theme's header or cart drawer." }
+  ],
+  "presets": [
+    { "name": "KNR Sticky" }
+  ]
+}
+{% endschema %}
