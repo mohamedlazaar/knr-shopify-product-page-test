@@ -10,6 +10,7 @@ body {
   margin: 0;
   min-height: 100svh;
   font-variation-settings: 'slnt' 0;
+  overflow-x: clip;
 }
 
 :root {
@@ -23,6 +24,7 @@ html {
   scrollbar-width: thin;
   scrollbar-color: rgb(var(--color-foreground-rgb) / var(--opacity-40)) var(--color-background);
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 @media (min-width: 990px) {
@@ -43,6 +45,7 @@ html[scroll-lock] .page-wrapper {
   flex-direction: column;
   min-height: 100dvh;
   transition: margin-inline-end var(--animation-speed) var(--animation-timing-fade-out);
+  overflow-x: clip;
 }
 
 @media (min-width: 990px) {
@@ -52,6 +55,12 @@ html[scroll-lock] .page-wrapper {
     scroll-behavior: smooth;
     scrollbar-width: thin;
     scrollbar-color: rgb(var(--color-foreground-rgb) / var(--opacity-40)) var(--color-background);
+    overflow-x: visible;
+  }
+
+  .page-wrapper--drawer-open {
+    margin-inline-end: var(--theme-drawer-width, var(--sidebar-width));
+    transition-timing-function: var(--animation-timing-fade-in);
   }
 
   .page-wrapper--drawer-open shopify-account::part(dialog) {
@@ -62,11 +71,6 @@ html[scroll-lock] .page-wrapper {
   [dir='rtl'] .page-wrapper--drawer-open shopify-account::part(dialog) {
     translate: var(--theme-drawer-width, var(--sidebar-width));
   }
-}
-
-.page-wrapper--drawer-open {
-  margin-inline-end: var(--theme-drawer-width, var(--sidebar-width));
-  transition-timing-function: var(--animation-timing-fade-in);
 }
 
 img,
