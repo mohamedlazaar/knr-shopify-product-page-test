@@ -20,10 +20,13 @@
     -webkit-font-smoothing: antialiased;
   }
   #htu-{{ section.id }} * { box-sizing: border-box; }
+  #htu-{{ section.id }} a { color: inherit; text-decoration: none; }
+  #htu-{{ section.id }} .htu__card { display: block; min-width: 0; }
+  #htu-{{ section.id }} a.htu__card:hover .htu__media img { transform: scale(1.03); }
   #htu-{{ section.id }} .htu__title { margin: 0 0 24px; font-size: clamp(22px, 2.2vw, 32px); font-weight: 400; line-height: 1.2; }
   #htu-{{ section.id }} .htu__grid { display: grid; grid-template-columns: repeat(var(--htu-cols), minmax(0, 1fr)); gap: 8px; }
   #htu-{{ section.id }} .htu__media { aspect-ratio: {{ section.settings.image_ratio }}; background: #e6e1d6; overflow: hidden; }
-  #htu-{{ section.id }} .htu__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #htu-{{ section.id }} .htu__media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s ease; }
   #htu-{{ section.id }} .htu__num { display: block; margin: 18px 0 20px; font-size: 12px; line-height: 1; }
   #htu-{{ section.id }} .htu__step-title { margin: 0 0 10px; font-size: clamp(18px, 1.7vw, 24px); font-weight: 400; line-height: 1.25; }
   #htu-{{ section.id }} .htu__text { margin: 0; max-width: 46ch; font-size: 13px; line-height: 1.5; color: var(--htu-muted); }
@@ -57,7 +60,9 @@
 
   <div class="htu__grid">
     {%- for block in section.blocks -%}
-      <article class="htu__card" {{ block.shopify_attributes }}>
+      {%- assign tag = 'div' -%}
+      {%- if block.settings.url != blank -%}{%- assign tag = 'a' -%}{%- endif -%}
+      <{{ tag }} class="htu__card" {% if block.settings.url != blank %}href="{{ block.settings.url }}"{% endif %} {{ block.shopify_attributes }}>
         <div class="htu__media">
           {%- if block.settings.image != blank -%}
             {{ block.settings.image | image_url: width: 1000 | image_tag: loading: 'lazy', widths: '400, 600, 800, 1000', sizes: '(min-width: 990px) 33vw, 80vw', alt: block.settings.title }}
@@ -71,7 +76,7 @@
         <h3 class="htu__step-title">{{ block.settings.title }}</h3>
         <div class="htu__text">{{ block.settings.text }}</div>
         <button type="button" class="htu__more" data-more="{{ section.settings.read_more_label | escape }}" data-less="{{ section.settings.read_less_label | escape }}" aria-expanded="false">{{ section.settings.read_more_label }}</button>
-      </article>
+      </{{ tag }}>
     {%- endfor -%}
   </div>
   <div class="htu__bar" aria-hidden="true"><i></i></div>
@@ -93,6 +98,8 @@
     root.addEventListener('click', (e) => {
       const btn = e.target.closest('.htu__more');
       if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
       const card = btn.closest('.htu__card');
       const open = card.classList.toggle('is-open');
       btn.setAttribute('aria-expanded', open);
@@ -161,7 +168,8 @@
       "settings": [
         { "type": "image_picker", "id": "image", "label": "Image" },
         { "type": "text", "id": "title", "label": "Title", "default": "Découvrir" },
-        { "type": "richtext", "id": "text", "label": "Description", "default": "<p>Description de l'étape.</p>" }
+        { "type": "richtext", "id": "text", "label": "Description", "default": "<p>Description de l'étape.</p>" },
+        { "type": "url", "id": "url", "label": "Link" }
       ]
     }
   ],
