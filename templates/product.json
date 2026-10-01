@@ -484,6 +484,84 @@
         "padding_top_mobile": 48,
         "padding_bottom_mobile": 48
       }
+    },
+    "knr_newsletter_banner_fE6iJT": {
+      "type": "knr-newsletter-banner",
+      "name": "Newsletter banner",
+      "settings": {
+        "image_ratio": "5 / 4",
+        "heading": "L'alliance de la science botanique et du luxe naturel pour une peau visiblement rajeunie en 4 semaines.",
+        "heading_mobile": "Sérum précieux régénérant — l'alliance de la science botanique et du luxe naturel pour une peau visiblement rajeunie en 4 semaines.",
+        "placeholder": "E-mail",
+        "button_label": "S'inscrire",
+        "note": "Formule brevetée, testée dermatologiquement, 97 % d'ingrédients d'origine naturelle.",
+        "success_message": "Merci ! Vous êtes bien inscrit(e).",
+        "error_message": "Adresse e-mail invalide. Veuillez réessayer.",
+        "bg_color": "#ffffff",
+        "text_color": "#000000",
+        "field_bg": "#ffffff",
+        "field_border": "#ebe6d8",
+        "button_bg": "#000000",
+        "button_text": "#ffffff",
+        "font": "inter_n4",
+        "padding_top": 48,
+        "padding_bottom": 96,
+        "padding_top_mobile": 32,
+        "padding_bottom_mobile": 68
+      }
+    },
+    "knr_service_strip_krQbBM": {
+      "type": "knr-service-strip",
+      "blocks": {
+        "item_UXrDCa": {
+          "type": "item",
+          "settings": {
+            "title": "Livraison offerte",
+            "text": "Livraison offerte\ndès 60 € d'achat\nen France métropolitaine.",
+            "url": ""
+          }
+        },
+        "item_rLtN6H": {
+          "type": "item",
+          "settings": {
+            "title": "Retours gratuits",
+            "text": "Retours acceptés\njusqu'à 30 jours\naprès réception.",
+            "url": ""
+          }
+        },
+        "item_xHfefp": {
+          "type": "item",
+          "settings": {
+            "title": "Paiement sécurisé",
+            "text": "Paiement 100 % sécurisé\npar carte bancaire,\nPayPal ou virement.",
+            "url": ""
+          }
+        },
+        "item_xh7yXe": {
+          "type": "item",
+          "settings": {
+            "title": "Service client",
+            "text": "Du lundi au vendredi\nde 9h à 18h par email\net téléphone.",
+            "url": ""
+          }
+        }
+      },
+      "block_order": [
+        "item_UXrDCa",
+        "item_rLtN6H",
+        "item_xHfefp",
+        "item_xh7yXe"
+      ],
+      "name": "Service strip",
+      "settings": {
+        "bg_color": "#dcd4c1",
+        "text_color": "#000000",
+        "font": "inter_n4",
+        "padding_top": 80,
+        "padding_bottom": 80,
+        "padding_top_mobile": 64,
+        "padding_bottom_mobile": 76
+      }
     }
   },
   "order": [
@@ -493,6 +571,8 @@
     "knr_testimonial",
     "knr_faq",
     "knr_reviews_RwTyAL",
-    "knr_blog_columns_UXDdAm"
+    "knr_blog_columns_UXDdAm",
+    "knr_newsletter_banner_fE6iJT",
+    "knr_service_strip_krQbBM"
   ]
 }

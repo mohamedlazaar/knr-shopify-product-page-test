@@ -13,6 +13,7 @@
   "sections": {
     "knr_brand_footer_DRQ4xE": {
       "type": "knr-brand-footer",
+      "disabled": true,
       "name": "KNR Brand Footer",
       "settings": {
         "brand_name": "maison célestine"
@@ -66,6 +67,7 @@
         "footer_policy_list_VCdnpa",
         "social_links_Ew63Kq"
       ],
+      "disabled": true,
       "name": "t:names.utilities",
       "settings": {
         "section_width": "page-width",
