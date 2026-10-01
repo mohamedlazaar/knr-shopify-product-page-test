@@ -40,6 +40,12 @@ html[scroll-lock] .page-wrapper {
   overflow: hidden;
 }
 
+#header-group,
+.header-section {
+  position: relative;
+  z-index: 50;
+}
+
 .page-wrapper {
   display: flex;
   flex-direction: column;

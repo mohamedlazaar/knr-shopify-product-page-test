@@ -33,7 +33,16 @@
     --pd-font: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
     --pd-gap: 9px;
   }
-  #pd-{{ section.id }} { background: var(--pd-page); color: var(--pd-text); font-family: var(--pd-font); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  #pd-{{ section.id }} {
+    position: relative;
+    z-index: 1;
+    background: var(--pd-page);
+    color: var(--pd-text);
+    font-family: var(--pd-font);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
   #pd-{{ section.id }} *, #pd-{{ section.id }} *::before, #pd-{{ section.id }} *::after { box-sizing: border-box; }
   #pd-{{ section.id }} img { display: block; width: 100%; height: 100%; object-fit: cover; }
   #pd-{{ section.id }} button { font: inherit; color: inherit; cursor: pointer; }
@@ -50,8 +59,25 @@
   #pd-{{ section.id }} .pd__zoom svg { width: 20px; height: 20px; }
   #pd-{{ section.id }} .pd__dots { display: none; }
 
-  #pd-{{ section.id }} .pd__info { grid-column: 2; grid-row: 2; margin-top: calc(-100cqw * 730 / 1526); padding: 59px 41px 0 0; position: relative; z-index: 2; pointer-events: none; }
-  #pd-{{ section.id }} .pd__card { pointer-events: auto; position: sticky; top: 20px; background: var(--pd-card); padding: 42px 42px 48px; }
+  #pd-{{ section.id }} .pd__info {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: calc(-100cqw * 730 / 1526);
+    padding: 59px 41px 0 0;
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+  }
+  body:has(#header-component[transparent]) #pd-{{ section.id }} .pd__info {
+    padding-top: calc(var(--header-group-height, 90px) + 24px);
+  }
+  #pd-{{ section.id }} .pd__card {
+    pointer-events: auto;
+    position: sticky;
+    top: calc(var(--header-height, 70px) + 20px);
+    background: var(--pd-card);
+    padding: 42px 42px 48px;
+  }
 
   /* ---------- Blocks ---------- */
   #pd-{{ section.id }} .pd-breadcrumb { font-size: 11px; color: var(--pd-muted); margin: 0 0 40px; }
@@ -144,6 +170,7 @@
 
     /* card */
     #pd-{{ section.id }} .pd__info { position: static; margin-top: 0; padding: 0 15px 24px; pointer-events: auto; }
+    body:has(#header-component[transparent]) #pd-{{ section.id }} .pd__info { padding-top: 0; }
     #pd-{{ section.id }} .pd__card { position: static; padding: 30px 16px 68px; }
     #pd-{{ section.id }} .pd-breadcrumb, #pd-{{ section.id }} .pd-b--price { display: none; }
 
