@@ -12,6 +12,7 @@
   assign opt = product.options_with_values.first
 -%}
 
+
 {% style %}
   #sc-{{ section.id }} {
     --sc-font: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
@@ -22,7 +23,7 @@
     --sc-btn-bg: {{ section.settings.button_bg }};
     --sc-btn-text: {{ section.settings.button_text }};
     --sc-thumb-bg: {{ section.settings.thumb_bg }};
-    position: fixed; width:45%; right: 0; bottom: 0; z-index: {{ section.settings.z_index }};
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: {{ section.settings.z_index }};
     display: flex; align-items: center; gap: 14px;
     padding: 4px 20px calc(4px + env(safe-area-inset-bottom, 0px)) 4px;
     background: var(--sc-bg); color: var(--sc-text); font-family: var(--sc-font);
@@ -104,21 +105,29 @@
 
 <script>
   (() => {
-    const bar = document.getElementById('sc-{{ section.id }}');
+    const BAR_ID = 'sc-{{ section.id }}';
+    let bar = document.getElementById(BAR_ID);
     if (!bar) return;
+
+    /* Move the bar to <body> so no theme wrapper (transform, contain, overflow…) can break position: fixed.
+       Remove a previous copy first (theme editor re-renders the section). */
+    document.querySelectorAll('body > #' + BAR_ID).forEach((el) => { if (el !== bar) el.remove(); });
+    document.body.appendChild(bar);
+    document.addEventListener('shopify:section:unload', (e) => {
+      if (e.target && e.target.id && e.target.id.indexOf('{{ section.id }}') > -1) bar.remove();
+    });
+
     const trigger = parseInt(bar.dataset.trigger, 10) || 0;
-    const variants = JSON.parse(bar.querySelector('[data-sc-variants]').textContent);
-    const idInput = bar.querySelector('[data-sc-id]');
-    const btn = bar.querySelector('[data-sc-btn]');
-    const priceEl = bar.querySelector('[data-sc-price]');
-    const wasEl = bar.querySelector('[data-sc-was]');
-    const optBtns = [...bar.querySelectorAll('.sc__opt')];
-    let current = variants.find((v) => v.id === Number(idInput.value)) || variants[0];
 
     /* ---------- Visibility ---------- */
     let anchorVisible = false;
+    let scrolled = 0;
+    const readScroll = (e) => {
+      const t = e && e.target && e.target !== document ? e.target.scrollTop || 0 : 0;
+      scrolled = Math.max(window.pageYOffset || 0, document.documentElement.scrollTop || 0, document.body.scrollTop || 0, t);
+    };
     const update = () => {
-      const show = window.scrollY > trigger && !anchorVisible;
+      const show = scrolled > trigger && !anchorVisible;
       bar.classList.toggle('is-visible', show);
       bar.setAttribute('aria-hidden', String(!show));
       bar.inert = !show;
@@ -130,57 +139,71 @@
     if (anchor && 'IntersectionObserver' in window) {
       new IntersectionObserver(([en]) => { anchorVisible = en.isIntersecting; update(); }).observe(anchor);
     }
-    window.addEventListener('scroll', update, { passive: true });
-    update();
+    /* capture = true also catches pages that scroll inside a container instead of the window */
+    document.addEventListener('scroll', (e) => { readScroll(e); update(); }, { passive: true, capture: true });
+    window.addEventListener('resize', () => { readScroll(); update(); });
+    readScroll(); update();
 
     /* ---------- Variant state ---------- */
-    const render = () => {
-      idInput.value = current.id;
-      priceEl.textContent = current.price;
-      wasEl.hidden = !current.compare;
-      wasEl.textContent = current.compare || '';
-      btn.disabled = !current.available;
-      btn.textContent = current.available ? bar.dataset.label : bar.dataset.soldOut;
-      optBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.value === current.options[0])));
-    };
+    try {
+      const variants = JSON.parse(bar.querySelector('[data-sc-variants]').textContent);
+      const idInput = bar.querySelector('[data-sc-id]');
+      const btn = bar.querySelector('[data-sc-btn]');
+      const priceEl = bar.querySelector('[data-sc-price]');
+      const wasEl = bar.querySelector('[data-sc-was]');
+      const optBtns = [...bar.querySelectorAll('.sc__opt')];
+      let current = variants.find((v) => v.id === Number(idInput.value)) || variants[0];
 
-    optBtns.forEach((b) => b.addEventListener('click', () => {
-      const keep = current.options.slice(1);
-      const next =
-        variants.find((v) => v.options[0] === b.dataset.value && keep.every((o, i) => v.options[i + 1] === o)) ||
-        variants.find((v) => v.options[0] === b.dataset.value);
-      if (!next) return;
-      current = next;
-      render();
-      history.replaceState(null, '', `?variant=${next.id}`);
-      document.dispatchEvent(new CustomEvent('pd:variant', { detail: { id: next.id, options: next.options, source: 'sticky' } }));
-    }));
+      const label = () => (current.available ? bar.dataset.label : bar.dataset.soldOut);
+      const render = () => {
+        idInput.value = current.id;
+        priceEl.textContent = current.price;
+        wasEl.hidden = !current.compare;
+        wasEl.textContent = current.compare || '';
+        btn.disabled = !current.available;
+        btn.textContent = label();
+        optBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.value === current.options[0])));
+      };
 
-    /* The Product details section tells us when the visitor picks a size there */
-    document.addEventListener('pd:variant', (e) => {
-      if (e.detail.source === 'sticky') return;
-      const v = variants.find((x) => x.id === e.detail.id);
-      if (v) { current = v; render(); }
-    });
+      optBtns.forEach((b) => b.addEventListener('click', () => {
+        const keep = current.options.slice(1);
+        const next =
+          variants.find((v) => v.options[0] === b.dataset.value && keep.every((o, i) => v.options[i + 1] === o)) ||
+          variants.find((v) => v.options[0] === b.dataset.value);
+        if (!next) return;
+        current = next;
+        render();
+        history.replaceState(null, '', `?variant=${next.id}`);
+        document.dispatchEvent(new CustomEvent('pd:variant', { detail: { id: next.id, options: next.options, source: 'sticky' } }));
+      }));
 
-    /* ---------- Ajax add to cart ---------- */
-    bar.querySelector('form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const label = btn.textContent;
-      btn.disabled = true;
-      try {
-        const base = (window.Shopify && Shopify.routes && Shopify.routes.root) || '/';
-        const res = await fetch(base + 'cart/add.js', { method: 'POST', body: new FormData(e.target), headers: { Accept: 'application/json' } });
-        if (!res.ok) throw new Error((await res.json()).description || 'Error');
-        if (bar.dataset.afterAdd === 'cart') { window.location.href = base + 'cart'; return; }
-        document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
-        btn.textContent = bar.dataset.added;
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setTimeout(() => { btn.disabled = !current.available; btn.textContent = label === bar.dataset.added ? (current.available ? bar.dataset.label : bar.dataset.soldOut) : label; }, 1600);
-      }
-    });
+      /* The Product details section tells us when the visitor picks a size there */
+      document.addEventListener('pd:variant', (e) => {
+        if (e.detail.source === 'sticky') return;
+        const v = variants.find((x) => x.id === e.detail.id);
+        if (v) { current = v; render(); }
+      });
+
+      /* ---------- Ajax add to cart ---------- */
+      bar.querySelector('form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        btn.disabled = true;
+        try {
+          const base = (window.Shopify && Shopify.routes && Shopify.routes.root) || '/';
+          const res = await fetch(base + 'cart/add.js', { method: 'POST', body: new FormData(e.target), headers: { Accept: 'application/json' } });
+          if (!res.ok) throw new Error((await res.json()).description || 'Error');
+          if (bar.dataset.afterAdd === 'cart') { window.location.href = base + 'cart'; return; }
+          document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+          btn.textContent = bar.dataset.added;
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setTimeout(() => { btn.disabled = !current.available; btn.textContent = label(); }, 1600);
+        }
+      });
+    } catch (err) {
+      console.error('Sticky add to cart: variants could not be read', err);
+    }
   })();
 </script>
 
