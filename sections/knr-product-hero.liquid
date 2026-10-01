@@ -1,3 +1,9 @@
+{%- comment -%}
+  sections/product-details.liquid
+  Product details section — big hero + 2-col gallery on the left, sticky white info card on the right.
+  Use it in templates/product.json (or product.liquid).
+{%- endcomment -%}
+
 {%- liquid
   assign variant = product.selected_or_first_available_variant
   assign form_id = 'pd-form-' | append: section.id
@@ -12,7 +18,7 @@
   assign delivery_date = fr_days[d_idx] | append: ' ' | append: d_num | append: ' ' | append: fr_months[m_idx]
 -%}
 
-{{ section.settings.font | font_face: font_display: 'swap' }}
+
 
 {% style %}
   #pd-{{ section.id }} {
@@ -23,6 +29,7 @@
     --pd-btn-bg: {{ section.settings.button_bg }};
     --pd-btn-text: {{ section.settings.button_text }};
     --pd-page: {{ section.settings.page_color }};
+    --pd-bg-m: {{ section.settings.mobile_bg }};
     --pd-font: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
     --pd-gap: 9px;
   }
@@ -34,7 +41,7 @@
   #pd-{{ section.id }} :focus-visible { outline: 2px solid var(--pd-text); outline-offset: 3px; }
 
   /* ---------- Layout ---------- */
-  #pd-{{ section.id }} .pd { display: grid; grid-template-columns: minmax(0, 65.6%) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); background: var(--pd-card); }
+  #pd-{{ section.id }} .pd { display: grid; grid-template-columns: minmax(0, 65.6%) minmax(0, 1fr); container-type: inline-size; position: relative; background: var(--pd-card); }
   #pd-{{ section.id }} .pd__media { display: contents; }
   #pd-{{ section.id }} .pd__hero { grid-column: 1 / -1; grid-row: 1; aspect-ratio: 1526 / 730; position: relative; background: var(--pd-page); overflow: hidden; }
   #pd-{{ section.id }} .pd__grid { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; gap: var(--pd-gap); margin-top: var(--pd-gap); align-content: start; }
@@ -43,7 +50,7 @@
   #pd-{{ section.id }} .pd__zoom svg { width: 20px; height: 20px; }
   #pd-{{ section.id }} .pd__dots { display: none; }
 
-  #pd-{{ section.id }} .pd__info { grid-column: 2; grid-row: 1 / span 2; padding: 59px 41px 0 0; position: relative; z-index: 2; pointer-events: none; margin-top:100px; }
+  #pd-{{ section.id }} .pd__info { grid-column: 2; grid-row: 2; margin-top: calc(-100cqw * 730 / 1526); padding: 59px 41px 0 0; position: relative; z-index: 2; pointer-events: none; }
   #pd-{{ section.id }} .pd__card { pointer-events: auto; position: sticky; top: 20px; background: var(--pd-card); padding: 42px 42px 48px; }
 
   /* ---------- Blocks ---------- */
@@ -61,6 +68,7 @@
   #pd-{{ section.id }} .pd-scores { margin: 0 0 22px; }
   #pd-{{ section.id }} .pd-scores strong { font-weight: 600; }
   #pd-{{ section.id }} .pd-scores span { margin: 0 4px; }
+  #pd-{{ section.id }} .pd-sep::before { content: '·'; }
   #pd-{{ section.id }} .pd-intro { margin: 0 0 46px; line-height: 1.75; }
   #pd-{{ section.id }} .pd-intro p { margin: 0; }
 
@@ -95,6 +103,12 @@
   #pd-{{ section.id }} .pd-acc__body > :last-child { margin-bottom: 0; }
   #pd-{{ section.id }} .pd-acc[open] summary { padding-bottom: 18px; }
 
+  #pd-{{ section.id }} .pd-mprice, #pd-{{ section.id }} .pd-rating-m, #pd-{{ section.id }} .pd__next { display: none; }
+  #pd-{{ section.id }} .pd-dots { display: flex; justify-content: center; gap: 6px; margin: -8px 0 26px; }
+  #pd-{{ section.id }} .pd-dots button { width: 19px; height: 11px; padding: 0; border: 0; background: none; position: relative; cursor: pointer; }
+  #pd-{{ section.id }} .pd-dots button::after { content: ''; position: absolute; left: 0; right: 0; top: 5px; height: 1.5px; background: var(--pd-line); opacity: .8; }
+  #pd-{{ section.id }} .pd-dots button.is-active::after { background: var(--pd-text); opacity: 1; }
+
   #pd-{{ section.id }} .pd-ritual { margin-top: 44px; }
   #pd-{{ section.id }} .pd-ritual__head { display: flex; justify-content: space-between; align-items: center; margin: 0 0 20px; text-transform: uppercase; }
   #pd-{{ section.id }} .pd-ritual__next { background: none; border: 0; padding: 0; width: 20px; height: 20px; display: grid; place-items: center; }
@@ -114,18 +128,66 @@
 
   /* ---------- Mobile ---------- */
   @media (max-width: 989px) {
-    #pd-{{ section.id }} .pd { display: block; }
-    #pd-{{ section.id }} .pd__media { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; position: relative; }
+    #pd-{{ section.id }} .pd { display: block; background: var(--pd-bg-m); }
+    #pd-{{ section.id }} .pd__media { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
     #pd-{{ section.id }} .pd__media::-webkit-scrollbar { display: none; }
     #pd-{{ section.id }} .pd__grid { display: contents; }
-    #pd-{{ section.id }} .pd__hero, #pd-{{ section.id }} .pd__tile { flex: 0 0 100%; aspect-ratio: 4 / 5; scroll-snap-align: start; margin: 0; }
-    #pd-{{ section.id }} .pd__dots { display: flex; justify-content: center; gap: 6px; padding: 14px 0 0; background: var(--pd-card); }
-    #pd-{{ section.id }} .pd__dots i { width: 20px; height: 2px; background: var(--pd-line); }
-    #pd-{{ section.id }} .pd__dots i.is-active { background: var(--pd-text); }
-    #pd-{{ section.id }} .pd__info { padding: 0; pointer-events: auto; }
-    #pd-{{ section.id }} .pd__card { position: static; padding: 28px 20px 40px; }
-    #pd-{{ section.id }} .pd-ritual__track { margin-right: -20px; padding-right: 20px; }
-    #pd-{{ section.id }} .pd-title { font-size: 22px; }
+    #pd-{{ section.id }} .pd__hero, #pd-{{ section.id }} .pd__tile { flex: 0 0 100%; aspect-ratio: 9 / 10; scroll-snap-align: start; margin: 0; }
+    #pd-{{ section.id }} .pd__zoom { display: none; }
+
+    /* slider indicator over the bottom of the image + next arrow */
+    #pd-{{ section.id }} .pd__dots { display: flex; position: absolute; left: 0; right: 0; top: calc(100cqw * 10 / 9 - 22px); justify-content: center; gap: 6px; z-index: 3; pointer-events: none; }
+    #pd-{{ section.id }} .pd__dots i { width: 19px; height: 1.5px; background: rgba(255,255,255,.8); }
+    #pd-{{ section.id }} .pd__dots i.is-active { background: #111; }
+    #pd-{{ section.id }} .pd__next { display: grid; place-items: center; position: absolute; right: 8px; top: calc(100cqw * 10 / 18); width: 36px; height: 36px; margin-top: -18px; padding: 0; background: none; border: 0; z-index: 3; }
+    #pd-{{ section.id }} .pd__next svg { width: 14px; height: 14px; }
+
+    /* card */
+    #pd-{{ section.id }} .pd__info { position: static; margin-top: 0; padding: 0 15px 24px; pointer-events: auto; }
+    #pd-{{ section.id }} .pd__card { position: static; padding: 30px 16px 68px; }
+    #pd-{{ section.id }} .pd-breadcrumb, #pd-{{ section.id }} .pd-b--price { display: none; }
+
+    /* badges float over the image, centered */
+    #pd-{{ section.id }} .pd-badges { position: absolute; top: 84px; left: 0; right: 0; justify-content: center; gap: 4px; margin: 0; z-index: 3; pointer-events: none; }
+    #pd-{{ section.id }} .pd-badges li { background: #fff; border: 0; border-radius: 0; padding: 4px 7px; font-size: 13px; }
+
+    /* title + price on one row, rating underneath */
+    #pd-{{ section.id }} .pd-title-row { align-items: flex-start; gap: 12px; margin: 0 0 14px; }
+    #pd-{{ section.id }} .pd-title { font-size: 15px; line-height: 1.35; }
+    #pd-{{ section.id }} .pd-rating { display: none; }
+    #pd-{{ section.id }} .pd-mprice { display: block; flex: none; text-align: right; }
+    #pd-{{ section.id }} .pd-mprice .pd-price__row { justify-content: flex-end; gap: 5px; }
+    #pd-{{ section.id }} .pd-mprice .pd-price__now { font-size: 17px; line-height: 1.2; }
+    #pd-{{ section.id }} .pd-mprice .pd-price__was { font-size: 11px; }
+    #pd-{{ section.id }} .pd-mprice .pd-price__unit { margin-top: 6px; font-size: 10px; }
+    #pd-{{ section.id }} .pd-rating-m { display: flex; align-items: center; gap: 6px; margin: 0 0 20px; font-size: 12px; color: var(--pd-muted); }
+    #pd-{{ section.id }} .pd-rating-m .pd-stars { font-size: 12px; letter-spacing: 1px; }
+
+    #pd-{{ section.id }} .pd-scores { margin-bottom: 20px; font-size: 14px; }
+    #pd-{{ section.id }} .pd-scores strong { font-weight: 400; }
+    #pd-{{ section.id }} .pd-sep::before { content: '•'; }
+    #pd-{{ section.id }} .pd-intro { margin-bottom: 30px; font-size: 14px; line-height: 1.55; }
+
+    /* size picker: equal-width options, underline on the selected one */
+    #pd-{{ section.id }} .pd-option { margin-bottom: 24px; }
+    #pd-{{ section.id }} .pd-option legend { margin-bottom: 14px; font-size: 14px; }
+    #pd-{{ section.id }} .pd-option__values { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0; }
+    #pd-{{ section.id }} .pd-option label { display: block; text-align: center; padding: 6px 0 10px; font-size: 15px; }
+
+    #pd-{{ section.id }} .pd-buy { margin-bottom: 18px; }
+    #pd-{{ section.id }} .pd-atc { height: 48px; font-size: 15px; }
+    #pd-{{ section.id }} .pd-delivery { margin-top: 14px; font-size: 12px; }
+    #pd-{{ section.id }} .pd-dots { margin: 0 0 22px; }
+
+    #pd-{{ section.id }} .pd-acc summary { padding: 19px 0; font-size: 15px; }
+    #pd-{{ section.id }} .pd-acc[open] summary { padding-bottom: 14px; }
+    #pd-{{ section.id }} .pd-acc__body { font-size: 14px; line-height: 1.6; padding-bottom: 20px; }
+
+    #pd-{{ section.id }} .pd-ritual { margin-top: 36px; }
+    #pd-{{ section.id }} .pd-ritual__head { font-size: 14px; }
+    #pd-{{ section.id }} .pd-ritual__track { margin-right: -16px; padding-right: 16px; }
+    #pd-{{ section.id }} .pd-ritual__item { flex-basis: 48.8%; }
+    #pd-{{ section.id }} .pd-ritual__meta { font-size: 13px; }
   }
 {% endstyle %}
 
@@ -153,15 +215,20 @@
         {%- endfor -%}
       </div>
     </div>
-    <div class="pd__dots" data-pd-dots aria-hidden="true">
-      {%- for media in product.media -%}<i{% if forloop.first %} class="is-active"{% endif %}></i>{%- endfor -%}
-    </div>
+    {%- if product.media.size > 1 -%}
+      <div class="pd__dots" data-pd-dots aria-hidden="true">
+        {%- for media in product.media -%}<i{% if forloop.first %} class="is-active"{% endif %}></i>{%- endfor -%}
+      </div>
+      <button type="button" class="pd__next" data-pd-gnext aria-label="{{ section.settings.next_label | escape }}">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.2 1.5l4.5 4.5-4.5 4.5"/></svg>
+      </button>
+    {%- endif -%}
 
     {%- comment -%} ---------- Info card ---------- {%- endcomment -%}
     <div class="pd__info">
       <div class="pd__card">
         {%- for block in section.blocks -%}
-          <div {{ block.shopify_attributes }}>
+          <div class="pd-b pd-b--{{ block.type }}" {{ block.shopify_attributes }}>
           {%- case block.type -%}
 
             {%- when 'breadcrumb' -%}
@@ -216,12 +283,34 @@
                     <span class="pd-rating__count">{{ rating_count }} {{ block.settings.reviews_label }}</span>
                   </div>
                 {%- endif -%}
+                <div class="pd-mprice" data-pd-dynamic="{{ block.id }}-mprice">
+                  <div class="pd-price__row">
+                    <span class="pd-price__now">{{ variant.price | money }}</span>
+                    {%- if variant.compare_at_price > variant.price -%}<s class="pd-price__was">{{ variant.compare_at_price | money }}</s>{%- endif -%}
+                  </div>
+                  {%- if variant.unit_price_measurement -%}
+                    <p class="pd-price__unit">
+                      {{ variant.unit_price | money }} {{ block.settings.per_label | default: 'par' }}
+                      {% if variant.unit_price_measurement.reference_value != 1 %}{{ variant.unit_price_measurement.reference_value }}{% endif %}
+                      {{ variant.unit_price_measurement.reference_unit }}
+                    </p>
+                  {%- endif -%}
+                </div>
               </div>
+              {%- if block.settings.show_rating and rating != blank and rating != 0 -%}
+                <div class="pd-rating-m">
+                  <span class="pd-stars" role="img" aria-label="{{ rating }} / 5">
+                    <span class="pd-stars__bg">★★★★★</span>
+                    <span class="pd-stars__fg" style="width: {{ rating_pct }}%">★★★★★</span>
+                  </span>
+                  <span>{{ rating }} · {{ rating_count }} {{ block.settings.reviews_label }}</span>
+                </div>
+              {%- endif -%}
 
             {%- when 'scores' -%}
               <p class="pd-scores">
                 {%- if block.settings.label_1 != blank -%}<strong>{{ block.settings.label_1 }}</strong> {{ block.settings.score_1 }}{%- endif -%}
-                {%- if block.settings.label_2 != blank -%}<span>·</span><strong>{{ block.settings.label_2 }}</strong> {{ block.settings.score_2 }}{%- endif -%}
+                {%- if block.settings.label_2 != blank -%}<span class="pd-sep"></span><strong>{{ block.settings.label_2 }}</strong> {{ block.settings.score_2 }}{%- endif -%}
               </p>
 
             {%- when 'intro' -%}
@@ -296,6 +385,13 @@
                 </div>
               </details>
 
+            {%- when 'gallery_dots' -%}
+              {%- if product.media.size > 1 -%}
+                <div class="pd-dots" data-pd-dots>
+                  {%- for media in product.media -%}<button type="button" aria-label="{{ forloop.index }} / {{ product.media.size }}"{% if forloop.first %} class="is-active"{% endif %}></button>{%- endfor -%}
+                </div>
+              {%- endif -%}
+
             {%- when 'ritual' -%}
               {%- if block.settings.products.size > 0 -%}
                 <div class="pd-ritual" data-pd-ritual>
@@ -366,15 +462,30 @@
       }
     });
 
-    /* Mobile slider dots */
+    /* Gallery indicators (overlay + block), next arrow, click-to-jump */
     const media = root.querySelector('[data-pd-media]');
-    const dots = root.querySelectorAll('[data-pd-dots] i');
+    const slides = [...root.querySelectorAll('.pd__hero, .pd__tile')];
+    const groups = [...root.querySelectorAll('[data-pd-dots]')];
+    const setActive = (i) => groups.forEach((g) => [...g.children].forEach((d, n) => d.classList.toggle('is-active', n === i)));
     media.addEventListener('scroll', () => {
-      const i = Math.round(media.scrollLeft / media.clientWidth);
-      dots.forEach((d, n) => d.classList.toggle('is-active', n === i));
+      if (media.scrollWidth <= media.clientWidth + 1) return;
+      setActive(Math.round(media.scrollLeft / media.clientWidth));
     }, { passive: true });
+    const nextBtn = root.querySelector('[data-pd-gnext]');
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+      const i = Math.round(media.scrollLeft / media.clientWidth);
+      media.scrollTo({ left: ((i + 1) % slides.length) * media.clientWidth, behavior: 'smooth' });
+    });
+    root.addEventListener('click', (e) => {
+      const d = e.target.closest('.pd-dots button');
+      if (!d) return;
+      const i = [...d.parentNode.children].indexOf(d);
+      if (media.scrollWidth > media.clientWidth + 1) media.scrollTo({ left: i * media.clientWidth, behavior: 'smooth' });
+      else if (slides[i]) slides[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setActive(i);
+    });
 
-    /* Variant switching */
+    /* Variant switching: re-render price / buy blocks from the server */
     const variants = JSON.parse(root.querySelector('[data-pd-variants]').textContent);
     root.addEventListener('change', async (e) => {
       if (!e.target.closest('[data-pd-option]')) return;
@@ -395,7 +506,7 @@
       } catch (err) { console.error(err); }
     });
 
-    /* Ajax add to cart */
+    /* Ajax add to cart (main button + ritual "+" buttons) */
     root.addEventListener('submit', async (e) => {
       const form = e.target.closest('form[data-pd-ajax]');
       if (!form) return;

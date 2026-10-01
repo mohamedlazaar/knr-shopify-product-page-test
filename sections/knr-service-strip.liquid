@@ -1,0 +1,136 @@
+{%- comment -%}
+  sections/service-strip.liquid
+  Reassurance strip: equal centered columns on desktop (one per block),
+  a one-at-a-time swipeable carousel with dash indicators on mobile.
+{%- endcomment -%}
+
+{{ section.settings.font | font_face: font_display: 'swap' }}
+
+{% style %}
+  #ss-{{ section.id }} {
+    --ss-font: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
+    --ss-bg: {{ section.settings.bg_color }};
+    --ss-text: {{ section.settings.text_color }};
+    --ss-cols: {{ section.blocks.size | at_least: 1 }};
+    background: var(--ss-bg);
+    color: var(--ss-text);
+    font-family: var(--ss-font);
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+    text-align: center;
+    -webkit-font-smoothing: antialiased;
+  }
+  #ss-{{ section.id }} * { box-sizing: border-box; }
+  #ss-{{ section.id }} .ss__track { display: grid; grid-template-columns: repeat(var(--ss-cols), minmax(0, 1fr)); }
+  #ss-{{ section.id }} .ss__item { padding: 0 16px; }
+  #ss-{{ section.id }} .ss__item a { color: inherit; text-decoration: none; }
+  #ss-{{ section.id }} .ss__title { margin: 0 0 24px; font-size: 13px; font-weight: 400; line-height: 1.3; text-transform: uppercase; }
+  #ss-{{ section.id }} .ss__text { margin: 0; font-size: 12px; line-height: 1.65; }
+  #ss-{{ section.id }} .ss__dots { display: none; }
+
+  @media (max-width: 989px) {
+    #ss-{{ section.id }} { padding: {{ section.settings.padding_top_mobile }}px 0 {{ section.settings.padding_bottom_mobile }}px; }
+    #ss-{{ section.id }} .ss__track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+    #ss-{{ section.id }} .ss__track::-webkit-scrollbar { display: none; }
+    #ss-{{ section.id }} .ss__item { flex: 0 0 100%; scroll-snap-align: center; padding: 0 20px; }
+    #ss-{{ section.id }} .ss__title { font-size: 14px; margin-bottom: 22px; }
+    #ss-{{ section.id }} .ss__text { font-size: 13px; }
+    #ss-{{ section.id }} .ss__text br { display: none; }
+    #ss-{{ section.id }} .ss__dots { display: flex; justify-content: center; gap: 14px; margin-top: 32px; }
+    #ss-{{ section.id }} .ss__dots button { width: 16px; height: 11px; padding: 0; border: 0; background: none; cursor: pointer; position: relative; }
+    #ss-{{ section.id }} .ss__dots button::after { content: ''; position: absolute; left: 0; right: 0; top: 5px; height: 1.5px; background: var(--ss-text); opacity: .2; transition: opacity .2s; }
+    #ss-{{ section.id }} .ss__dots button[aria-current="true"]::after { opacity: 1; }
+  }
+{% endstyle %}
+
+<section id="ss-{{ section.id }}">
+  <div class="ss__track" data-ss-track>
+    {%- for block in section.blocks -%}
+      <div class="ss__item" data-ss-item {{ block.shopify_attributes }}>
+        {%- if block.settings.url != blank -%}<a href="{{ block.settings.url }}">{%- endif -%}
+          {%- if block.settings.title != blank -%}<h3 class="ss__title">{{ block.settings.title }}</h3>{%- endif -%}
+          <p class="ss__text">{{ block.settings.text | escape | newline_to_br }}</p>
+        {%- if block.settings.url != blank -%}</a>{%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+
+  {%- if section.blocks.size > 1 -%}
+    <div class="ss__dots" data-ss-dots>
+      {%- for block in section.blocks -%}
+        <button type="button" aria-label="{{ forloop.index }} / {{ section.blocks.size }}"{% if forloop.first %} aria-current="true"{% endif %}></button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</section>
+
+<script>
+  (() => {
+    const root = document.getElementById('ss-{{ section.id }}');
+    if (!root) return;
+    const track = root.querySelector('[data-ss-track]');
+    const dots = [...root.querySelectorAll('[data-ss-dots] button')];
+    if (!dots.length) return;
+    track.addEventListener('scroll', () => {
+      const i = Math.round(track.scrollLeft / track.clientWidth);
+      dots.forEach((d, n) => { if (n === i) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current'); });
+    }, { passive: true });
+    dots.forEach((d, n) => d.addEventListener('click', () => track.scrollTo({ left: n * track.clientWidth, behavior: 'smooth' })));
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Service strip",
+  "tag": "div",
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#dcd4c1" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#000000" },
+    { "type": "font_picker", "id": "font", "label": "Font", "default": "inter_n4" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Top padding (mobile)", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Bottom padding (mobile)", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 76 }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Livraison offerte" },
+        { "type": "textarea", "id": "text", "label": "Text (new line = line break on desktop)", "default": "Livraison offerte\ndès 60 € d'achat\nen France métropolitaine." },
+        { "type": "url", "id": "url", "label": "Link (optional)" }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Service strip",
+      "blocks": [
+        { "type": "item" },
+        {
+          "type": "item",
+          "settings": {
+            "title": "Retours gratuits",
+            "text": "Retours acceptés\njusqu'à 30 jours\naprès réception."
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "title": "Paiement sécurisé",
+            "text": "Paiement 100 % sécurisé\npar carte bancaire,\nPayPal ou virement."
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "title": "Service client",
+            "text": "Du lundi au vendredi\nde 9h à 18h par email\net téléphone."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
