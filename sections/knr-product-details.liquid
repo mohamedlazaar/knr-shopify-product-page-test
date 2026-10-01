@@ -18,7 +18,6 @@
   assign delivery_date = fr_days[d_idx] | append: ' ' | append: d_num | append: ' ' | append: fr_months[m_idx]
 -%}
 
-{{ section.settings.font | font_face: font_display: 'swap' }}
 
 {% style %}
   #pd-{{ section.id }} {
