@@ -275,7 +275,7 @@
   "class": "section-header",
   "settings": [
     { "type": "header", "content": "Announcement bar" },
-    { "type": "checkbox", "id": "show_bar", "label": "Show announcement bar", "default": true },
+    { "type": "checkbox", "id": "show_bar", "label": "Show announcement", "default": true },
     { "type": "text", "id": "bar_text", "label": "Text", "default": "Livraison estimée sous 48h" },
     { "type": "text", "id": "bar_link_text", "label": "Link text", "default": "consectetur." },
     { "type": "url", "id": "bar_link_url", "label": "Link" },
@@ -283,10 +283,10 @@
     { "type": "color", "id": "bar_text_color", "label": "Text color", "default": "#ffffff" },
 
     { "type": "header", "content": "Logo" },
-    { "type": "image_picker", "id": "logo", "label": "Logo (light / white version for the transparent header)" },
-    { "type": "image_picker", "id": "logo_dark", "label": "Logo (dark version, optional)", "info": "Shown when the header is solid. If empty, the logo is turned black automatically." },
+    { "type": "image_picker", "id": "logo", "label": "Logo" },
+    { "type": "image_picker", "id": "logo_dark", "label": "Logo", "info": "Shown when the header is solid. If empty, the logo is turned black automatically." },
     { "type": "range", "id": "logo_width", "label": "Logo width", "min": 80, "max": 260, "step": 4, "unit": "px", "default": 160 },
-    { "type": "text", "id": "logo_text", "label": "Logo text (used when no image)", "default": "maison célestine" },
+    { "type": "text", "id": "logo_text", "label": "Logo text", "default": "maison célestine" },
 
     { "type": "header", "content": "Navigation" },
     { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
@@ -300,9 +300,9 @@
     { "type": "text", "id": "menu_label", "label": "Menu button label", "default": "Menu" },
 
     { "type": "header", "content": "Style" },
-    { "type": "checkbox", "id": "overlay", "label": "Transparent header over the first section", "info": "The header floats over your hero image, then turns solid on scroll. Turn off for a normal solid header.", "default": true },
-    { "type": "color", "id": "overlay_text", "label": "Text on transparent header", "default": "#ffffff" },
-    { "type": "color", "id": "solid_bg", "label": "Solid header background", "default": "#ffffff" },
+    { "type": "checkbox", "id": "overlay", "label": "Transparent header", "info": "The header floats over your hero image, then turns solid on scroll. Turn off for a normal solid header.", "default": true },
+    { "type": "color", "id": "overlay_text", "label": "Text transparent", "default": "#ffffff" },
+    { "type": "color", "id": "solid_bg", "label": "Solid header bg", "default": "#ffffff" },
     { "type": "color", "id": "solid_text", "label": "Solid header text", "default": "#000000" },
     { "type": "font_picker", "id": "font", "label": "Font", "default": "inter_n4" }
   ]
