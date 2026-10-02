@@ -7,7 +7,6 @@
   Add it to sections/header-group.json.
 {%- endcomment -%}
 
-{{ section.settings.font | font_face: font_display: 'swap' }}
 
 {%- assign bar_on = false -%}
 {%- if section.settings.show_bar and section.settings.bar_text != blank -%}{%- assign bar_on = true -%}{%- endif -%}
@@ -271,7 +270,7 @@
 
 {% schema %}
 {
-  "name": "Header",
+  "name": "KNR Header",
   "tag": "div",
   "class": "section-header",
   "settings": [
