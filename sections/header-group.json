@@ -32,6 +32,7 @@
       "block_order": [
         "announcement_iX3YUT"
       ],
+      "disabled": true,
       "name": "t:names.announcement_bar",
       "settings": {
         "speed": 5,
@@ -81,6 +82,7 @@
           "blocks": {}
         }
       },
+      "disabled": true,
       "settings": {
         "logo_position": "left",
         "menu_position": "center",
@@ -125,10 +127,39 @@
         "collection_inverse_logo": false,
         "text_color_transparent_collection": ""
       }
+    },
+    "knr_header_6ErbCV": {
+      "type": "knr-header",
+      "name": "KNR Header",
+      "settings": {
+        "show_bar": true,
+        "bar_text": "Livraison estimée sous 48h",
+        "bar_link_text": "consectetur.",
+        "bar_link_url": "",
+        "bar_bg": "#000000",
+        "bar_text_color": "#ffffff",
+        "logo_width": 160,
+        "logo_text": "maison célestine",
+        "menu": "main-menu",
+        "show_location": true,
+        "location_url": "",
+        "location_label": "Nous trouver",
+        "account_label": "Mon compte",
+        "search_label": "Rechercher",
+        "search_placeholder": "Rechercher un produit",
+        "cart_label": "Panier",
+        "menu_label": "Menu",
+        "overlay": true,
+        "overlay_text": "#ffffff",
+        "solid_bg": "#ffffff",
+        "solid_text": "#000000",
+        "font": "inter_n4"
+      }
     }
   },
   "order": [
     "header_announcements_VVbFwK",
-    "header_section"
+    "header_section",
+    "knr_header_6ErbCV"
   ]
 }
