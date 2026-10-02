@@ -17,22 +17,22 @@
         "links_QMT6gM": {
           "type": "links",
           "settings": {
-            "heading": "Découvrir",
-            "menu": ""
+            "heading": "",
+            "menu": "menu1"
           }
         },
         "links_nzKzzi": {
           "type": "links",
           "settings": {
-            "heading": "Service client",
-            "menu": ""
+            "heading": "",
+            "menu": "menu2"
           }
         },
         "links_Y3FAPw": {
           "type": "links",
           "settings": {
-            "heading": "Legal",
-            "menu": ""
+            "heading": "",
+            "menu": "menu3"
           }
         },
         "about_3RrChr": {
