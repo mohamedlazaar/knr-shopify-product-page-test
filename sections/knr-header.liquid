@@ -1,0 +1,311 @@
+{%- comment -%}
+  sections/header.liquid
+  Announcement bar + header.
+  - Desktop: logo left, menu centered, icons right (location, account, search, cart with count).
+  - Mobile: logo left, icons (location, search, cart) + burger that opens a full-screen menu.
+  - Overlay mode: the header floats transparent (white text) over the first section and turns solid once the page scrolls.
+  Add it to sections/header-group.json.
+{%- endcomment -%}
+
+{{ section.settings.font | font_face: font_display: 'swap' }}
+
+{%- assign bar_on = false -%}
+{%- if section.settings.show_bar and section.settings.bar_text != blank -%}{%- assign bar_on = true -%}{%- endif -%}
+
+{% style %}
+  #hd-{{ section.id }} {
+    --hd-font: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
+    --hd-bar-bg: {{ section.settings.bar_bg }};
+    --hd-bar-text: {{ section.settings.bar_text_color }};
+    --hd-bar-h: {% if bar_on %}32px{% else %}0px{% endif %};
+    --hd-over-text: {{ section.settings.overlay_text }};
+    --hd-solid-bg: {{ section.settings.solid_bg }};
+    --hd-solid-text: {{ section.settings.solid_text }};
+    --hd-h: 60px;
+    --hd-logo-w: {{ section.settings.logo_width }}px;
+    position: relative;
+    z-index: 100;
+    font-family: var(--hd-font);
+    -webkit-font-smoothing: antialiased;
+  }
+  #hd-{{ section.id }} *, #hd-{{ section.id }} *::before, #hd-{{ section.id }} *::after { box-sizing: border-box; }
+  #hd-{{ section.id }} a { color: inherit; text-decoration: none; }
+  #hd-{{ section.id }} button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  #hd-{{ section.id }} ul { list-style: none; margin: 0; padding: 0; }
+  #hd-{{ section.id }} :focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+  /* ---------- Announcement bar ---------- */
+  #hd-{{ section.id }} .hd__bar { height: var(--hd-bar-h); display: flex; align-items: center; justify-content: center; padding: 0 16px; background: var(--hd-bar-bg); color: var(--hd-bar-text); font-size: 13px; line-height: 1; text-align: center; white-space: nowrap; overflow: hidden; }
+  #hd-{{ section.id }} .hd__bar a { text-decoration: underline; text-underline-offset: 3px; margin-left: 4px; }
+
+  /* ---------- Header ---------- */
+  #hd-{{ section.id }} .hd { --hd-text: var(--hd-solid-text); position: sticky; top: 0; z-index: 2; background: var(--hd-solid-bg); color: var(--hd-text); transition: background-color .3s ease, color .3s ease, box-shadow .3s ease; }
+  #hd-{{ section.id }}.is-overlay .hd { --hd-text: var(--hd-over-text); position: absolute; top: var(--hd-bar-h); left: 0; right: 0; background: transparent; }
+  #hd-{{ section.id }}.is-overlay .hd.is-stuck, #hd-{{ section.id }}.is-overlay .hd.is-open { --hd-text: var(--hd-solid-text); position: fixed; top: 0; background: var(--hd-solid-bg); box-shadow: 0 1px 0 rgba(0,0,0,.06); }
+  #hd-{{ section.id }}:not(.is-overlay) .hd.is-stuck { box-shadow: 0 1px 0 rgba(0,0,0,.06); }
+  #hd-{{ section.id }} .hd { color: var(--hd-text); }
+  #hd-{{ section.id }} .hd__row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: var(--hd-h); padding: 0 24px; }
+
+  #hd-{{ section.id }} .hd__logo { justify-self: start; display: inline-flex; align-items: center; font-size: 22px; letter-spacing: -0.035em; line-height: 1; white-space: nowrap; }
+  #hd-{{ section.id }} .hd__logo img { display: block; width: var(--hd-logo-w); height: auto; }
+  #hd-{{ section.id }} .hd__logo img.is-dark { display: none; }
+  #hd-{{ section.id }} .hd.is-stuck .hd__logo img.is-light:not(:only-child), #hd-{{ section.id }} .hd.is-open .hd__logo img.is-light:not(:only-child) { display: none; }
+  #hd-{{ section.id }} .hd.is-stuck .hd__logo img.is-dark, #hd-{{ section.id }} .hd.is-open .hd__logo img.is-dark { display: block; }
+  #hd-{{ section.id }}.is-overlay .hd.is-stuck .hd__logo img.is-light:only-child, #hd-{{ section.id }}.is-overlay .hd.is-open .hd__logo img.is-light:only-child { filter: brightness(0); }
+
+  #hd-{{ section.id }} .hd__nav { justify-self: center; }
+  #hd-{{ section.id }} .hd__nav > ul { display: flex; gap: 24px; }
+  #hd-{{ section.id }} .hd__nav > ul > li { position: relative; }
+  #hd-{{ section.id }} .hd__nav a { display: block; padding: 20px 0; font-size: 13px; line-height: 1; }
+  #hd-{{ section.id }} .hd__nav a:hover { opacity: .65; }
+  #hd-{{ section.id }} .hd__sub { position: absolute; left: -16px; top: calc(100% - 8px); min-width: 200px; padding: 12px 16px; background: var(--hd-solid-bg); color: var(--hd-solid-text); opacity: 0; visibility: hidden; transform: translateY(4px); transition: opacity .2s, transform .2s, visibility .2s; box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+  #hd-{{ section.id }} .hd__nav li:hover > .hd__sub, #hd-{{ section.id }} .hd__nav li:focus-within > .hd__sub { opacity: 1; visibility: visible; transform: none; }
+  #hd-{{ section.id }} .hd__sub a { padding: 8px 0; white-space: nowrap; }
+
+  #hd-{{ section.id }} .hd__icons { justify-self: end; display: flex; align-items: center; }
+  #hd-{{ section.id }} .hd__icon { position: relative; display: grid; place-items: center; width: 28px; height: 28px; }
+  #hd-{{ section.id }} .hd__icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  #hd-{{ section.id }} .hd__icon:hover { opacity: .65; }
+  #hd-{{ section.id }} .hd__badge { position: absolute; top: -1px; right: -2px; min-width: 14px; height: 14px; padding: 0 3px; border-radius: 7px; background: var(--hd-solid-bg); color: var(--hd-solid-text); font-size: 9px; font-weight: 500; line-height: 14px; text-align: center; }
+  #hd-{{ section.id }} .hd.is-stuck .hd__badge, #hd-{{ section.id }} .hd.is-open .hd__badge, #hd-{{ section.id }}:not(.is-overlay) .hd__badge { background: var(--hd-solid-text); color: var(--hd-solid-bg); }
+  #hd-{{ section.id }} .hd__badge[hidden] { display: none; }
+  #hd-{{ section.id }} .hd__burger { display: none; }
+
+  /* ---------- Search panel ---------- */
+  #hd-{{ section.id }} .hd__search { position: absolute; left: 0; right: 0; top: 100%; padding: 18px 24px 22px; background: var(--hd-solid-bg); color: var(--hd-solid-text); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+  #hd-{{ section.id }} .hd__search[hidden] { display: none; }
+  #hd-{{ section.id }} .hd__search form { display: flex; align-items: center; gap: 12px; max-width: 720px; margin: 0 auto; border-bottom: 1px solid currentColor; }
+  #hd-{{ section.id }} .hd__search input { flex: 1; min-width: 0; height: 44px; padding: 0; border: 0; background: transparent; font: inherit; font-size: 16px; color: inherit; outline: 0; }
+  #hd-{{ section.id }} .hd__search input::placeholder { color: inherit; opacity: .5; }
+
+  /* ---------- Mobile drawer ---------- */
+  #hd-{{ section.id }} .hd__drawer { position: fixed; inset: 0; z-index: 1; padding: calc(var(--hd-h) + 28px) 24px 32px; background: var(--hd-solid-bg); color: var(--hd-solid-text); overflow-y: auto; }
+  #hd-{{ section.id }} .hd__drawer[hidden] { display: none; }
+  #hd-{{ section.id }} .hd__dlist > li { border-top: 1px solid rgba(0,0,0,.1); }
+  #hd-{{ section.id }} .hd__dlist > li:last-child { border-bottom: 1px solid rgba(0,0,0,.1); }
+  #hd-{{ section.id }} .hd__dlink { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 18px 0; font-size: 22px; line-height: 1.2; text-align: left; }
+  #hd-{{ section.id }} .hd__dlink svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s; }
+  #hd-{{ section.id }} .hd__dlink[aria-expanded="true"] svg { transform: rotate(180deg); }
+  #hd-{{ section.id }} .hd__dsub { display: none; padding: 0 0 14px; }
+  #hd-{{ section.id }} .hd__dsub.is-open { display: block; }
+  #hd-{{ section.id }} .hd__dsub a { display: block; padding: 8px 0; font-size: 15px; opacity: .75; }
+  #hd-{{ section.id }} .hd__dmeta { display: grid; gap: 14px; margin-top: 28px; font-size: 14px; }
+
+  @media (max-width: 989px) {
+    #hd-{{ section.id }} { --hd-h: 58px; }
+    #hd-{{ section.id }} .hd__bar { font-size: 12px; }
+    #hd-{{ section.id }} .hd__row { grid-template-columns: 1fr auto; padding: 0 20px 0 24px; }
+    #hd-{{ section.id }} .hd__nav, #hd-{{ section.id }} .hd__icon--account { display: none; }
+    #hd-{{ section.id }} .hd__logo { font-size: 20px; }
+    #hd-{{ section.id }} .hd__logo img { width: calc(var(--hd-logo-w) * .82); }
+    #hd-{{ section.id }} .hd__icon { width: 32px; height: 32px; }
+    #hd-{{ section.id }} .hd__burger { display: grid; }
+    #hd-{{ section.id }} .hd__search { padding: 14px 20px 18px; }
+  }
+{% endstyle %}
+
+<header id="hd-{{ section.id }}"{% if section.settings.overlay %} class="is-overlay"{% endif %} data-hd data-overlay="{{ section.settings.overlay }}" data-bar-h="{% if bar_on %}32{% else %}0{% endif %}">
+  {%- if bar_on -%}
+    <div class="hd__bar">
+      <span>{{ section.settings.bar_text }}</span>
+      {%- if section.settings.bar_link_text != blank -%}<a href="{{ section.settings.bar_link_url | default: '#' }}">{{ section.settings.bar_link_text }}</a>{%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="hd" data-hd-main>
+    <div class="hd__row">
+      <a class="hd__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
+        {%- if section.settings.logo != blank -%}
+          {{ section.settings.logo | image_url: width: 600 | image_tag: class: 'is-light', widths: '200, 300, 400, 600', sizes: '200px', alt: shop.name }}
+          {%- if section.settings.logo_dark != blank -%}
+            {{ section.settings.logo_dark | image_url: width: 600 | image_tag: class: 'is-dark', widths: '200, 300, 400, 600', sizes: '200px', alt: shop.name }}
+          {%- endif -%}
+        {%- else -%}
+          {{ section.settings.logo_text | default: shop.name }}
+        {%- endif -%}
+      </a>
+
+      <nav class="hd__nav" aria-label="{{ section.settings.menu.title | escape }}">
+        <ul>
+          {%- for link in section.settings.menu.links -%}
+            <li>
+              <a href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title }}</a>
+              {%- if link.links.size > 0 -%}
+                <ul class="hd__sub">
+                  {%- for child in link.links -%}<li><a href="{{ child.url }}">{{ child.title }}</a></li>{%- endfor -%}
+                </ul>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+
+      <div class="hd__icons">
+        {%- if section.settings.show_location -%}
+          <a class="hd__icon" href="{{ section.settings.location_url | default: '#' }}" aria-label="{{ section.settings.location_label | escape }}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.5s-6.8-5.8-6.8-11.3a6.8 6.8 0 1 1 13.6 0c0 5.5-6.8 11.3-6.8 11.3z"/><circle cx="12" cy="10.2" r="2.4"/></svg>
+          </a>
+        {%- endif -%}
+        {%- if shop.customer_accounts_enabled -%}
+          <a class="hd__icon hd__icon--account" href="{{ routes.account_url }}" aria-label="{{ section.settings.account_label | escape }}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.7"/><path d="M4.6 20.5c.8-4 3.6-6.2 7.4-6.2s6.6 2.2 7.4 6.2"/></svg>
+          </a>
+        {%- endif -%}
+        <button type="button" class="hd__icon" data-hd-search aria-expanded="false" aria-label="{{ section.settings.search_label | escape }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6"/><path d="M15.8 15.8l5 5"/></svg>
+        </button>
+        <a class="hd__icon" href="{{ routes.cart_url }}" aria-label="{{ section.settings.cart_label | escape }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.2 8h13.6l-.9 12.5H6.1L5.2 8z"/><path d="M9 8V6.6a3 3 0 0 1 6 0V8"/></svg>
+          <span class="hd__badge" data-hd-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+        </a>
+        <button type="button" class="hd__icon hd__burger" data-hd-burger aria-expanded="false" aria-controls="hd-drawer-{{ section.id }}" aria-label="{{ section.settings.menu_label | escape }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" data-hd-burger-icon><path d="M3.5 9h17M3.5 15h17"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="hd__search" data-hd-search-panel hidden>
+      <form action="{{ routes.search_url }}" method="get" role="search">
+        <input type="search" name="q" placeholder="{{ section.settings.search_placeholder | escape }}" aria-label="{{ section.settings.search_label | escape }}" autocomplete="off">
+        <input type="hidden" name="type" value="product">
+        <button type="submit" class="hd__icon" aria-label="{{ section.settings.search_label | escape }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6"/><path d="M15.8 15.8l5 5"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="hd__drawer" id="hd-drawer-{{ section.id }}" data-hd-drawer hidden>
+    <ul class="hd__dlist">
+      {%- for link in section.settings.menu.links -%}
+        <li>
+          {%- if link.links.size > 0 -%}
+            <button type="button" class="hd__dlink" data-hd-toggle aria-expanded="false">
+              <span>{{ link.title }}</span>
+              <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4.2l4 4 4-4"/></svg>
+            </button>
+            <ul class="hd__dsub">
+              <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {%- for child in link.links -%}<li><a href="{{ child.url }}">{{ child.title }}</a></li>{%- endfor -%}
+            </ul>
+          {%- else -%}
+            <a class="hd__dlink" href="{{ link.url }}"><span>{{ link.title }}</span></a>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+    <div class="hd__dmeta">
+      {%- if shop.customer_accounts_enabled -%}<a href="{{ routes.account_url }}">{{ section.settings.account_label }}</a>{%- endif -%}
+      {%- if section.settings.show_location -%}<a href="{{ section.settings.location_url | default: '#' }}">{{ section.settings.location_label }}</a>{%- endif -%}
+    </div>
+  </div>
+</header>
+
+<script>
+  (() => {
+    const root = document.getElementById('hd-{{ section.id }}');
+    if (!root) return;
+    const main = root.querySelector('[data-hd-main]');
+    const barH = parseInt(root.dataset.barH, 10) || 0;
+
+    /* Header turns solid once the page scrolls */
+    const onScroll = () => {
+      const y = Math.max(window.pageYOffset || 0, document.documentElement.scrollTop || 0);
+      main.classList.toggle('is-stuck', y > (root.dataset.overlay === 'true' ? 4 : barH));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    /* Search panel */
+    const sBtn = root.querySelector('[data-hd-search]');
+    const sPanel = root.querySelector('[data-hd-search-panel]');
+    const setSearch = (open) => {
+      sPanel.hidden = !open;
+      sBtn.setAttribute('aria-expanded', String(open));
+      main.classList.toggle('is-open', open);
+      if (open) sPanel.querySelector('input[type="search"]').focus();
+    };
+    sBtn.addEventListener('click', () => setSearch(sPanel.hidden));
+
+    /* Mobile drawer */
+    const burger = root.querySelector('[data-hd-burger]');
+    const drawer = root.querySelector('[data-hd-drawer]');
+    const icon = root.querySelector('[data-hd-burger-icon]');
+    const BURGER = 'M3.5 9h17M3.5 15h17';
+    const CLOSE = 'M5 5l14 14M19 5L5 19';
+    const setDrawer = (open) => {
+      drawer.hidden = !open;
+      burger.setAttribute('aria-expanded', String(open));
+      main.classList.toggle('is-open', open);
+      icon.firstElementChild.setAttribute('d', open ? CLOSE : BURGER);
+      document.documentElement.style.overflow = open ? 'hidden' : '';
+      if (open) setSearch(false);
+    };
+    burger.addEventListener('click', () => setDrawer(drawer.hidden));
+    root.querySelectorAll('[data-hd-toggle]').forEach((b) => b.addEventListener('click', () => {
+      const open = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', String(open));
+      b.nextElementSibling.classList.toggle('is-open', open);
+    }));
+    window.matchMedia('(min-width: 990px)').addEventListener('change', (e) => { if (e.matches && !drawer.hidden) setDrawer(false); });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (!sPanel.hidden) setSearch(false);
+      if (!drawer.hidden) setDrawer(false);
+    });
+
+    /* Cart count: refresh after an ajax add to cart (event fired by the product sections) */
+    const badge = root.querySelector('[data-hd-count]');
+    const refreshCount = async () => {
+      try {
+        const base = (window.Shopify && Shopify.routes && Shopify.routes.root) || '/';
+        const cart = await (await fetch(base + 'cart.js', { headers: { Accept: 'application/json' } })).json();
+        badge.textContent = cart.item_count;
+        badge.hidden = cart.item_count === 0;
+      } catch (err) { console.error(err); }
+    };
+    document.addEventListener('cart:refresh', refreshCount);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Header",
+  "tag": "div",
+  "class": "section-header",
+  "settings": [
+    { "type": "header", "content": "Announcement bar" },
+    { "type": "checkbox", "id": "show_bar", "label": "Show announcement bar", "default": true },
+    { "type": "text", "id": "bar_text", "label": "Text", "default": "Livraison estimée sous 48h" },
+    { "type": "text", "id": "bar_link_text", "label": "Link text", "default": "consectetur." },
+    { "type": "url", "id": "bar_link_url", "label": "Link" },
+    { "type": "color", "id": "bar_bg", "label": "Background", "default": "#000000" },
+    { "type": "color", "id": "bar_text_color", "label": "Text color", "default": "#ffffff" },
+
+    { "type": "header", "content": "Logo" },
+    { "type": "image_picker", "id": "logo", "label": "Logo (light / white version for the transparent header)" },
+    { "type": "image_picker", "id": "logo_dark", "label": "Logo (dark version, optional)", "info": "Shown when the header is solid. If empty, the logo is turned black automatically." },
+    { "type": "range", "id": "logo_width", "label": "Logo width", "min": 80, "max": 260, "step": 4, "unit": "px", "default": 160 },
+    { "type": "text", "id": "logo_text", "label": "Logo text (used when no image)", "default": "maison célestine" },
+
+    { "type": "header", "content": "Navigation" },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    { "type": "checkbox", "id": "show_location", "label": "Show location icon", "default": true },
+    { "type": "url", "id": "location_url", "label": "Location link" },
+    { "type": "text", "id": "location_label", "label": "Location label", "default": "Nous trouver" },
+    { "type": "text", "id": "account_label", "label": "Account label", "default": "Mon compte" },
+    { "type": "text", "id": "search_label", "label": "Search label", "default": "Rechercher" },
+    { "type": "text", "id": "search_placeholder", "label": "Search placeholder", "default": "Rechercher un produit" },
+    { "type": "text", "id": "cart_label", "label": "Cart label", "default": "Panier" },
+    { "type": "text", "id": "menu_label", "label": "Menu button label", "default": "Menu" },
+
+    { "type": "header", "content": "Style" },
+    { "type": "checkbox", "id": "overlay", "label": "Transparent header over the first section", "info": "The header floats over your hero image, then turns solid on scroll. Turn off for a normal solid header.", "default": true },
+    { "type": "color", "id": "overlay_text", "label": "Text on transparent header", "default": "#ffffff" },
+    { "type": "color", "id": "solid_bg", "label": "Solid header background", "default": "#ffffff" },
+    { "type": "color", "id": "solid_text", "label": "Solid header text", "default": "#000000" },
+    { "type": "font_picker", "id": "font", "label": "Font", "default": "inter_n4" }
+  ]
+}
+{% endschema %}
