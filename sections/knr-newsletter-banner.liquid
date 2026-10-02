@@ -57,7 +57,8 @@
   <div class="nl">
     <div class="nl__media">
       {%- if section.settings.image != blank -%}
-        {{ section.settings.image | image_url: width: 1600 | image_tag: loading: 'lazy', widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 50vw, 100vw', alt: section.settings.heading | strip_html | escape }}
+        {%- assign image_alt = section.settings.heading | default: section.settings.heading_mobile | default: shop.name | strip_html | escape -%}
+        {{ section.settings.image | image_url: width: 1600 | image_tag: loading: 'lazy', widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 50vw, 100vw', alt: image_alt }}
       {%- else -%}
         {{ 'lifestyle-1' | placeholder_svg_tag }}
       {%- endif -%}
